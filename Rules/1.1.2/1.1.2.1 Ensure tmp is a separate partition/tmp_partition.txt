@@ -1,0 +1,4 @@
+The /tmp directory is a world-writable directory used for temporary file storage. Ensure it has its own partition or logical volume at installation time, or migrate it using LVM.
+
+Rationale:
+Making /tmp its own file system allows an administrator to set the noexec option on the mount, making /tmp useless for an attacker to install executable code. It would also prevent an attacker from establishing a hardlink to a system setuid program and wait for it to be updated. When this occurs the attacker would then have a setuid program that was specifically modified by the attacker.
