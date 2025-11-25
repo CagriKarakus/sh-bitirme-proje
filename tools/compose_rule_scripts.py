@@ -58,17 +58,7 @@ def read_file(path: Path) -> str:
 
 
 def build_rule_block(entry: Dict[str, str], index: int, total: int) -> str:
-    """Render one rule block with an inert audit transcript and runnable remediation."""
-
     label = f"{entry['id']} {entry['title']}"
-    audit_block = "\n".join(
-        [
-            f": <<'__AUDIT_{index}__'  # Audit transcript (not executed)",
-            read_file(Path(entry["audit"])).rstrip("\n"),
-            f"__AUDIT_{index}__",
-        ]
-    )
-
     lines = [
         "###############################################################################",
         f"# BEGIN fix ({index} / {total}) for '{label}'",
@@ -76,7 +66,7 @@ def build_rule_block(entry: Dict[str, str], index: int, total: int) -> str:
         f"(>&2 echo \"Remediating rule {index}/{total}: '{label}'\")",
         "",
         "# --- Audit ---",
-        audit_block,
+        read_file(Path(entry["audit"])),
         "# --- Remediation ---",
         read_file(Path(entry["remediation"])),
         f"# END fix for '{label}'",

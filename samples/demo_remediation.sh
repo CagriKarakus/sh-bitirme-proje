@@ -4,7 +4,7 @@
 # Generated remediation bundle
 #
 # Source registry : rules/index.json
-# Generated on    : 2025-11-25 11:22:46 UTC
+# Generated on    : 2025-11-25 11:10:04 UTC
 # Rule count      : 3
 #
 # This script concatenates audit and remediation content for selected rules.
@@ -18,7 +18,6 @@
 (>&2 echo "Remediating rule 1/3: '1.1.3.1 Ensure var is a separate partition'")
 
 # --- Audit ---
-: <<'__AUDIT_1__'  # Audit transcript (not executed)
 #!/bin/bash
 if mountpoint -q /var; then
     echo "/var is a separate partition"
@@ -27,7 +26,7 @@ else
     echo "/var is NOT a separate partition"
     exit 1
 fi
-__AUDIT_1__
+
 # --- Remediation ---
 #!/bin/bash
 echo "Manual intervention required: Create a separate partition for /var"
@@ -40,7 +39,6 @@ echo "Manual intervention required: Create a separate partition for /var"
 (>&2 echo "Remediating rule 2/3: '1.1.3.2 Ensure nodev option set on var partition'")
 
 # --- Audit ---
-: <<'__AUDIT_2__'  # Audit transcript (not executed)
 #!/bin/bash
 if mount | grep " on /var " | grep -q "nodev"; then
     echo "nodev is set on /var"
@@ -49,7 +47,7 @@ else
     echo "nodev is NOT set on /var"
     exit 1
 fi
-__AUDIT_2__
+
 # --- Remediation ---
 #!/bin/bash
 mount -o remount,nodev /var
@@ -62,7 +60,6 @@ mount -o remount,nodev /var
 (>&2 echo "Remediating rule 3/3: '1.1.3.3 Ensure nosuid option set on var partition'")
 
 # --- Audit ---
-: <<'__AUDIT_3__'  # Audit transcript (not executed)
 #!/bin/bash
 if mount | grep " on /var " | grep -q "nosuid"; then
     echo "nosuid is set on /var"
@@ -71,7 +68,7 @@ else
     echo "nosuid is NOT set on /var"
     exit 1
 fi
-__AUDIT_3__
+
 # --- Remediation ---
 #!/bin/bash
 mount -o remount,nosuid /var
