@@ -1,919 +1,1010 @@
 [
   {
-    "id": "1.1.3.1",
-    "title": "Ensure var is a separate partition",
+    "id": "1.1.1.1",
+    "title": "1.1.1.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.3 Configure var/1.1.3.1 Ensure var is a separate partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.3 Configure var/1.1.3.1 Ensure var is a separate partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.1/cramfs_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.1/cramfs_remediation.sh"
   },
   {
-    "id": "1.1.3.2",
-    "title": "Ensure nodev option set on var partition",
+    "id": "1.1.1.2",
+    "title": "1.1.1.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.3 Configure var/1.1.3.2 Ensure nodev option set on var partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.3 Configure var/1.1.3.2 Ensure nodev option set on var partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.2/freevxfs_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.2/freevxfs_remediation.sh"
   },
   {
-    "id": "1.1.3.3",
-    "title": "Ensure nosuid option set on var partition",
+    "id": "1.1.1.3",
+    "title": "1.1.1.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.3 Configure var/1.1.3.3 Ensure nosuid option set on var partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.3 Configure var/1.1.3.3 Ensure nosuid option set on var partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.3/hfs_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.3/hfs_remediation.sh"
   },
   {
-    "id": "1.1.4.1",
-    "title": "Ensure var tmp is a separate partition",
+    "id": "1.1.1.4",
+    "title": "1.1.1.4",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.1 Ensure var tmp is a separate partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.1 Ensure var tmp is a separate partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.4/hfsplus_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.4/hfsplus_remediation.sh"
   },
   {
-    "id": "1.1.4.2",
-    "title": "Ensure nodev option set on var tmp partition",
+    "id": "1.1.1.5",
+    "title": "1.1.1.5",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.2 Ensure nodev option set on var tmp partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.2 Ensure nodev option set on var tmp partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.5/jffs2_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.5/jffs2_remediation.sh"
   },
   {
-    "id": "1.1.4.3",
-    "title": "Ensure nosuid option set on var tmp partition",
+    "id": "1.1.1.6",
+    "title": "1.1.1.6",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.3 Ensure nosuid option set on var tmp partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.3 Ensure nosuid option set on var tmp partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.6/overalyfs_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.6/overlayfs_remediation.sh"
   },
   {
-    "id": "1.1.4.4",
-    "title": "Ensure noexec option set on var tmp partition",
+    "id": "1.1.1.7",
+    "title": "1.1.1.7",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.4 Ensure noexec option set on var tmp partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.4 Configure var tmp/1.1.4.4 Ensure noexec option set on var tmp partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.7/squasfs_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.7/squashfs_remediation.sh"
   },
   {
-    "id": "1.1.5.1",
-    "title": "Ensure var log is a separate partition",
+    "id": "1.1.1.8",
+    "title": "1.1.1.8",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.1 Ensure var log is a separate partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.1 Ensure var log is a separate partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.8/udf_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.8/udf_remediation.sh"
   },
   {
-    "id": "1.1.5.2",
-    "title": "Ensure nodev option set on var log partition",
+    "id": "1.1.1.9",
+    "title": "1.1.1.9",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.2 Ensure nodev option set on var log partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.2 Ensure nodev option set on var log partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.9/usb-storage_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.1/1.1.1.9/usb-storage_remediation.sh"
   },
   {
-    "id": "1.1.5.3",
-    "title": "Ensure nosuid option set on var log partition",
+    "id": "1.1.2.1.1",
+    "title": "1.1.2.1.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.3 Ensure nosuid option set on var log partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.3 Ensure nosuid option set on var log partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.1/tmp_partition_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.1/tmp_partition_remediation.sh"
   },
   {
-    "id": "1.1.5.4",
-    "title": "Ensure noexec option set on var log partition",
+    "id": "1.1.2.1.2",
+    "title": "1.1.2.1.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.4 Ensure noexec option set on var log partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.5 Configure var log/1.1.5.4 Ensure noexec option set on var log partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.2/tmp_nodev_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.2/tmp_nodev_remediation.sh"
   },
   {
-    "id": "1.1.6.1",
-    "title": "Ensure var log audit is a separate partition",
+    "id": "1.1.2.1.3",
+    "title": "1.1.2.1.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.1 Ensure var log audit is a separate partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.1 Ensure var log audit is a separate partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.3/tmp_noexec_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.3/tmp_noexec_remediation.sh"
   },
   {
-    "id": "1.1.6.2",
-    "title": "Ensure nodev option set on var log audit partition",
+    "id": "1.1.2.1.4",
+    "title": "1.1.2.1.4",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.2 Ensure nodev option set on var log audit partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.2 Ensure nodev option set on var log audit partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.4/tmp_nosuid_audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.1/1.1.2.1.4/tmp_nosuid_remediation.sh"
   },
   {
-    "id": "1.1.6.3",
-    "title": "Ensure nosuid option set on var log audit partition",
+    "id": "1.1.2.2.1",
+    "title": "1.1.2.2.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.3 Ensure nosuid option set on var log audit partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.3 Ensure nosuid option set on var log audit partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.1/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.1/remediation.sh"
   },
   {
-    "id": "1.1.6.4",
-    "title": "Ensure noexec option set on var log audit partition",
+    "id": "1.1.2.2.2",
+    "title": "1.1.2.2.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.4 Ensure noexec option set on var log audit partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.6 Configure var log audit/1.1.6.4 Ensure noexec option set on var log audit partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.2/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.2/remediation.sh"
   },
   {
-    "id": "1.1.7.1",
-    "title": "Ensure home is a separate partition",
+    "id": "1.1.2.2.3",
+    "title": "1.1.2.2.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.7 Configure home/1.1.7.1 Ensure home is a separate partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.7 Configure home/1.1.7.1 Ensure home is a separate partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.3/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.3/remediation.sh"
   },
   {
-    "id": "1.1.7.2",
-    "title": "Ensure nodev option set on home partition",
+    "id": "1.1.2.2.4",
+    "title": "1.1.2.2.4",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.7 Configure home/1.1.7.2 Ensure nodev option set on home partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.7 Configure home/1.1.7.2 Ensure nodev option set on home partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.4/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.2/1.1.2.2.4/remediation.sh"
   },
   {
-    "id": "1.1.7.3",
-    "title": "Ensure nosuid option set on home partition",
+    "id": "1.1.2.3.1",
+    "title": "1.1.2.3.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.7 Configure home/1.1.7.3 Ensure nosuid option set on home partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.7 Configure home/1.1.7.3 Ensure nosuid option set on home partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.3/1.1.2.3.1/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.3/1.1.2.3.1/remediation.sh"
   },
   {
-    "id": "1.1.8.1",
-    "title": "Ensure dev shm is a separate partition",
+    "id": "1.1.2.3.2",
+    "title": "1.1.2.3.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.1 Ensure dev shm is a separate partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.1 Ensure dev shm is a separate partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.3/1.1.2.3.2/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.3/1.1.2.3.2/remediation.sh"
   },
   {
-    "id": "1.1.8.2",
-    "title": "Ensure nodev option set on dev shm partition",
+    "id": "1.1.2.3.3",
+    "title": "1.1.2.3.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.2 Ensure nodev option set on dev shm partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.2 Ensure nodev option set on dev shm partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.3/1.1.2.3.3/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.3/1.1.2.3.3/remediation.sh"
   },
   {
-    "id": "1.1.8.3",
-    "title": "Ensure nosuid option set on dev shm partition",
+    "id": "1.1.2.4.1",
+    "title": "1.1.2.4.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.3 Ensure nosuid option set on dev shm partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.3 Ensure nosuid option set on dev shm partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.4/1.1.2.4.1/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.4/1.1.2.4.1/remediation.sh"
   },
   {
-    "id": "1.1.8.4",
-    "title": "Ensure noexec option set on dev shm partition",
+    "id": "1.1.2.4.2",
+    "title": "1.1.2.4.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.4 Ensure noexec option set on dev shm partition/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.1 Filesystem/1.1.8 Configure dev shm/1.1.8.4 Ensure noexec option set on dev shm partition/remediation.sh"
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.4/1.1.2.4.2/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.4/1.1.2.4.2/remediation.sh"
+  },
+  {
+    "id": "1.1.2.4.3",
+    "title": "1.1.2.4.3",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.4/1.1.2.4.3/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.4/1.1.2.4.3/remediation.sh"
+  },
+  {
+    "id": "1.1.2.5.1",
+    "title": "1.1.2.5.1",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.1/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.1/remediation.sh"
+  },
+  {
+    "id": "1.1.2.5.2",
+    "title": "1.1.2.5.2",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.2/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.2/remediation.sh"
+  },
+  {
+    "id": "1.1.2.5.3",
+    "title": "1.1.2.5.3",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.3/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.3/remediation.sh"
+  },
+  {
+    "id": "1.1.2.5.4",
+    "title": "1.1.2.5.4",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.4/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.5/1.1.2.5.4/remediation.sh"
+  },
+  {
+    "id": "1.1.2.6.1",
+    "title": "1.1.2.6.1",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.1/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.1/remediation.sh"
+  },
+  {
+    "id": "1.1.2.6.2",
+    "title": "1.1.2.6.2",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.2/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.2/remediation.sh"
+  },
+  {
+    "id": "1.1.2.6.3",
+    "title": "1.1.2.6.3",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.3/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.3/remediation.sh"
+  },
+  {
+    "id": "1.1.2.6.4",
+    "title": "1.1.2.6.4",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.4/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.6/1.1.2.6.4/remediation.sh"
+  },
+  {
+    "id": "1.1.2.7.1",
+    "title": "1.1.2.7.1",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.1/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.1/remediation.sh"
+  },
+  {
+    "id": "1.1.2.7.2",
+    "title": "1.1.2.7.2",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.2/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.2/remediation.sh"
+  },
+  {
+    "id": "1.1.2.7.3",
+    "title": "1.1.2.7.3",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.3/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.3/remediation.sh"
+  },
+  {
+    "id": "1.1.2.7.4",
+    "title": "1.1.2.7.4",
+    "section": "Section 1 Initial Setup",
+    "audit": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.4/audit.sh",
+    "remediation": "Rules/S1/1.1 Filesystem/1.1.2/1.1.2.7/1.1.2.7.4/remediation.sh"
   },
   {
     "id": "1.2.1",
-    "title": "Ensure prelink is not installed",
+    "title": "1.2.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.2 Configure Software Updates/1.2.1 Ensure prelink is not installed/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.2 Configure Software Updates/1.2.1 Ensure prelink is not installed/remediation.sh"
+    "audit": "Rules/S1/1.2 Configure Software Updates/1.2.1/audit.sh",
+    "remediation": "Rules/S1/1.2 Configure Software Updates/1.2.1/remediation.sh"
   },
   {
     "id": "1.3.1",
-    "title": "Ensure sudo is installed",
+    "title": "1.3.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.3 Configure sudo/1.3.1 Ensure sudo is installed/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.3 Configure sudo/1.3.1 Ensure sudo is installed/remediation.sh"
+    "audit": "Rules/S1/1.3 Configure sudo/1.3.1/audit.sh",
+    "remediation": "Rules/S1/1.3 Configure sudo/1.3.1/remediation.sh"
   },
   {
     "id": "1.3.2",
-    "title": "Ensure sudo commands use pty",
+    "title": "1.3.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.3 Configure sudo/1.3.2 Ensure sudo commands use pty/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.3 Configure sudo/1.3.2 Ensure sudo commands use pty/remediation.sh"
+    "audit": "Rules/S1/1.3 Configure sudo/1.3.2/audit.sh",
+    "remediation": "Rules/S1/1.3 Configure sudo/1.3.2/remediation.sh"
   },
   {
     "id": "1.3.3",
-    "title": "Ensure sudo log file exists",
+    "title": "1.3.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.3 Configure sudo/1.3.3 Ensure sudo log file exists/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.3 Configure sudo/1.3.3 Ensure sudo log file exists/remediation.sh"
+    "audit": "Rules/S1/1.3 Configure sudo/1.3.3/audit.sh",
+    "remediation": "Rules/S1/1.3 Configure sudo/1.3.3/remediation.sh"
   },
   {
     "id": "1.4.1",
-    "title": "Ensure AIDE is installed",
+    "title": "1.4.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.4 Filesystem Integrity Checking/1.4.1 Ensure AIDE is installed/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.4 Filesystem Integrity Checking/1.4.1 Ensure AIDE is installed/remediation.sh"
+    "audit": "Rules/S1/1.4 Filesystem Integrity Checking/1.4.1/audit.sh",
+    "remediation": "Rules/S1/1.4 Filesystem Integrity Checking/1.4.1/remediation.sh"
   },
   {
     "id": "1.4.2",
-    "title": "Ensure filesystem integrity is regularly checked",
+    "title": "1.4.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.4 Filesystem Integrity Checking/1.4.2 Ensure filesystem integrity is regularly checked/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.4 Filesystem Integrity Checking/1.4.2 Ensure filesystem integrity is regularly checked/remediation.sh"
+    "audit": "Rules/S1/1.4 Filesystem Integrity Checking/1.4.2/audit.sh",
+    "remediation": "Rules/S1/1.4 Filesystem Integrity Checking/1.4.2/remediation.sh"
   },
   {
     "id": "1.5.1",
-    "title": "Ensure bootloader password is set",
+    "title": "1.5.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.5 Secure Boot Settings/1.5.1 Ensure bootloader password is set/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.5 Secure Boot Settings/1.5.1 Ensure bootloader password is set/remediation.sh"
+    "audit": "Rules/S1/1.5 Secure Boot Settings/1.5.1/audit.sh",
+    "remediation": "Rules/S1/1.5 Secure Boot Settings/1.5.1/remediation.sh"
   },
   {
     "id": "1.5.2",
-    "title": "Ensure permissions on bootloader config are configured",
+    "title": "1.5.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.5 Secure Boot Settings/1.5.2 Ensure permissions on bootloader config are configured/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.5 Secure Boot Settings/1.5.2 Ensure permissions on bootloader config are configured/remediation.sh"
+    "audit": "Rules/S1/1.5 Secure Boot Settings/1.5.2/audit.sh",
+    "remediation": "Rules/S1/1.5 Secure Boot Settings/1.5.2/remediation.sh"
   },
   {
     "id": "1.6.1",
-    "title": "Ensure AppArmor is installed",
+    "title": "1.6.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.6 Mandatory Access Control/1.6.1 Ensure AppArmor is installed/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.6 Mandatory Access Control/1.6.1 Ensure AppArmor is installed/remediation.sh"
+    "audit": "Rules/S1/1.6 Mandatory Access Control/1.6.1/audit.sh",
+    "remediation": "Rules/S1/1.6 Mandatory Access Control/1.6.1/remediation.sh"
   },
   {
     "id": "1.6.2",
-    "title": "Ensure AppArmor is enabled in bootloader",
+    "title": "1.6.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.6 Mandatory Access Control/1.6.2 Ensure AppArmor is enabled in bootloader/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.6 Mandatory Access Control/1.6.2 Ensure AppArmor is enabled in bootloader/remediation.sh"
+    "audit": "Rules/S1/1.6 Mandatory Access Control/1.6.2/audit.sh",
+    "remediation": "Rules/S1/1.6 Mandatory Access Control/1.6.2/remediation.sh"
   },
   {
     "id": "1.6.3",
-    "title": "Ensure all AppArmor profiles are in enforce or complain mode",
+    "title": "1.6.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.6 Mandatory Access Control/1.6.3 Ensure all AppArmor profiles are in enforce or complain mode/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.6 Mandatory Access Control/1.6.3 Ensure all AppArmor profiles are in enforce or complain mode/remediation.sh"
+    "audit": "Rules/S1/1.6 Mandatory Access Control/1.6.3/audit.sh",
+    "remediation": "Rules/S1/1.6 Mandatory Access Control/1.6.3/remediation.sh"
   },
   {
     "id": "1.7.1",
-    "title": "Ensure message of the day is configured properly",
+    "title": "1.7.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.1 Ensure message of the day is configured properly/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.1 Ensure message of the day is configured properly/remediation.sh"
+    "audit": "Rules/S1/1.7 Warning Banners/1.7.1/audit.sh",
+    "remediation": "Rules/S1/1.7 Warning Banners/1.7.1/remediation.sh"
   },
   {
     "id": "1.7.2",
-    "title": "Ensure local login warning banner is configured properly",
+    "title": "1.7.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.2 Ensure local login warning banner is configured properly/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.2 Ensure local login warning banner is configured properly/remediation.sh"
+    "audit": "Rules/S1/1.7 Warning Banners/1.7.2/audit.sh",
+    "remediation": "Rules/S1/1.7 Warning Banners/1.7.2/remediation.sh"
   },
   {
     "id": "1.7.3",
-    "title": "Ensure remote login warning banner is configured properly",
+    "title": "1.7.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.3 Ensure remote login warning banner is configured properly/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.3 Ensure remote login warning banner is configured properly/remediation.sh"
+    "audit": "Rules/S1/1.7 Warning Banners/1.7.3/audit.sh",
+    "remediation": "Rules/S1/1.7 Warning Banners/1.7.3/remediation.sh"
   },
   {
     "id": "1.7.4",
-    "title": "Ensure permissions on etc motd are configured",
+    "title": "1.7.4",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.4 Ensure permissions on etc motd are configured/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.4 Ensure permissions on etc motd are configured/remediation.sh"
+    "audit": "Rules/S1/1.7 Warning Banners/1.7.4/audit.sh",
+    "remediation": "Rules/S1/1.7 Warning Banners/1.7.4/remediation.sh"
   },
   {
     "id": "1.7.5",
-    "title": "Ensure permissions on etc issue are configured",
+    "title": "1.7.5",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.5 Ensure permissions on etc issue are configured/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.5 Ensure permissions on etc issue are configured/remediation.sh"
+    "audit": "Rules/S1/1.7 Warning Banners/1.7.5/audit.sh",
+    "remediation": "Rules/S1/1.7 Warning Banners/1.7.5/remediation.sh"
   },
   {
     "id": "1.7.6",
-    "title": "Ensure permissions on etc issue net are configured",
+    "title": "1.7.6",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.6 Ensure permissions on etc issue net are configured/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.7 Warning Banners/1.7.6 Ensure permissions on etc issue net are configured/remediation.sh"
+    "audit": "Rules/S1/1.7 Warning Banners/1.7.6/audit.sh",
+    "remediation": "Rules/S1/1.7 Warning Banners/1.7.6/remediation.sh"
   },
   {
     "id": "1.8.1",
-    "title": "Ensure GNOME login banner is enabled",
+    "title": "1.8.1",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.1 Ensure GNOME login banner is enabled/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.1 Ensure GNOME login banner is enabled/remediation.sh"
+    "audit": "Rules/S1/1.8 GNOME Display Manager/1.8.1/audit.sh",
+    "remediation": "Rules/S1/1.8 GNOME Display Manager/1.8.1/remediation.sh"
   },
   {
     "id": "1.8.2",
-    "title": "Ensure GNOME login banner text is configured",
+    "title": "1.8.2",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.2 Ensure GNOME login banner text is configured/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.2 Ensure GNOME login banner text is configured/remediation.sh"
+    "audit": "Rules/S1/1.8 GNOME Display Manager/1.8.2/audit.sh",
+    "remediation": "Rules/S1/1.8 GNOME Display Manager/1.8.2/remediation.sh"
   },
   {
     "id": "1.8.3",
-    "title": "Ensure disable-user-list is enabled",
+    "title": "1.8.3",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.3 Ensure disable-user-list is enabled/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.3 Ensure disable-user-list is enabled/remediation.sh"
+    "audit": "Rules/S1/1.8 GNOME Display Manager/1.8.3/audit.sh",
+    "remediation": "Rules/S1/1.8 GNOME Display Manager/1.8.3/remediation.sh"
   },
   {
     "id": "1.8.4",
-    "title": "Ensure XDMCP is disabled",
+    "title": "1.8.4",
     "section": "Section 1 Initial Setup",
-    "audit": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.4 Ensure XDMCP is disabled/audit.sh",
-    "remediation": "Rules/Section 1 Initial Setup/1.8 GNOME Display Manager/1.8.4 Ensure XDMCP is disabled/remediation.sh"
+    "audit": "Rules/S1/1.8 GNOME Display Manager/1.8.4/audit.sh",
+    "remediation": "Rules/S1/1.8 GNOME Display Manager/1.8.4/remediation.sh"
   },
   {
     "id": "2.1.1",
-    "title": "Ensure autofs services are not in use",
+    "title": "2.1.1",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.1 Ensure autofs services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.1 Ensure autofs services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.1/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.1/remediation.sh"
   },
   {
     "id": "2.1.2",
-    "title": "Ensure avahi-daemon services are not in use",
+    "title": "2.1.2",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.2 Ensure avahi-daemon services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.2 Ensure avahi-daemon services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.2/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.2/remediation.sh"
   },
   {
     "id": "2.1.3",
-    "title": "Ensure dhcp-server services are not in use",
+    "title": "2.1.3",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.3 Ensure dhcp-server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.3 Ensure dhcp-server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.3/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.3/remediation.sh"
   },
   {
     "id": "2.1.4",
-    "title": "Ensure dns server services are not in use",
+    "title": "2.1.4",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.4 Ensure dns server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.4 Ensure dns server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.4/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.4/remediation.sh"
   },
   {
     "id": "2.1.5",
-    "title": "Ensure dnsmasq services are not in use",
+    "title": "2.1.5",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.5 Ensure dnsmasq services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.5 Ensure dnsmasq services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.5/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.5/remediation.sh"
   },
   {
     "id": "2.1.6",
-    "title": "Ensure ftp server services are not in use",
+    "title": "2.1.6",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.6 Ensure ftp server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.6 Ensure ftp server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.6/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.6/remediation.sh"
   },
   {
     "id": "2.1.7",
-    "title": "Ensure ldap server services are not in use",
+    "title": "2.1.7",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.7 Ensure ldap server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.7 Ensure ldap server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.7/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.7/remediation.sh"
   },
   {
     "id": "2.1.8",
-    "title": "Ensure message access server services are not in use",
+    "title": "2.1.8",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.8 Ensure message access server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.8 Ensure message access server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.8/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.8/remediation.sh"
   },
   {
     "id": "2.1.9",
-    "title": "Ensure network file system services are not in use",
+    "title": "2.1.9",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.9 Ensure network file system services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.9 Ensure network file system services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.9/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.9/remediation.sh"
   },
   {
     "id": "2.1.10",
-    "title": "Ensure nis server services are not in use",
+    "title": "2.1.10",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.10 Ensure nis server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.10 Ensure nis server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.10/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.10/remediation.sh"
   },
   {
     "id": "2.1.11",
-    "title": "Ensure print server services are not in use",
+    "title": "2.1.11",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.11 Ensure print server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.11 Ensure print server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.11/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.11/remediation.sh"
   },
   {
     "id": "2.1.12",
-    "title": "Ensure rpcbind services are not in use",
+    "title": "2.1.12",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.12 Ensure rpcbind services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.12 Ensure rpcbind services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.12/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.12/remediation.sh"
   },
   {
     "id": "2.1.13",
-    "title": "Ensure rsync services are not in use",
+    "title": "2.1.13",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.13 Ensure rsync services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.13 Ensure rsync services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.13/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.13/remediation.sh"
   },
   {
     "id": "2.1.14",
-    "title": "Ensure samba file server services are not in use",
+    "title": "2.1.14",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.14 Ensure samba file server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.14 Ensure samba file server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.14/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.14/remediation.sh"
   },
   {
     "id": "2.1.15",
-    "title": "Ensure snmp services are not in use",
+    "title": "2.1.15",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.15 Ensure snmp services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.15 Ensure snmp services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.15/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.15/remediation.sh"
   },
   {
     "id": "2.1.16",
-    "title": "Ensure tftp server services are not in use",
+    "title": "2.1.16",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.16 Ensure tftp server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.16 Ensure tftp server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.16/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.16/remediation.sh"
   },
   {
     "id": "2.1.17",
-    "title": "Ensure web proxy server services are not in use",
+    "title": "2.1.17",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.17 Ensure web proxy server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.17 Ensure web proxy server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.17/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.17/remediation.sh"
   },
   {
     "id": "2.1.18",
-    "title": "Ensure web server services are not in use",
+    "title": "2.1.18",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.18 Ensure web server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.18 Ensure web server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.18/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.18/remediation.sh"
   },
   {
     "id": "2.1.19",
-    "title": "Ensure xinetd services are not in use",
+    "title": "2.1.19",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.19 Ensure xinetd services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.19 Ensure xinetd services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.19/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.19/remediation.sh"
   },
   {
     "id": "2.1.20",
-    "title": "Ensure X window server services are not in use",
+    "title": "2.1.20",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.20 Ensure X window server services are not in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.20 Ensure X window server services are not in use/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.20/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.20/remediation.sh"
   },
   {
     "id": "2.1.21",
-    "title": "Ensure mail transfer agent is configured for local-only mode",
+    "title": "2.1.21",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.21 Ensure mail transfer agent is configured for local-only mode/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.21 Ensure mail transfer agent is configured for local-only mode/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.21/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.21/remediation.sh"
   },
   {
     "id": "2.1.22",
-    "title": "Ensure only approved services are listening on a network interface",
+    "title": "2.1.22",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.22 Ensure only approved services are listening on a network interface/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.1 Configure Server Services/2.1.22 Ensure only approved services are listening on a network interface/remediation.sh"
+    "audit": "Rules/S2/2.1 Configure Server Services/2.1.22/audit.sh",
+    "remediation": "Rules/S2/2.1 Configure Server Services/2.1.22/remediation.sh"
   },
   {
     "id": "2.2.1",
-    "title": "Ensure ftp client is not installed",
+    "title": "2.2.1",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.1 Ensure ftp client is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.1 Ensure ftp client is not installed/remediation.sh"
+    "audit": "Rules/S2/2.2 Configure Client Services/2.2.1/audit.sh",
+    "remediation": "Rules/S2/2.2 Configure Client Services/2.2.1/remediation.sh"
   },
   {
     "id": "2.2.2",
-    "title": "Ensure ldap client is not installed",
+    "title": "2.2.2",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.2 Ensure ldap client is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.2 Ensure ldap client is not installed/remediation.sh"
+    "audit": "Rules/S2/2.2 Configure Client Services/2.2.2/audit.sh",
+    "remediation": "Rules/S2/2.2 Configure Client Services/2.2.2/remediation.sh"
   },
   {
     "id": "2.2.3",
-    "title": "Ensure nis client is not installed",
+    "title": "2.2.3",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.3 Ensure nis client is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.3 Ensure nis client is not installed/remediation.sh"
+    "audit": "Rules/S2/2.2 Configure Client Services/2.2.3/audit.sh",
+    "remediation": "Rules/S2/2.2 Configure Client Services/2.2.3/remediation.sh"
   },
   {
     "id": "2.2.4",
-    "title": "Ensure rsh client is not installed",
+    "title": "2.2.4",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.4 Ensure rsh client is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.4 Ensure rsh client is not installed/remediation.sh"
+    "audit": "Rules/S2/2.2 Configure Client Services/2.2.4/audit.sh",
+    "remediation": "Rules/S2/2.2 Configure Client Services/2.2.4/remediation.sh"
   },
   {
     "id": "2.2.5",
-    "title": "Ensure talk client is not installed",
+    "title": "2.2.5",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.5 Ensure talk client is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.5 Ensure talk client is not installed/remediation.sh"
+    "audit": "Rules/S2/2.2 Configure Client Services/2.2.5/audit.sh",
+    "remediation": "Rules/S2/2.2 Configure Client Services/2.2.5/remediation.sh"
   },
   {
     "id": "2.2.6",
-    "title": "Ensure telnet client is not installed",
+    "title": "2.2.6",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.6 Ensure telnet client is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.6 Ensure telnet client is not installed/remediation.sh"
+    "audit": "Rules/S2/2.2 Configure Client Services/2.2.6/audit.sh",
+    "remediation": "Rules/S2/2.2 Configure Client Services/2.2.6/remediation.sh"
   },
   {
     "id": "2.2.7",
-    "title": "Ensure tftp client is not installed",
+    "title": "2.2.7",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.7 Ensure tftp client is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.2 Configure Client Services/2.2.7 Ensure tftp client is not installed/remediation.sh"
+    "audit": "Rules/S2/2.2 Configure Client Services/2.2.7/audit.sh",
+    "remediation": "Rules/S2/2.2 Configure Client Services/2.2.7/remediation.sh"
   },
   {
     "id": "2.3.1",
-    "title": "Ensure time synchronization is in use",
+    "title": "2.3.1",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.1 Ensure time synchronization is in use/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.1 Ensure time synchronization is in use/remediation.sh"
+    "audit": "Rules/S2/2.3 Configure Time Synchronization/2.3.1/audit.sh",
+    "remediation": "Rules/S2/2.3 Configure Time Synchronization/2.3.1/remediation.sh"
   },
   {
     "id": "2.3.2",
-    "title": "Ensure ntp is configured",
+    "title": "2.3.2",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.2 Ensure ntp is configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.2 Ensure ntp is configured/remediation.sh"
+    "audit": "Rules/S2/2.3 Configure Time Synchronization/2.3.2/audit.sh",
+    "remediation": "Rules/S2/2.3 Configure Time Synchronization/2.3.2/remediation.sh"
   },
   {
     "id": "2.3.3",
-    "title": "Ensure chrony is configured",
+    "title": "2.3.3",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.3 Ensure chrony is configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.3 Ensure chrony is configured/remediation.sh"
+    "audit": "Rules/S2/2.3 Configure Time Synchronization/2.3.3/audit.sh",
+    "remediation": "Rules/S2/2.3 Configure Time Synchronization/2.3.3/remediation.sh"
   },
   {
     "id": "2.3.4",
-    "title": "Ensure systemd-timesyncd is configured",
+    "title": "2.3.4",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.4 Ensure systemd-timesyncd is configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.3 Configure Time Synchronization/2.3.4 Ensure systemd-timesyncd is configured/remediation.sh"
+    "audit": "Rules/S2/2.3 Configure Time Synchronization/2.3.4/audit.sh",
+    "remediation": "Rules/S2/2.3 Configure Time Synchronization/2.3.4/remediation.sh"
   },
   {
     "id": "2.4.1",
-    "title": "Ensure cron daemon is enabled",
+    "title": "2.4.1",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.1 Ensure cron daemon is enabled/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.1 Ensure cron daemon is enabled/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.1/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.1/remediation.sh"
   },
   {
     "id": "2.4.2",
-    "title": "Ensure permissions on etc-crontab are configured",
+    "title": "2.4.2",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.2 Ensure permissions on etc-crontab are configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.2 Ensure permissions on etc-crontab are configured/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.2/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.2/remediation.sh"
   },
   {
     "id": "2.4.3",
-    "title": "Ensure permissions on etc-cron-hourly are configured",
+    "title": "2.4.3",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.3 Ensure permissions on etc-cron-hourly are configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.3 Ensure permissions on etc-cron-hourly are configured/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.3/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.3/remediation.sh"
   },
   {
     "id": "2.4.4",
-    "title": "Ensure permissions on etc-cron-daily are configured",
+    "title": "2.4.4",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.4 Ensure permissions on etc-cron-daily are configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.4 Ensure permissions on etc-cron-daily are configured/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.4/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.4/remediation.sh"
   },
   {
     "id": "2.4.5",
-    "title": "Ensure permissions on etc-cron-weekly are configured",
+    "title": "2.4.5",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.5 Ensure permissions on etc-cron-weekly are configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.5 Ensure permissions on etc-cron-weekly are configured/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.5/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.5/remediation.sh"
   },
   {
     "id": "2.4.6",
-    "title": "Ensure permissions on etc-cron-monthly are configured",
+    "title": "2.4.6",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.6 Ensure permissions on etc-cron-monthly are configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.6 Ensure permissions on etc-cron-monthly are configured/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.6/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.6/remediation.sh"
   },
   {
     "id": "2.4.7",
-    "title": "Ensure permissions on etc-cron-d are configured",
+    "title": "2.4.7",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.7 Ensure permissions on etc-cron-d are configured/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.7 Ensure permissions on etc-cron-d are configured/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.7/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.7/remediation.sh"
   },
   {
     "id": "2.4.8",
-    "title": "Ensure at is not installed",
+    "title": "2.4.8",
     "section": "Section 2 Services",
-    "audit": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.8 Ensure at is not installed/audit.sh",
-    "remediation": "Rules/Section 2 Services/2.4 Job Schedulers/2.4.8 Ensure at is not installed/remediation.sh"
+    "audit": "Rules/S2/2.4 Job Schedulers/2.4.8/audit.sh",
+    "remediation": "Rules/S2/2.4 Job Schedulers/2.4.8/remediation.sh"
   },
   {
     "id": "3.1.1",
-    "title": "Ensure IPv6 status is identified",
+    "title": "3.1.1",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.1 Configure Network Devices/3.1.1 Ensure IPv6 status is identified/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.1 Configure Network Devices/3.1.1 Ensure IPv6 status is identified/remediation.sh"
+    "audit": "Rules/S3/3.1 Configure Network Devices/3.1.1/audit.sh",
+    "remediation": "Rules/S3/3.1 Configure Network Devices/3.1.1/remediation.sh"
   },
   {
     "id": "3.1.2",
-    "title": "Ensure wireless interfaces are disabled",
+    "title": "3.1.2",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.1 Configure Network Devices/3.1.2 Ensure wireless interfaces are disabled/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.1 Configure Network Devices/3.1.2 Ensure wireless interfaces are disabled/remediation.sh"
+    "audit": "Rules/S3/3.1 Configure Network Devices/3.1.2/audit.sh",
+    "remediation": "Rules/S3/3.1 Configure Network Devices/3.1.2/remediation.sh"
   },
   {
     "id": "3.1.3",
-    "title": "Ensure bluetooth services are not in use",
+    "title": "3.1.3",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.1 Configure Network Devices/3.1.3 Ensure bluetooth services are not in use/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.1 Configure Network Devices/3.1.3 Ensure bluetooth services are not in use/remediation.sh"
+    "audit": "Rules/S3/3.1 Configure Network Devices/3.1.3/audit.sh",
+    "remediation": "Rules/S3/3.1 Configure Network Devices/3.1.3/remediation.sh"
   },
   {
     "id": "3.2.1",
-    "title": "Ensure dccp kernel module is not available",
+    "title": "3.2.1",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.1 Ensure dccp kernel module is not available/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.1 Ensure dccp kernel module is not available/remediation.sh"
+    "audit": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.1/audit.sh",
+    "remediation": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.1/remediation.sh"
   },
   {
     "id": "3.2.2",
-    "title": "Ensure tipc kernel module is not available",
+    "title": "3.2.2",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.2 Ensure tipc kernel module is not available/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.2 Ensure tipc kernel module is not available/remediation.sh"
+    "audit": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.2/audit.sh",
+    "remediation": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.2/remediation.sh"
   },
   {
     "id": "3.2.3",
-    "title": "Ensure rds kernel module is not available",
+    "title": "3.2.3",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.3 Ensure rds kernel module is not available/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.3 Ensure rds kernel module is not available/remediation.sh"
+    "audit": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.3/audit.sh",
+    "remediation": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.3/remediation.sh"
   },
   {
     "id": "3.2.4",
-    "title": "Ensure sctp kernel module is not available",
+    "title": "3.2.4",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.4 Ensure sctp kernel module is not available/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.2 Configure Network Kernel Modules/3.2.4 Ensure sctp kernel module is not available/remediation.sh"
+    "audit": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.4/audit.sh",
+    "remediation": "Rules/S3/3.2 Configure Network Kernel Modules/3.2.4/remediation.sh"
   },
   {
     "id": "3.3.1",
-    "title": "Ensure ip forwarding is disabled",
+    "title": "3.3.1",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.1 Ensure ip forwarding is disabled/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.1 Ensure ip forwarding is disabled/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.1/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.1/remediation.sh"
   },
   {
     "id": "3.3.2",
-    "title": "Ensure packet redirect sending is disabled",
+    "title": "3.3.2",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.2 Ensure packet redirect sending is disabled/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.2 Ensure packet redirect sending is disabled/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.2/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.2/remediation.sh"
   },
   {
     "id": "3.3.3",
-    "title": "Ensure bogus icmp responses are ignored",
+    "title": "3.3.3",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.3 Ensure bogus icmp responses are ignored/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.3 Ensure bogus icmp responses are ignored/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.3/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.3/remediation.sh"
   },
   {
     "id": "3.3.4",
-    "title": "Ensure broadcast icmp requests are ignored",
+    "title": "3.3.4",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.4 Ensure broadcast icmp requests are ignored/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.4 Ensure broadcast icmp requests are ignored/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.4/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.4/remediation.sh"
   },
   {
     "id": "3.3.5",
-    "title": "Ensure icmp redirects are not accepted",
+    "title": "3.3.5",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.5 Ensure icmp redirects are not accepted/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.5 Ensure icmp redirects are not accepted/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.5/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.5/remediation.sh"
   },
   {
     "id": "3.3.6",
-    "title": "Ensure secure icmp redirects are not accepted",
+    "title": "3.3.6",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.6 Ensure secure icmp redirects are not accepted/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.6 Ensure secure icmp redirects are not accepted/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.6/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.6/remediation.sh"
   },
   {
     "id": "3.3.7",
-    "title": "Ensure reverse path filtering is enabled",
+    "title": "3.3.7",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.7 Ensure reverse path filtering is enabled/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.7 Ensure reverse path filtering is enabled/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.7/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.7/remediation.sh"
   },
   {
     "id": "3.3.8",
-    "title": "Ensure source routed packets are not accepted",
+    "title": "3.3.8",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.8 Ensure source routed packets are not accepted/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.8 Ensure source routed packets are not accepted/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.8/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.8/remediation.sh"
   },
   {
     "id": "3.3.9",
-    "title": "Ensure suspicious packets are logged",
+    "title": "3.3.9",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.9 Ensure suspicious packets are logged/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.9 Ensure suspicious packets are logged/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.9/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.9/remediation.sh"
   },
   {
     "id": "3.3.10",
-    "title": "Ensure tcp syn cookies is enabled",
+    "title": "3.3.10",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.10 Ensure tcp syn cookies is enabled/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.10 Ensure tcp syn cookies is enabled/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.10/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.10/remediation.sh"
   },
   {
     "id": "3.3.11",
-    "title": "Ensure ipv6 router advertisements are not accepted",
+    "title": "3.3.11",
     "section": "Section 3 Network",
-    "audit": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.11 Ensure ipv6 router advertisements are not accepted/audit.sh",
-    "remediation": "Rules/Section 3 Network/3.3 Configure Network Kernel Parameters/3.3.11 Ensure ipv6 router advertisements are not accepted/remediation.sh"
+    "audit": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.11/audit.sh",
+    "remediation": "Rules/S3/3.3 Configure Network Kernel Parameters/3.3.11/remediation.sh"
   },
   {
     "id": "4.1.1",
-    "title": "Ensure a single firewall configuration utility is in use",
+    "title": "4.1.1",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.1 Configure a Single Firewall Utility/4.1.1 Ensure a single firewall configuration utility is in use/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.1 Configure a Single Firewall Utility/4.1.1 Ensure a single firewall configuration utility is in use/remediation.sh"
+    "audit": "Rules/S4/4.1 Configure a Single Firewall Utility/4.1.1/audit.sh",
+    "remediation": "Rules/S4/4.1 Configure a Single Firewall Utility/4.1.1/remediation.sh"
   },
   {
     "id": "4.2.1",
-    "title": "Ensure ufw is installed",
+    "title": "4.2.1",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.1 Ensure ufw is installed/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.1 Ensure ufw is installed/remediation.sh"
+    "audit": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.1/audit.sh",
+    "remediation": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.1/remediation.sh"
   },
   {
     "id": "4.2.2",
-    "title": "Ensure iptables-persistent is not installed with ufw",
+    "title": "4.2.2",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.2 Ensure iptables-persistent is not installed with ufw/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.2 Ensure iptables-persistent is not installed with ufw/remediation.sh"
+    "audit": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.2/audit.sh",
+    "remediation": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.2/remediation.sh"
   },
   {
     "id": "4.2.3",
-    "title": "Ensure ufw service is enabled",
+    "title": "4.2.3",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.3 Ensure ufw service is enabled/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.3 Ensure ufw service is enabled/remediation.sh"
+    "audit": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.3/audit.sh",
+    "remediation": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.3/remediation.sh"
   },
   {
     "id": "4.2.4",
-    "title": "Ensure ufw loopback traffic is configured",
+    "title": "4.2.4",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.4 Ensure ufw loopback traffic is configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.4 Ensure ufw loopback traffic is configured/remediation.sh"
+    "audit": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.4/audit.sh",
+    "remediation": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.4/remediation.sh"
   },
   {
     "id": "4.2.5",
-    "title": "Ensure ufw outbound connections are configured",
+    "title": "4.2.5",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.5 Ensure ufw outbound connections are configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.5 Ensure ufw outbound connections are configured/remediation.sh"
+    "audit": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.5/audit.sh",
+    "remediation": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.5/remediation.sh"
   },
   {
     "id": "4.2.6",
-    "title": "Ensure ufw firewall rules exist for all open ports",
+    "title": "4.2.6",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.6 Ensure ufw firewall rules exist for all open ports/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.6 Ensure ufw firewall rules exist for all open ports/remediation.sh"
+    "audit": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.6/audit.sh",
+    "remediation": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.6/remediation.sh"
   },
   {
     "id": "4.2.7",
-    "title": "Ensure ufw default deny firewall policy",
+    "title": "4.2.7",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.7 Ensure ufw default deny firewall policy/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.2 Configure UncomplicatedFirewall/4.2.7 Ensure ufw default deny firewall policy/remediation.sh"
+    "audit": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.7/audit.sh",
+    "remediation": "Rules/S4/4.2 Configure UncomplicatedFirewall/4.2.7/remediation.sh"
   },
   {
     "id": "4.3.1",
-    "title": "Ensure nftables is installed",
+    "title": "4.3.1",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.1 Ensure nftables is installed/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.1 Ensure nftables is installed/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.1/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.1/remediation.sh"
   },
   {
     "id": "4.3.2",
-    "title": "Ensure ufw is uninstalled or disabled with nftables",
+    "title": "4.3.2",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.2 Ensure ufw is uninstalled or disabled with nftables/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.2 Ensure ufw is uninstalled or disabled with nftables/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.2/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.2/remediation.sh"
   },
   {
     "id": "4.3.3",
-    "title": "Ensure iptables are flushed with nftables",
+    "title": "4.3.3",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.3 Ensure iptables are flushed with nftables/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.3 Ensure iptables are flushed with nftables/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.3/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.3/remediation.sh"
   },
   {
     "id": "4.3.4",
-    "title": "Ensure a nftables table exists",
+    "title": "4.3.4",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.4 Ensure a nftables table exists/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.4 Ensure a nftables table exists/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.4/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.4/remediation.sh"
   },
   {
     "id": "4.3.5",
-    "title": "Ensure nftables base chains exist",
+    "title": "4.3.5",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.5 Ensure nftables base chains exist/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.5 Ensure nftables base chains exist/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.5/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.5/remediation.sh"
   },
   {
     "id": "4.3.6",
-    "title": "Ensure nftables loopback traffic is configured",
+    "title": "4.3.6",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.6 Ensure nftables loopback traffic is configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.6 Ensure nftables loopback traffic is configured/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.6/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.6/remediation.sh"
   },
   {
     "id": "4.3.7",
-    "title": "Ensure nftables outbound and established connections are configured",
+    "title": "4.3.7",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.7 Ensure nftables outbound and established connections are configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.7 Ensure nftables outbound and established connections are configured/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.7/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.7/remediation.sh"
   },
   {
     "id": "4.3.8",
-    "title": "Ensure nftables default deny firewall policy",
+    "title": "4.3.8",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.8 Ensure nftables default deny firewall policy/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.8 Ensure nftables default deny firewall policy/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.8/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.8/remediation.sh"
   },
   {
     "id": "4.3.9",
-    "title": "Ensure nftables service is enabled",
+    "title": "4.3.9",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.9 Ensure nftables service is enabled/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.9 Ensure nftables service is enabled/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.9/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.9/remediation.sh"
   },
   {
     "id": "4.3.10",
-    "title": "Ensure nftables rules are permanent",
+    "title": "4.3.10",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.10 Ensure nftables rules are permanent/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.3 Configure nftables/4.3.10 Ensure nftables rules are permanent/remediation.sh"
+    "audit": "Rules/S4/4.3 Configure nftables/4.3.10/audit.sh",
+    "remediation": "Rules/S4/4.3 Configure nftables/4.3.10/remediation.sh"
   },
   {
     "id": "4.4.1.1",
-    "title": "Ensure iptables packages are installed",
+    "title": "4.4.1.1",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.1 Configure iptables software/4.4.1.1 Ensure iptables packages are installed/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.1 Configure iptables software/4.4.1.1 Ensure iptables packages are installed/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.1/4.4.1.1/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.1/4.4.1.1/remediation.sh"
   },
   {
     "id": "4.4.1.2",
-    "title": "Ensure nftables is not in use with iptables",
+    "title": "4.4.1.2",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.1 Configure iptables software/4.4.1.2 Ensure nftables is not in use with iptables/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.1 Configure iptables software/4.4.1.2 Ensure nftables is not in use with iptables/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.1/4.4.1.2/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.1/4.4.1.2/remediation.sh"
   },
   {
     "id": "4.4.1.3",
-    "title": "Ensure ufw is not in use with iptables",
+    "title": "4.4.1.3",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.1 Configure iptables software/4.4.1.3 Ensure ufw is not in use with iptables/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.1 Configure iptables software/4.4.1.3 Ensure ufw is not in use with iptables/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.1/4.4.1.3/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.1/4.4.1.3/remediation.sh"
   },
   {
     "id": "4.4.2.1",
-    "title": "Ensure iptables default deny firewall policy",
+    "title": "4.4.2.1",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.1 Ensure iptables default deny firewall policy/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.1 Ensure iptables default deny firewall policy/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.1/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.1/remediation.sh"
   },
   {
     "id": "4.4.2.2",
-    "title": "Ensure iptables loopback traffic is configured",
+    "title": "4.4.2.2",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.2 Ensure iptables loopback traffic is configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.2 Ensure iptables loopback traffic is configured/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.2/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.2/remediation.sh"
   },
   {
     "id": "4.4.2.3",
-    "title": "Ensure iptables outbound and established connections are configured",
+    "title": "4.4.2.3",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.3 Ensure iptables outbound and established connections are configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.3 Ensure iptables outbound and established connections are configured/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.3/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.3/remediation.sh"
   },
   {
     "id": "4.4.2.4",
-    "title": "Ensure iptables firewall rules exist for all open ports",
+    "title": "4.4.2.4",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.4 Ensure iptables firewall rules exist for all open ports/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.2 Configure IPv4 iptables/4.4.2.4 Ensure iptables firewall rules exist for all open ports/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.4/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.2/4.4.2.4/remediation.sh"
   },
   {
     "id": "4.4.3.1",
-    "title": "Ensure ip6tables default deny firewall policy",
+    "title": "4.4.3.1",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.1 Ensure ip6tables default deny firewall policy/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.1 Ensure ip6tables default deny firewall policy/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.1/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.1/remediation.sh"
   },
   {
     "id": "4.4.3.2",
-    "title": "Ensure ip6tables loopback traffic is configured",
+    "title": "4.4.3.2",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.2 Ensure ip6tables loopback traffic is configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.2 Ensure ip6tables loopback traffic is configured/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.2/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.2/remediation.sh"
   },
   {
     "id": "4.4.3.3",
-    "title": "Ensure ip6tables outbound and established connections are configured",
+    "title": "4.4.3.3",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.3 Ensure ip6tables outbound and established connections are configured/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.3 Ensure ip6tables outbound and established connections are configured/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.3/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.3/remediation.sh"
   },
   {
     "id": "4.4.3.4",
-    "title": "Ensure ip6tables firewall rules exist for all open ports",
+    "title": "4.4.3.4",
     "section": "Section 4 Host Based Firewall",
-    "audit": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.4 Ensure ip6tables firewall rules exist for all open ports/audit.sh",
-    "remediation": "Rules/Section 4 Host Based Firewall/4.4 Configure iptables/4.4.3 Configure IPv6 ip6tables/4.4.3.4 Ensure ip6tables firewall rules exist for all open ports/remediation.sh"
+    "audit": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.4/audit.sh",
+    "remediation": "Rules/S4/4.4 Configure iptables/4.4.3/4.4.3.4/remediation.sh"
   }
 ]
