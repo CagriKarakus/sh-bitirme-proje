@@ -1,0 +1,185 @@
+İki dosya iki ayrı işleve hizmet ediyor. Mantığı sade ve doğrudan şöyle:
+
+---
+
+# **A) AUDIT SCRIPT – Ne yapıyor?**
+
+Temel hedef:
+*“/tmp gerçekten ayrı bir filesystem mı ve reboot sonrası bu yapı kalıcı mı?”*
+
+Doğrulama üç aşamada yapılır:
+
+## 1) **Runtime Mount Denetimi**
+
+Denetimin çekirdeği:
+
+* `findmnt -o TARGET /tmp`
+  → Eğer TARGET tam olarak `/tmp` ise **ayrı mount vardır**.
+  → TARGET `/` veya başka bir şeyse `/tmp` sadece klasördür → **FAIL**.
+
+Bu, CIS gereksinimindeki *“/tmp ayrı bir partition olmalı”* şartının gerçek teknik karşılığıdır.
+
+Fallback olarak:
+
+* `mountpoint /tmp`
+* `/proc/mounts` içindeki mount entry’si
+
+kontrol edilir.
+
+Sonuç:
+
+* Ayrı mount varsa → denetleme devam eder
+* Yoksa → direkt **NON-COMPLIANT** (exit 1)
+
+---
+
+## 2) **Persistence (Kalıcılık) Denetimi**
+
+Amaç: “Runtime’da ayrı mount var, peki reboot'tan sonra aynı yapı tekrar oluşacak mı?”
+
+Kontrol edilen iki yer:
+
+### a) `/etc/fstab`
+
+`/tmp` entry’si var mı?
+
+### b) systemd
+
+`systemctl is-enabled tmp.mount` sonuçları okunur:
+
+* `enabled`, `generated`, `static` → kalıcı yapı var
+* `masked` → çalışamaz, **WARNING** (exit 2)
+* hiçbiri yok → runtime var ama reboot sonrası bozulacak → **WARNING** (exit 2)
+
+---
+
+## 3) **Final Sonuç**
+
+* Runtime mount **yok** → **FAIL** (exit 1)
+* Runtime var ama persistence yok → **WARNING** (exit 2)
+* Runtime + persistence var → **PASS** (exit 0)
+
+Bu, CIS’in “ayrı ve kalıcı mount” şartını eksiksiz doğrular.
+
+---
+
+# **B) REMEDIATION SCRIPT – Ne yapıyor?**
+
+Bu dosya, audit’in yakaladığı problemi **otomatik düzeltmek** için yazılmıştır.
+
+Çalışma mantığı şu şekilde:
+
+---
+
+## 1) **Ön Kontrol**
+
+* Eğer `/tmp` zaten ayrı mount + persistent ise → çıkış.
+
+---
+
+## 2) **systemd engeli kaldırılır (varsa)**
+
+* Eğer `tmp.mount` *masked* ise → `systemctl unmask tmp.mount`
+
+Çünkü masked bir unit yeniden mount edilmesini engeller.
+
+---
+
+## 3) **fstab yedeklenir**
+
+Sistem dosyalarının bozulma riskine karşı otomatik backup alınır.
+
+---
+
+## 4) **/tmp için tmpfs yapılandırması oluşturulur**
+
+Sistemin türüne göre iki yöntemden biri seçilir:
+
+### a) **systemd olan sistemlerde**
+
+`/etc/systemd/system/tmp.mount` dosyası oluşturulur.
+İçinde:
+
+* What=tmpfs
+* Where=/tmp
+* size= (konservatif hesaplanmış tmpfs boyutu)
+* mode=1777
+
+bulunur.
+
+`systemctl enable tmp.mount` → kalıcı
+`systemctl start tmp.mount` → anında uygulamaya çalışma
+
+### b) **systemd olmayan sistemlerde**
+
+`/etc/fstab` içine tmpfs entry’si eklenir:
+
+```
+tmpfs /tmp tmpfs defaults,size=XXX 0 0
+```
+
+Eski `/tmp` entry’leri temizlenir → çifte mount engellenir.
+
+---
+
+## 5) **Canlı Mount İşlemi**
+
+Aşamalar:
+
+* `/tmp` boş değilse → /root altına otomatik backup
+* Eski mount varsa → unmount
+* tmpfs mount edilir
+* Gerekirse backup geri yüklenir
+
+Bu adım, reboot gereksinimini minimize eder.
+
+---
+
+## 6) **Son Doğrulama**
+
+* findmnt ile TARGET kontrol edilir
+* mount seçenekleri listelenir
+* df -h ile boyut doğrulanır
+
+Sonuç PASS ise kurulum tamamlanır.
+
+---
+
+# **İki Script Arasındaki Mantıksal Fark**
+
+| İşlev               | Audit               | Remediation                 |
+| ------------------- | ------------------- | --------------------------- |
+| /tmp ayrı FS mi?    | Evet/Hayır kontrolü | Gerekiyorsa oluşturur       |
+| Persistent kontrolü | fstab + systemd     | Gerekiyorsa düzeltir        |
+| Masked unit tespiti | Uyarı verir         | Açıp düzeltir               |
+| Runtime mount       | Kontrol eder        | Gerekirse anında mount eder |
+| Değişiklik yapma    | Yapmaz              | Yapar                       |
+| Exit codlar         | 0 / 1 / 2           | Full işlem + doğrulama      |
+
+---
+
+# **Kısa Özet (çekirdek mantık)**
+
+### **Audit**
+
+* `/tmp` gerçekten kendi filesystem’i mi?
+* Bu yapı reboot sonrası da çalışacak mı?
+* Sonuç: PASS / WARNING / FAIL
+
+### **Remediation**
+
+* Systemd mask’leri kaldırır
+* fstab veya systemd mount unit üretir
+* tmpfs mount eder
+* `/tmp`’yi tamamen CIS uyumlu hale getirir
+* En sonunda kontrol eder
+
+---
+
+Bu iki dosya birlikte çalışınca:
+
+1. Audit → hatayı tespit eder
+2. Remediation → hatayı otomatik düzeltir
+3. Audit → yeniden koştuğunda artık PASS verir
+
+CIS hardening pipeline’ı böyle tamamlanır.

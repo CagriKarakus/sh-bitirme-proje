@@ -3,26 +3,19 @@ set -euo pipefail
 
 TMP_DIR="/tmp"
 FSTAB_FILE="/etc/fstab"
-FSTAB_BACKUP="/etc/fstab.backup-nosuid-$(date +%Y%m%d-%H%M%S)"
+FSTAB_BACKUP="/etc/fstab.backup-nodev-$(date +%Y%m%d-%H%M%S)"
 
-echo "[CHECK] Remediating: ensure nosuid on /tmp"
-
-########################################
-# 0) Container / applicability check
-########################################
-
-if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
-    echo "[INFO] Container environment detected, skipping nosuid remediation for /tmp"
-    exit 0
-fi
+echo "[CHECK] Remediating: ensure nodev on /tmp"
 
 ########################################
-# 1) Runtime mount üzerinde nosuid ekle
+# 1) Runtime mount üzerinde nodev ekle
 ########################################
 
+# Mevcut mount opsiyonlarını al
 if command -v findmnt >/dev/null 2>&1; then
     mount_opts=$(findmnt -n -o OPTIONS "${TMP_DIR}" 2>/dev/null || true)
 else
+    # findmnt yoksa, fallback olarak mount çıktısından çek
     mount_opts=$(mount | awk '$3=="/tmp"{gsub(/[()]/,"",$6);print $6}' | head -n1)
 fi
 
@@ -31,17 +24,13 @@ if [[ -z "${mount_opts}" ]]; then
     exit 1
 fi
 
-if echo "${mount_opts}" | grep -qw nosuid; then
-    echo "[INFO] nosuid already present on /tmp runtime mount"
+if echo "${mount_opts}" | grep -qw nodev; then
+    echo "[INFO] nodev already present on /tmp runtime mount"
 else
-    new_opts="${mount_opts},nosuid"
+    new_opts="${mount_opts},nodev"
     echo "[ACTION] Remounting /tmp with options: ${new_opts}"
-    if mount -o "remount,${new_opts}" "${TMP_DIR}"; then
-        echo "[SUCCESS] /tmp remounted with nosuid (runtime)"
-    else
-        echo "[ERROR] Failed to remount /tmp with nosuid"
-        exit 1
-    fi
+    mount -o "remount,${new_opts}" "${TMP_DIR}"
+    echo "[SUCCESS] /tmp remounted with nodev (runtime)"
 fi
 
 ########################################
@@ -57,13 +46,13 @@ else
 fi
 
 ########################################
-# 3) /etc/fstab içinde /tmp satırına nosuid ekle
+# 3) /etc/fstab içinde /tmp satırına nodev ekle
 ########################################
 
-# Eğer /tmp için entry yoksa, bu kural ekleme yapmaz; upstream separate-partition kuralını bekler.
+# Eğer /tmp için entry yoksa, bu kural ekleme yapmaz; uyarı verir.
 if ! grep -Eq '^[[:space:]]*[^#[:space:]]+[[:space:]]+/tmp[[:space:]]+' "${FSTAB_FILE}"; then
     echo "[WARNING] /tmp not found in ${FSTAB_FILE}. Separate partition rule should create it."
-    echo "[RESULT] Runtime nosuid ok, fstab için üst kural ihtiyaç duyuluyor."
+    echo "[RESULT] Runtime nodev ok, fstab için upstream kural bekleniyor."
     exit 2
 fi
 
@@ -72,46 +61,41 @@ tmpfile=$(mktemp)
 awk -v mp="${TMP_DIR}" '
 BEGIN { OFS="\t" }
 
+# Yorum satırlarını aynen geç
 /^#/ { print; next }
 
+# /tmp entrysi olan satır
 $2 == mp {
     # 4. alan opsiyonlar; boş veya "-" ise defaults yap
     if ($4 == "" || $4 == "-") {
         $4 = "defaults"
     }
 
+    # opsiyonları parçala, nodev olup olmadığına bak
     n = split($4, opts, ",")
-    has_nosuid = 0
+    has_nodev = 0
     for (i = 1; i <= n; i++) {
-        if (opts[i] == "nosuid") {
-            has_nosuid = 1
+        if (opts[i] == "nodev") {
+            has_nodev = 1
         }
     }
 
-    if (!has_nosuid) {
-        $4 = $4 ",nosuid"
+    if (!has_nodev) {
+        $4 = $4 ",nodev"
     }
 
     print
     next
 }
 
+# diğer satırlar
 { print }
 ' "${FSTAB_FILE}" > "${tmpfile}"
 
 mv "${tmpfile}" "${FSTAB_FILE}"
 
 ########################################
-# 4) İstersen remount fstab üzerinden de tetiklenebilir
-########################################
-
-if mountpoint -q "${TMP_DIR}"; then
-    echo "[ACTION] Remounting /tmp using updated fstab entry"
-    mount -o remount "${TMP_DIR}" || true
-fi
-
-########################################
-# 5) Son doğrulama
+# 4) Son doğrulama (opsiyonel ama faydalı)
 ########################################
 
 final_opts=$(findmnt -n -o OPTIONS "${TMP_DIR}" 2>/dev/null || echo "${mount_opts}")
@@ -119,11 +103,11 @@ final_opts=$(findmnt -n -o OPTIONS "${TMP_DIR}" 2>/dev/null || echo "${mount_opt
 echo "[VERIFY] /tmp mount options after remediation:"
 echo "  ${final_opts}"
 
-if echo "${final_opts}" | grep -qw nosuid; then
-    echo "[RESULT] PASS: /tmp has nosuid (runtime) and /etc/fstab updated."
+if echo "${final_opts}" | grep -qw nodev; then
+    echo "[RESULT] PASS: /tmp has nodev (runtime) and /etc/fstab updated."
     exit 0
 else
-    echo "[RESULT] WARNING: /etc/fstab updated, but runtime options missing nosuid."
-    echo "         Reboot or remount required."
+    echo "[RESULT] WARNING: /etc/fstab updated, but runtime options missing nodev."
+    echo "         Reboot or rerun remount may be required."
     exit 2
 fi
