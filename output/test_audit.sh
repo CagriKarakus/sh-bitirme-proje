@@ -1,29 +1,11 @@
-#!/usr/bin/env python3
-"""Compose a bundled CIS audit/remediation script from rule IDs.
-
-Generates a bash script that:
-1. Runs audit for all selected rules (BEFORE state)
-2. Runs remediation for rules that failed
-3. Runs audit again for all rules (AFTER state)
-4. Generates an HTML report showing before/after comparison
-"""
-from __future__ import annotations
-
-import argparse
-import datetime as dt
-import json
-import re
-from pathlib import Path
-from typing import Dict, List
-
-SCRIPT_HEADER = '''#!/usr/bin/env bash
+#!/usr/bin/env bash
 ###############################################################################
 #
 # CIS Benchmark Audit & Remediation Script
 #
-# Generated on    : {timestamp}
-# Source registry : {registry}
-# Rule count      : {rule_count}
+# Generated on    : 2025-12-06 23:47:02
+# Source registry : Rules\index.json
+# Rule count      : 3
 #
 # This script performs:
 #   1. Initial audit of all selected rules (BEFORE)
@@ -37,15 +19,15 @@ SCRIPT_HEADER = '''#!/usr/bin/env bash
 set -u
 
 # Colors for output
-RED='\\033[0;31m'
-GREEN='\\033[0;32m'
-YELLOW='\\033[1;33m'
-BLUE='\\033[0;34m'
-NC='\\033[0m' # No Color
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
 # Results storage
 TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
-REPORT_DIR="${{REPORT_DIR:-/tmp/cis_report_$TIMESTAMP}}"
+REPORT_DIR="${REPORT_DIR:-/tmp/cis_report_$TIMESTAMP}"
 mkdir -p "$REPORT_DIR"
 
 # Arrays to store results
@@ -54,12 +36,12 @@ declare -A AFTER_RESULTS
 declare -A BEFORE_OUTPUT
 declare -A AFTER_OUTPUT
 
-TOTAL_RULES={rule_count}
-RULES_LIST=({rule_ids_quoted})
+TOTAL_RULES=3
+RULES_LIST=("3.3.1" "3.3.2" "3.3.3")
 
-echo -e "${{BLUE}}=============================================${{NC}}"
-echo -e "${{BLUE}}  CIS Benchmark Audit & Remediation Tool${{NC}}"
-echo -e "${{BLUE}}=============================================${{NC}}"
+echo -e "${BLUE}=============================================${NC}"
+echo -e "${BLUE}  CIS Benchmark Audit & Remediation Tool${NC}"
+echo -e "${BLUE}=============================================${NC}"
 echo ""
 echo "Report directory: $REPORT_DIR"
 echo "Total rules to check: $TOTAL_RULES"
@@ -68,47 +50,243 @@ echo ""
 ###############################################################################
 # PHASE 1: INITIAL AUDIT (BEFORE)
 ###############################################################################
-echo -e "${{YELLOW}}=== PHASE 1: Initial Audit (BEFORE) ===${{NC}}"
+echo -e "${YELLOW}=== PHASE 1: Initial Audit (BEFORE) ===${NC}"
 echo ""
 
-'''
 
-AUDIT_FUNCTION_TEMPLATE = '''
-# Audit function for rule {rule_id}
-audit_{rule_id_safe}() {{
+
+# Audit function for rule 3.3.1
+audit_3_3_1() {
     local output
     local exit_code
     
     output=$(
-{audit_content}
+        # CIS 3.3.1 Ensure IP forwarding is disabled
+
+        echo "Checking IP forwarding status..."
+
+        FAIL=0
+
+        # Check IPv4 forwarding
+        IPV4_FWD=$(sysctl -n net.ipv4.ip_forward 2>/dev/null)
+        if [ "$IPV4_FWD" = "0" ]; then
+            echo "PASS: net.ipv4.ip_forward = 0"
+        else
+            echo "FAIL: net.ipv4.ip_forward = $IPV4_FWD (should be 0)"
+            FAIL=1
+        fi
+
+        # Check IPv6 forwarding (if IPv6 is enabled)
+        IPV6_FWD=$(sysctl -n net.ipv6.conf.all.forwarding 2>/dev/null)
+        if [ -n "$IPV6_FWD" ]; then
+            if [ "$IPV6_FWD" = "0" ]; then
+                echo "PASS: net.ipv6.conf.all.forwarding = 0"
+            else
+                echo "FAIL: net.ipv6.conf.all.forwarding = $IPV6_FWD (should be 0)"
+                FAIL=1
+            fi
+        else
+            echo "INFO: IPv6 not available, skipping IPv6 forwarding check"
+        fi
+
+        # Check persistent configuration
+        if grep -rqs "^\s*net\.ipv4\.ip_forward\s*=\s*1" /etc/sysctl.conf /etc/sysctl.d/; then
+            echo "WARNING: IP forwarding may be enabled at boot via sysctl configuration"
+        fi
+
+        if [ "$FAIL" -eq 0 ]; then
+            echo ""
+            echo "AUDIT RESULT: PASS"
+            exit 0
+        else
+            echo ""
+            echo "AUDIT RESULT: FAIL"
+            exit 1
+        fi
     ) 2>&1
     exit_code=$?
     
     echo "$output"
     return $exit_code
-}}
-'''
+}
 
-REMEDIATION_FUNCTION_TEMPLATE = '''
-# Remediation function for rule {rule_id}
-remediate_{rule_id_safe}() {{
-{remediation_content}
-}}
-'''
 
-BEFORE_AUDIT_BLOCK = '''
-# --- Before Audit: {rule_id} ---
-echo -n "[{index}/{total}] Auditing {rule_id}... "
-BEFORE_OUTPUT["{rule_id}"]=$(audit_{rule_id_safe} 2>&1)
-BEFORE_RESULTS["{rule_id}"]=$?
-if [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 0 ]; then
-    echo -e "${{GREEN}}PASS${{NC}}"
+# Remediation function for rule 3.3.1
+remediate_3_3_1() {
+    # CIS 3.3.1 Ensure IP forwarding is disabled
+
+    echo "Applying remediation for CIS 3.3.1..."
+
+    # Create sysctl configuration
+    cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
+    # CIS 3.3.1 - Disable IP forwarding
+    net.ipv4.ip_forward = 0
+    EOF
+
+    cat >> /etc/sysctl.d/60-netipv6_sysctl.conf << 'EOF'
+    # CIS 3.3.1 - Disable IPv6 forwarding
+    net.ipv6.conf.all.forwarding = 0
+    EOF
+
+    # Apply settings immediately
+    sysctl -w net.ipv4.ip_forward=0 2>/dev/null
+    sysctl -w net.ipv6.conf.all.forwarding=0 2>/dev/null
+    sysctl -w net.ipv4.route.flush=1 2>/dev/null
+    sysctl -w net.ipv6.route.flush=1 2>/dev/null
+
+    echo "IP forwarding disabled"
+    echo "Remediation complete for CIS 3.3.1"
+}
+
+
+# Audit function for rule 3.3.2
+audit_3_3_2() {
+    local output
+    local exit_code
+    
+    output=$(
+        # CIS 3.3.2 Ensure packet redirect sending is disabled
+
+        echo "Checking packet redirect sending status..."
+
+        FAIL=0
+
+        ALL_SEND=$(sysctl -n net.ipv4.conf.all.send_redirects 2>/dev/null)
+        DEFAULT_SEND=$(sysctl -n net.ipv4.conf.default.send_redirects 2>/dev/null)
+
+        if [ "$ALL_SEND" = "0" ]; then
+            echo "PASS: net.ipv4.conf.all.send_redirects = 0"
+        else
+            echo "FAIL: net.ipv4.conf.all.send_redirects = $ALL_SEND (should be 0)"
+            FAIL=1
+        fi
+
+        if [ "$DEFAULT_SEND" = "0" ]; then
+            echo "PASS: net.ipv4.conf.default.send_redirects = 0"
+        else
+            echo "FAIL: net.ipv4.conf.default.send_redirects = $DEFAULT_SEND (should be 0)"
+            FAIL=1
+        fi
+
+        if [ "$FAIL" -eq 0 ]; then
+            echo ""
+            echo "AUDIT RESULT: PASS"
+            exit 0
+        else
+            echo ""
+            echo "AUDIT RESULT: FAIL"
+            exit 1
+        fi
+    ) 2>&1
+    exit_code=$?
+    
+    echo "$output"
+    return $exit_code
+}
+
+
+# Remediation function for rule 3.3.2
+remediate_3_3_2() {
+    # CIS 3.3.2 Ensure packet redirect sending is disabled
+
+    echo "Applying remediation for CIS 3.3.2..."
+
+    cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
+    # CIS 3.3.2 - Disable packet redirect sending
+    net.ipv4.conf.all.send_redirects = 0
+    net.ipv4.conf.default.send_redirects = 0
+    EOF
+
+    sysctl -w net.ipv4.conf.all.send_redirects=0
+    sysctl -w net.ipv4.conf.default.send_redirects=0
+    sysctl -w net.ipv4.route.flush=1
+
+    echo "Remediation complete for CIS 3.3.2"
+}
+
+
+# Audit function for rule 3.3.3
+audit_3_3_3() {
+    local output
+    local exit_code
+    
+    output=$(
+        # CIS 3.3.3 Ensure bogus ICMP responses are ignored
+
+        echo "Checking bogus ICMP response handling..."
+
+        VALUE=$(sysctl -n net.ipv4.icmp_ignore_bogus_error_responses 2>/dev/null)
+
+        if [ "$VALUE" = "1" ]; then
+            echo "PASS: net.ipv4.icmp_ignore_bogus_error_responses = 1"
+            echo ""
+            echo "AUDIT RESULT: PASS"
+            exit 0
+        else
+            echo "FAIL: net.ipv4.icmp_ignore_bogus_error_responses = $VALUE (should be 1)"
+            echo ""
+            echo "AUDIT RESULT: FAIL"
+            exit 1
+        fi
+    ) 2>&1
+    exit_code=$?
+    
+    echo "$output"
+    return $exit_code
+}
+
+
+# Remediation function for rule 3.3.3
+remediate_3_3_3() {
+    # CIS 3.3.3 Ensure bogus ICMP responses are ignored
+
+    echo "Applying remediation for CIS 3.3.3..."
+
+    cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
+    # CIS 3.3.3 - Ignore bogus ICMP responses
+    net.ipv4.icmp_ignore_bogus_error_responses = 1
+    EOF
+
+    sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=1
+    sysctl -w net.ipv4.route.flush=1
+
+    echo "Remediation complete for CIS 3.3.3"
+}
+
+
+# --- Before Audit: 3.3.1 ---
+echo -n "[1/3] Auditing 3.3.1... "
+BEFORE_OUTPUT["3.3.1"]=$(audit_3_3_1 2>&1)
+BEFORE_RESULTS["3.3.1"]=$?
+if [ "${BEFORE_RESULTS["3.3.1"]}" -eq 0 ]; then
+    echo -e "${GREEN}PASS${NC}"
 else
-    echo -e "${{RED}}FAIL${{NC}}"
+    echo -e "${RED}FAIL${NC}"
 fi
-'''
 
-REMEDIATION_BLOCK = '''
+
+# --- Before Audit: 3.3.2 ---
+echo -n "[2/3] Auditing 3.3.2... "
+BEFORE_OUTPUT["3.3.2"]=$(audit_3_3_2 2>&1)
+BEFORE_RESULTS["3.3.2"]=$?
+if [ "${BEFORE_RESULTS["3.3.2"]}" -eq 0 ]; then
+    echo -e "${GREEN}PASS${NC}"
+else
+    echo -e "${RED}FAIL${NC}"
+fi
+
+
+# --- Before Audit: 3.3.3 ---
+echo -n "[3/3] Auditing 3.3.3... "
+BEFORE_OUTPUT["3.3.3"]=$(audit_3_3_3 2>&1)
+BEFORE_RESULTS["3.3.3"]=$?
+if [ "${BEFORE_RESULTS["3.3.3"]}" -eq 0 ]; then
+    echo -e "${GREEN}PASS${NC}"
+else
+    echo -e "${RED}FAIL${NC}"
+fi
+
+
 ###############################################################################
 # PHASE 2: REMEDIATION
 ###############################################################################
@@ -121,13 +299,17 @@ for rule_id in "${RULES_LIST[@]}"; do
     if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ]; then
         echo -e "${BLUE}Remediating $rule_id...${NC}"
         case "$rule_id" in
-'''
 
-REMEDIATION_CASE_TEMPLATE = '''            "{rule_id}")
-                remediate_{rule_id_safe}
-                ;;'''
+            "3.3.1")
+                remediate_3_3_1
+                ;;
+            "3.3.2")
+                remediate_3_3_2
+                ;;
+            "3.3.3")
+                remediate_3_3_3
+                ;;
 
-REMEDIATION_BLOCK_END = '''
         esac
         ((REMEDIATED_COUNT++))
     fi
@@ -139,9 +321,8 @@ else
     echo ""
     echo "Remediated $REMEDIATED_COUNT rule(s)"
 fi
-'''
 
-AFTER_AUDIT_BLOCK_HEADER = '''
+
 ###############################################################################
 # PHASE 3: FINAL AUDIT (AFTER)
 ###############################################################################
@@ -149,21 +330,41 @@ echo ""
 echo -e "${YELLOW}=== PHASE 3: Final Audit (AFTER) ===${NC}"
 echo ""
 
-'''
 
-AFTER_AUDIT_TEMPLATE = '''
-# --- After Audit: {rule_id} ---
-echo -n "[{index}/{total}] Re-auditing {rule_id}... "
-AFTER_OUTPUT["{rule_id}"]=$(audit_{rule_id_safe} 2>&1)
-AFTER_RESULTS["{rule_id}"]=$?
-if [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
-    echo -e "${{GREEN}}PASS${{NC}}"
+
+# --- After Audit: 3.3.1 ---
+echo -n "[1/3] Re-auditing 3.3.1... "
+AFTER_OUTPUT["3.3.1"]=$(audit_3_3_1 2>&1)
+AFTER_RESULTS["3.3.1"]=$?
+if [ "${AFTER_RESULTS["3.3.1"]}" -eq 0 ]; then
+    echo -e "${GREEN}PASS${NC}"
 else
-    echo -e "${{RED}}FAIL${{NC}}"
+    echo -e "${RED}FAIL${NC}"
 fi
-'''
 
-HTML_REPORT_GENERATOR = '''
+
+# --- After Audit: 3.3.2 ---
+echo -n "[2/3] Re-auditing 3.3.2... "
+AFTER_OUTPUT["3.3.2"]=$(audit_3_3_2 2>&1)
+AFTER_RESULTS["3.3.2"]=$?
+if [ "${AFTER_RESULTS["3.3.2"]}" -eq 0 ]; then
+    echo -e "${GREEN}PASS${NC}"
+else
+    echo -e "${RED}FAIL${NC}"
+fi
+
+
+# --- After Audit: 3.3.3 ---
+echo -n "[3/3] Re-auditing 3.3.3... "
+AFTER_OUTPUT["3.3.3"]=$(audit_3_3_3 2>&1)
+AFTER_RESULTS["3.3.3"]=$?
+if [ "${AFTER_RESULTS["3.3.3"]}" -eq 0 ]; then
+    echo -e "${GREEN}PASS${NC}"
+else
+    echo -e "${RED}FAIL${NC}"
+fi
+
+
 ###############################################################################
 # PHASE 4: GENERATE HTML REPORT
 ###############################################################################
@@ -183,18 +384,10 @@ AFTER_FAIL=0
 FIXED_COUNT=0
 
 for rule_id in "${RULES_LIST[@]}"; do
-    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ]; then
-        ((BEFORE_PASS++)) || true
-    else
-        ((BEFORE_FAIL++)) || true
-    fi
-    if [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
-        ((AFTER_PASS++)) || true
-    else
-        ((AFTER_FAIL++)) || true
-    fi
+    [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ] && ((BEFORE_PASS++)) || ((BEFORE_FAIL++))
+    [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ] && ((AFTER_PASS++)) || ((AFTER_FAIL++))
     if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
-        ((FIXED_COUNT++)) || true
+        ((FIXED_COUNT++))
     fi
 done
 
@@ -305,8 +498,8 @@ for rule_id in "${RULES_LIST[@]}"; do
     fi
     
     # Escape HTML in output
-    before_out=$(echo "${BEFORE_OUTPUT[$rule_id]}" | sed 's/&/\\&amp;/g; s/</\\&lt;/g; s/>/\\&gt;/g; s/"/\\&quot;/g')
-    after_out=$(echo "${AFTER_OUTPUT[$rule_id]}" | sed 's/&/\\&amp;/g; s/</\\&lt;/g; s/>/\\&gt;/g; s/"/\\&quot;/g')
+    before_out=$(echo "${BEFORE_OUTPUT[$rule_id]}" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g')
+    after_out=$(echo "${AFTER_OUTPUT[$rule_id]}" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g')
     
     cat >> "$REPORT_FILE" << ROWEOF
                     <tr>
@@ -357,164 +550,3 @@ echo "  Before: $BEFORE_PASS passed, $BEFORE_FAIL failed"
 echo "  After:  $AFTER_PASS passed, $AFTER_FAIL failed"
 echo "  Fixed:  $FIXED_COUNT rule(s)"
 echo ""
-'''
-
-
-class Registry:
-    def __init__(self, entries: List[Dict[str, str]]):
-        self.entries = {entry["id"]: entry for entry in entries}
-
-    @classmethod
-    def from_file(cls, path: Path) -> "Registry":
-        with path.open("r", encoding="utf-8") as handle:
-            entries = json.load(handle)
-        return cls(entries)
-
-    def resolve(self, rule_id: str) -> Dict[str, str]:
-        if rule_id not in self.entries:
-            raise KeyError(f"Rule ID '{rule_id}' not found in registry")
-        return self.entries[rule_id]
-
-
-def make_safe_id(rule_id: str) -> str:
-    """Convert rule ID to safe bash function name."""
-    return re.sub(r'[^a-zA-Z0-9]', '_', rule_id)
-
-
-def read_file(path: Path) -> str:
-    """Read file and strip shebang lines."""
-    with path.open("r", encoding="utf-8") as handle:
-        content = handle.read()
-    
-    # Remove shebang lines and normalize line endings
-    lines = content.replace('\r\n', '\n').split('\n')
-    filtered_lines = [line for line in lines if not line.strip().startswith('#!')]
-    return '\n'.join(filtered_lines).strip()
-
-
-def indent_content(content: str, spaces: int = 8) -> str:
-    """Indent content by specified spaces."""
-    indent = ' ' * spaces
-    lines = content.split('\n')
-    return '\n'.join(indent + line if line.strip() else line for line in lines)
-
-
-def compose_script(registry_path: Path, rule_ids: List[str], output_path: Path) -> str:
-    """Compose the full audit/remediation script."""
-    registry = Registry.from_file(registry_path)
-    timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    total = len(rule_ids)
-    
-    # Quoted rule IDs for bash array
-    rule_ids_quoted = ' '.join(f'"{rid}"' for rid in rule_ids)
-    
-    # Start building script
-    script_parts = [
-        SCRIPT_HEADER.format(
-            timestamp=timestamp,
-            registry=registry_path,
-            rule_count=total,
-            rule_ids_quoted=rule_ids_quoted
-        )
-    ]
-    
-    # Generate audit and remediation functions for each rule
-    for rule_id in rule_ids:
-        entry = registry.resolve(rule_id)
-        safe_id = make_safe_id(rule_id)
-        
-        audit_content = read_file(Path(entry["audit"]))
-        remediation_content = read_file(Path(entry["remediation"]))
-        
-        script_parts.append(AUDIT_FUNCTION_TEMPLATE.format(
-            rule_id=rule_id,
-            rule_id_safe=safe_id,
-            audit_content=indent_content(audit_content)
-        ))
-        
-        script_parts.append(REMEDIATION_FUNCTION_TEMPLATE.format(
-            rule_id=rule_id,
-            rule_id_safe=safe_id,
-            remediation_content=indent_content(remediation_content, 4)
-        ))
-    
-    # Phase 1: Before audit
-    for idx, rule_id in enumerate(rule_ids, 1):
-        safe_id = make_safe_id(rule_id)
-        script_parts.append(BEFORE_AUDIT_BLOCK.format(
-            rule_id=rule_id,
-            rule_id_safe=safe_id,
-            index=idx,
-            total=total
-        ))
-    
-    # Phase 2: Remediation
-    script_parts.append(REMEDIATION_BLOCK)
-    for rule_id in rule_ids:
-        safe_id = make_safe_id(rule_id)
-        script_parts.append(REMEDIATION_CASE_TEMPLATE.format(
-            rule_id=rule_id,
-            rule_id_safe=safe_id
-        ))
-    script_parts.append(REMEDIATION_BLOCK_END)
-    
-    # Phase 3: After audit
-    script_parts.append(AFTER_AUDIT_BLOCK_HEADER)
-    for idx, rule_id in enumerate(rule_ids, 1):
-        safe_id = make_safe_id(rule_id)
-        script_parts.append(AFTER_AUDIT_TEMPLATE.format(
-            rule_id=rule_id,
-            rule_id_safe=safe_id,
-            index=idx,
-            total=total
-        ))
-    
-    # Phase 4: HTML report
-    script_parts.append(HTML_REPORT_GENERATOR)
-    
-    # Join and write
-    script = '\n'.join(script_parts)
-    
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8", newline='\n') as handle:
-        handle.write(script)
-    
-    return script
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Compose CIS audit/remediation bash script with HTML reporting"
-    )
-    parser.add_argument(
-        "rule_ids", 
-        nargs="+", 
-        help="Rule IDs to include, in desired order"
-    )
-    parser.add_argument(
-        "--registry", 
-        default=Path("Rules/index.json"), 
-        type=Path, 
-        help="Path to registry JSON"
-    )
-    parser.add_argument(
-        "--output", 
-        default=Path("output/cis_audit.sh"), 
-        type=Path, 
-        help="Where to write the combined script"
-    )
-    return parser.parse_args()
-
-
-def main() -> None:
-    args = parse_args()
-    compose_script(args.registry, args.rule_ids, args.output)
-    print(f"[OK] Generated script with {len(args.rule_ids)} rule(s)")
-    print(f"[OK] Output: {args.output}")
-    print(f"\nTo run on target:")
-    print(f"  1. Copy to target: scp {args.output} user@host:~/")
-    print(f"  2. Run: sudo bash {args.output.name}")
-
-
-if __name__ == "__main__":
-    main()
