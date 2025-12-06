@@ -1,17 +1,19 @@
 #!/bin/bash
-# 2.1.13 Ensure rsync services are not in use
+# CIS Benchmark 2.1.13 - Ensure rsync services are not in use
+audit_passed=true
+echo "Checking rsync services..."
 
-# Check if rsync is enabled
-if systemctl is-enabled rsync | grep -q 'enabled'; then
-  echo "FAILED: rsync is enabled"
-  exit 1
+if dpkg-query -W -f='${db:Status-Status}' rsync 2>/dev/null | grep -q "installed"; then
+    echo "FAIL: rsync package is installed"; audit_passed=false
+else
+    echo "PASS: rsync package is not installed"
 fi
 
-# Check if rsync is active
-if systemctl is-active rsync | grep -q 'active'; then
-  echo "FAILED: rsync is active"
-  exit 1
+if systemctl is-enabled rsync.service 2>/dev/null | grep -q "enabled"; then
+    echo "FAIL: rsync.service is enabled"; audit_passed=false
+else
+    echo "PASS: rsync.service is not enabled"
 fi
 
-echo "PASSED: rsync services are not in use"
-exit 0
+echo ""
+[ "$audit_passed" = true ] && echo "AUDIT RESULT: PASS" && exit 0 || echo "AUDIT RESULT: FAIL" && exit 1

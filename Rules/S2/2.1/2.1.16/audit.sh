@@ -1,17 +1,19 @@
 #!/bin/bash
-# 2.1.16 Ensure tftp server services are not in use
+# CIS Benchmark 2.1.16 - Ensure telnet server services are not in use
+audit_passed=true
+echo "Checking telnet server services..."
 
-# Check if tftpd-hpa is enabled
-if systemctl is-enabled tftpd-hpa | grep -q 'enabled'; then
-  echo "FAILED: tftpd-hpa is enabled"
-  exit 1
+if dpkg-query -W -f='${db:Status-Status}' telnetd 2>/dev/null | grep -q "installed"; then
+    echo "FAIL: telnetd package is installed"; audit_passed=false
+else
+    echo "PASS: telnetd package is not installed"
 fi
 
-# Check if tftpd-hpa is active
-if systemctl is-active tftpd-hpa | grep -q 'active'; then
-  echo "FAILED: tftpd-hpa is active"
-  exit 1
+if systemctl is-enabled telnet.socket 2>/dev/null | grep -q "enabled"; then
+    echo "FAIL: telnet.socket is enabled"; audit_passed=false
+else
+    echo "PASS: telnet.socket is not enabled"
 fi
 
-echo "PASSED: tftp server services are not in use"
-exit 0
+echo ""
+[ "$audit_passed" = true ] && echo "AUDIT RESULT: PASS" && exit 0 || echo "AUDIT RESULT: FAIL" && exit 1

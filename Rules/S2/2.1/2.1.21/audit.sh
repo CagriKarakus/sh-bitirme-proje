@@ -1,11 +1,16 @@
 #!/bin/bash
-# 2.1.21 Ensure mail transfer agent is configured for local-only mode
+# CIS Benchmark 2.1.21 - Ensure X window server services are not in use
+audit_passed=true
+echo "Checking X Window server services..."
 
-# Check if port 25 is listening on non-loopback interfaces
-if ss -lntu | grep -E ':25\s' | grep -E -v '\s(127.0.0.1|::1):25\s'; then
-  echo "FAILED: MTA is listening on non-loopback interfaces"
-  exit 1
+xorg_installed=$(dpkg-query -W -f='${binary:Package}\n' 'xserver-xorg*' 2>/dev/null | head -1)
+if [ -n "$xorg_installed" ]; then
+    echo "FAIL: X Window server packages are installed"
+    dpkg-query -W -f='${binary:Package}\t${Status}\n' 'xserver-xorg*' 2>/dev/null
+    audit_passed=false
+else
+    echo "PASS: X Window server packages are not installed"
 fi
 
-echo "PASSED: MTA is configured for local-only mode"
-exit 0
+echo ""
+[ "$audit_passed" = true ] && echo "AUDIT RESULT: PASS" && exit 0 || echo "AUDIT RESULT: FAIL" && exit 1

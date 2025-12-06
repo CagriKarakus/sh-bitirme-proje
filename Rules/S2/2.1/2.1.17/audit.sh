@@ -1,17 +1,19 @@
 #!/bin/bash
-# 2.1.17 Ensure web proxy server services are not in use
+# CIS Benchmark 2.1.17 - Ensure tftp server services are not in use
+audit_passed=true
+echo "Checking TFTP server services..."
 
-# Check if squid is enabled
-if systemctl is-enabled squid | grep -q 'enabled'; then
-  echo "FAILED: squid is enabled"
-  exit 1
+if dpkg-query -W -f='${db:Status-Status}' tftpd-hpa 2>/dev/null | grep -q "installed"; then
+    echo "FAIL: tftpd-hpa package is installed"; audit_passed=false
+else
+    echo "PASS: tftpd-hpa package is not installed"
 fi
 
-# Check if squid is active
-if systemctl is-active squid | grep -q 'active'; then
-  echo "FAILED: squid is active"
-  exit 1
+if systemctl is-enabled tftpd-hpa.service 2>/dev/null | grep -q "enabled"; then
+    echo "FAIL: tftpd-hpa.service is enabled"; audit_passed=false
+else
+    echo "PASS: tftpd-hpa.service is not enabled"
 fi
 
-echo "PASSED: web proxy server services are not in use"
-exit 0
+echo ""
+[ "$audit_passed" = true ] && echo "AUDIT RESULT: PASS" && exit 0 || echo "AUDIT RESULT: FAIL" && exit 1

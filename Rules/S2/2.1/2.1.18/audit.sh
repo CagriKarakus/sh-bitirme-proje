@@ -1,25 +1,19 @@
 #!/bin/bash
-# 2.1.18 Ensure web server services are not in use
+# CIS Benchmark 2.1.18 - Ensure web proxy server services are not in use
+audit_passed=true
+echo "Checking web proxy server services..."
 
-# Check apache2
-if systemctl is-enabled apache2 2>/dev/null | grep -q 'enabled'; then
-  echo "FAILED: apache2 is enabled"
-  exit 1
-fi
-if systemctl is-active apache2 2>/dev/null | grep -q 'active'; then
-  echo "FAILED: apache2 is active"
-  exit 1
+if dpkg-query -W -f='${db:Status-Status}' squid 2>/dev/null | grep -q "installed"; then
+    echo "FAIL: squid package is installed"; audit_passed=false
+else
+    echo "PASS: squid package is not installed"
 fi
 
-# Check nginx
-if systemctl is-enabled nginx 2>/dev/null | grep -q 'enabled'; then
-  echo "FAILED: nginx is enabled"
-  exit 1
-fi
-if systemctl is-active nginx 2>/dev/null | grep -q 'active'; then
-  echo "FAILED: nginx is active"
-  exit 1
+if systemctl is-enabled squid.service 2>/dev/null | grep -q "enabled"; then
+    echo "FAIL: squid.service is enabled"; audit_passed=false
+else
+    echo "PASS: squid.service is not enabled"
 fi
 
-echo "PASSED: web server services are not in use"
-exit 0
+echo ""
+[ "$audit_passed" = true ] && echo "AUDIT RESULT: PASS" && exit 0 || echo "AUDIT RESULT: FAIL" && exit 1

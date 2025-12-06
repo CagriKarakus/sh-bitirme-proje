@@ -1,11 +1,6 @@
 #!/bin/bash
-# 2.1.21 Ensure mail transfer agent is configured for local-only mode
-
-# This script assumes Postfix is the MTA.
-if [ -f /etc/postfix/main.cf ]; then
-  postconf -e "inet_interfaces = loopback-only"
-  systemctl restart postfix
-  echo "Remediated Postfix configuration."
-else
-  echo "WARNING: Postfix config not found. Manual remediation required for other MTAs."
-fi
+# CIS Benchmark 2.1.21 - Ensure X window server services are not in use
+echo "Applying remediation for CIS 2.1.21..."
+echo "WARNING: This will remove X Window server packages and may affect GUI functionality"
+apt purge -y 'xserver-xorg*' 2>/dev/null
+echo "Remediation complete for CIS 2.1.21"

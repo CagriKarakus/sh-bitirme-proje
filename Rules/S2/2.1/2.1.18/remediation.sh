@@ -1,10 +1,7 @@
 #!/bin/bash
-# 2.1.18 Ensure web server services are not in use
-
-systemctl stop apache2
-systemctl disable apache2
-apt purge apache2 -y
-
-systemctl stop nginx
-systemctl disable nginx
-apt purge nginx -y
+# CIS Benchmark 2.1.18 - Ensure web proxy server services are not in use
+echo "Applying remediation for CIS 2.1.18..."
+systemctl stop squid.service 2>/dev/null
+systemctl mask squid.service 2>/dev/null
+dpkg-query -W -f='${db:Status-Status}' squid 2>/dev/null | grep -q "installed" && apt purge -y squid
+echo "Remediation complete for CIS 2.1.18"
