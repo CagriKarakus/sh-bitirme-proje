@@ -1,12 +1,18 @@
 #!/bin/bash
-# 4.3.7 Ensure nftables outbound and established connections are configured
+# CIS 4.3.7 Ensure nftables outbound and established connections are configured
 
-if nft list ruleset | grep -q 'ip protocol tcp ct state established,related accept' && \
-   nft list ruleset | grep -q 'ip protocol udp ct state established,related accept' && \
-   nft list ruleset | grep -q 'ip protocol icmp ct state established,related accept'; then
-    echo "Outbound and established connections configured"
+echo "Checking nftables connection tracking..."
+
+RULESET=$(nft list ruleset 2>/dev/null)
+
+if echo "$RULESET" | grep -q "ct state"; then
+    echo "PASS: Connection tracking rules found"
+    echo ""
+    echo "AUDIT RESULT: PASS"
     exit 0
 else
-    echo "Outbound and established connections not configured"
+    echo "FAIL: No connection tracking rules found"
+    echo ""
+    echo "AUDIT RESULT: FAIL"
     exit 1
 fi

@@ -1,13 +1,31 @@
 #!/bin/bash
-# 4.2.7 Ensure ufw default deny firewall policy
+# CIS 4.2.7 Ensure ufw default deny firewall policy
 
-if ufw status verbose | grep -q "Default: deny (incoming), deny (outgoing), disabled (routed)"; then
-    echo "Default deny policy is configured"
-    exit 0
-elif ufw status verbose | grep -q "Default: deny (incoming), allow (outgoing), disabled (routed)"; then
-     echo "Default deny incoming policy is configured"
-     exit 0
+echo "Checking ufw default policy..."
+
+UFW_STATUS=$(ufw status verbose 2>/dev/null)
+
+FAIL=0
+
+# Check default incoming policy
+if echo "$UFW_STATUS" | grep -q "Default: deny (incoming)"; then
+    echo "PASS: Default incoming policy is deny"
 else
-    echo "Default deny policy is not configured"
+    echo "FAIL: Default incoming policy is not deny"
+    FAIL=1
+fi
+
+# Show current default policies
+echo ""
+echo "Current defaults:"
+echo "$UFW_STATUS" | grep "Default:"
+
+if [ "$FAIL" -eq 0 ]; then
+    echo ""
+    echo "AUDIT RESULT: PASS"
+    exit 0
+else
+    echo ""
+    echo "AUDIT RESULT: FAIL"
     exit 1
 fi

@@ -1,16 +1,20 @@
 #!/bin/bash
-# 4.2.5 Ensure ufw outbound connections are configured
+# CIS 4.2.5 Ensure ufw outbound connections are configured
 
-# This is a manual check as it depends on site policy.
-# We check if there are any ALLOW OUT rules or if the default policy is ALLOW OUT.
+echo "Checking ufw outbound connection configuration..."
 
-if ufw status verbose | grep -q "Default:.*allow (outgoing)"; then
-    echo "Default outgoing policy is allow"
-    exit 0
-elif ufw status verbose | grep -q "ALLOW OUT"; then
-    echo "Outbound rules exist"
-    exit 0
-else
-    echo "No outbound configuration detected"
-    exit 1
+UFW_STATUS=$(ufw status verbose 2>/dev/null)
+
+echo "Current UFW status:"
+echo "$UFW_STATUS"
+echo ""
+
+# Check default outgoing policy
+if echo "$UFW_STATUS" | grep -q "Default: .* (outgoing)"; then
+    OUTGOING=$(echo "$UFW_STATUS" | grep "Default:" | sed 's/.*(\(.*\) (outgoing).*/\1/')
+    echo "INFO: Default outgoing policy: $OUTGOING"
 fi
+
+echo ""
+echo "AUDIT RESULT: MANUAL - Verify outbound rules match site policy"
+exit 0

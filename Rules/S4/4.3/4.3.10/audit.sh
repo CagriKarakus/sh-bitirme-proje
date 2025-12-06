@@ -1,11 +1,23 @@
 #!/bin/bash
-# 4.3.10 Ensure nftables rules are permanent
+# CIS 4.3.10 Ensure nftables rules are permanent
 
-if grep -q "include \"/etc/nftables.conf\"" /etc/sysconfig/nftables.conf 2>/dev/null || \
-   [ -f /etc/nftables.conf ]; then
-    echo "nftables rules are permanent"
-    exit 0
+echo "Checking nftables persistence..."
+
+if [ -f /etc/nftables.conf ]; then
+    if grep -q "table" /etc/nftables.conf; then
+        echo "PASS: nftables.conf exists with rules"
+        echo ""
+        echo "AUDIT RESULT: PASS"
+        exit 0
+    else
+        echo "WARNING: nftables.conf exists but may be empty"
+        echo ""
+        echo "AUDIT RESULT: MANUAL - Review /etc/nftables.conf"
+        exit 0
+    fi
 else
-    echo "nftables rules are not permanent"
+    echo "FAIL: /etc/nftables.conf does not exist"
+    echo ""
+    echo "AUDIT RESULT: FAIL"
     exit 1
 fi

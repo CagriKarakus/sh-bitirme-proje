@@ -1,4 +1,8 @@
 #!/bin/bash
-# 4.3.4 Ensure a nftables table exists
+# CIS 4.3.4 Ensure a nftables table exists
 
-nft add table inet filter
+echo "Applying remediation for CIS 4.3.4..."
+
+nft create table inet filter 2>/dev/null || echo "Table may already exist"
+
+echo "Remediation complete for CIS 4.3.4"

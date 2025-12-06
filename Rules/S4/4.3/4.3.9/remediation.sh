@@ -1,4 +1,8 @@
 #!/bin/bash
-# 4.3.9 Ensure nftables service is enabled
+# CIS 4.3.9 Ensure nftables service is enabled
 
-systemctl enable nftables
+echo "Applying remediation for CIS 4.3.9..."
+
+systemctl enable nftables.service
+
+echo "Remediation complete for CIS 4.3.9"

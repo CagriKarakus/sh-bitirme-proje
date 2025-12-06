@@ -1,6 +1,10 @@
 #!/bin/bash
-# 4.2.5 Ensure ufw outbound connections are configured
-# Manual remediation required.
+# CIS 4.2.5 Ensure ufw outbound connections are configured
 
-echo "Manual remediation required. Configure outbound rules based on your specific requirements."
-echo "Example: ufw allow out 53/tcp"
+echo "Applying remediation for CIS 4.2.5..."
+
+# Set default outgoing policy to allow
+ufw default allow outgoing
+
+echo "Remediation complete for CIS 4.2.5"
+echo "NOTE: Adjust outbound rules based on your site policy"

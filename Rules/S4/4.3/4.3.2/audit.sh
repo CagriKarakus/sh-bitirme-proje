@@ -1,17 +1,16 @@
 #!/bin/bash
-# 4.3.2 Ensure ufw is uninstalled or disabled with nftables
+# CIS 4.3.2 Ensure ufw is uninstalled or disabled with nftables
 
-if dpkg-query -W -f='${Status}' ufw 2>/dev/null | grep -q "install ok installed"; then
-    if ufw status | grep -q "Status: active"; then
-        echo "ufw is installed and active"
-        exit 1
-    fi
-fi
+echo "Checking if ufw is disabled..."
 
-if dpkg-query -W -f='${Status}' iptables-persistent 2>/dev/null | grep -q "install ok installed"; then
-    echo "iptables-persistent is installed"
+if ufw status 2>/dev/null | grep -q "Status: active"; then
+    echo "FAIL: ufw is active (should be disabled when using nftables)"
+    echo ""
+    echo "AUDIT RESULT: FAIL"
     exit 1
+else
+    echo "PASS: ufw is not active"
+    echo ""
+    echo "AUDIT RESULT: PASS"
+    exit 0
 fi
-
-echo "ufw and iptables-persistent are not interfering"
-exit 0

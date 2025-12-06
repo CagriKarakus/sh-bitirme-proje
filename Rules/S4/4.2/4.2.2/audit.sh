@@ -1,10 +1,16 @@
 #!/bin/bash
-# 4.2.2 Ensure iptables-persistent is not installed with ufw
+# CIS 4.2.2 Ensure iptables-persistent is not installed with ufw
 
-if dpkg-query -W -f='${Status}' iptables-persistent 2>/dev/null | grep -q "install ok installed"; then
-    echo "iptables-persistent is installed"
+echo "Checking if iptables-persistent is installed..."
+
+if dpkg -l iptables-persistent 2>/dev/null | grep -q "^ii"; then
+    echo "FAIL: iptables-persistent is installed (conflicts with ufw)"
+    echo ""
+    echo "AUDIT RESULT: FAIL"
     exit 1
 else
-    echo "iptables-persistent is not installed"
+    echo "PASS: iptables-persistent is not installed"
+    echo ""
+    echo "AUDIT RESULT: PASS"
     exit 0
 fi
