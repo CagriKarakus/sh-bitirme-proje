@@ -1,8 +1,8 @@
 #!/bin/bash
-# CIS Benchmark 1.7.5 - Ensure GDM screen locks cannot be overridden
+# CIS Benchmark 1.7.7 - Ensure GDM disabling automatic mounting of removable media is not overridden
 # Remediation Script
 
-echo "Applying remediation for CIS 1.7.5 - Ensure GDM screen locks cannot be overridden..."
+echo "Applying remediation for CIS 1.7.7 - Ensure GDM disabling automatic mounting of removable media is not overridden..."
 
 # First check if GDM is installed
 if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installed"; then
@@ -11,20 +11,20 @@ if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installe
     exit 0
 fi
 
-echo "GDM is installed, configuring screen lock override prevention..."
+echo "GDM is installed, configuring automatic mounting override prevention..."
 
 # Create locks directory
 locks_dir="/etc/dconf/db/local.d/locks"
-locks_file="$locks_dir/00-screensaver"
+locks_file="$locks_dir/00-media-automount"
 
 echo "Creating locks directory at $locks_dir..."
 mkdir -p "$locks_dir"
 
 echo "Creating locks configuration at $locks_file..."
 cat > "$locks_file" << 'EOF'
-# Lock desktop screensaver settings
-/org/gnome/desktop/session/idle-delay
-/org/gnome/desktop/screensaver/lock-delay
+# Lock automatic mounting settings
+/org/gnome/desktop/media-handling/automount
+/org/gnome/desktop/media-handling/automount-open
 EOF
 
 echo "Created locks configuration"
@@ -60,6 +60,6 @@ echo "Locks file ($locks_file):"
 cat "$locks_file"
 echo "----------------------"
 echo ""
-echo "Remediation complete for CIS 1.7.5 - Ensure GDM screen locks cannot be overridden"
+echo "Remediation complete for CIS 1.7.7 - Ensure GDM disabling automatic mounting of removable media is not overridden"
 echo ""
 echo "NOTE: Users must log out and back in again for the settings to take effect"

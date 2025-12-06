@@ -1,10 +1,10 @@
 #!/bin/bash
-# CIS Benchmark 1.7.5 - Ensure GDM screen locks cannot be overridden
+# CIS Benchmark 1.7.7 - Ensure GDM disabling automatic mounting of removable media is not overridden
 # Audit Script
 
 audit_passed=true
 
-echo "Checking GDM screen lock override configuration..."
+echo "Checking GDM automatic mounting override configuration..."
 
 # First check if GDM is installed
 if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installed"; then
@@ -15,19 +15,18 @@ if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installe
     exit 0
 fi
 
-echo "GDM is installed, checking screen lock override settings..."
+echo "GDM is installed, checking automatic mounting override settings..."
 
 # Check dconf locks directory
 locks_dir="/etc/dconf/db/local.d/locks"
-locks_file="$locks_dir/00-screensaver"
 
 echo ""
 echo "Checking dconf locks configuration..."
 
 # Settings to verify are locked
 declare -A settings=(
-    ["idle-delay"]="/org/gnome/desktop/session/idle-delay"
-    ["lock-delay"]="/org/gnome/desktop/screensaver/lock-delay"
+    ["automount"]="/org/gnome/desktop/media-handling/automount"
+    ["automount-open"]="/org/gnome/desktop/media-handling/automount-open"
 )
 
 # Check if locks directory exists
@@ -53,9 +52,9 @@ fi
 # Final result
 echo ""
 if [ "$audit_passed" = true ]; then
-    echo "AUDIT RESULT: PASS - GDM screen locks cannot be overridden"
+    echo "AUDIT RESULT: PASS - GDM automatic mounting settings cannot be overridden"
     exit 0
 else
-    echo "AUDIT RESULT: FAIL - GDM screen lock settings can be overridden by users"
+    echo "AUDIT RESULT: FAIL - GDM automatic mounting settings can be overridden by users"
     exit 1
 fi
