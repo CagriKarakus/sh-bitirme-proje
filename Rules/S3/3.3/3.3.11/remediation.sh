@@ -1,13 +1,16 @@
 #!/bin/bash
-# 3.3.11 Ensure ipv6 router advertisements are not accepted
+# CIS 3.3.11 Ensure IPv6 router advertisements are not accepted
 
-sysctl -w net.ipv6.conf.all.accept_ra=0
-sysctl -w net.ipv6.conf.default.accept_ra=0
+echo "Applying remediation for CIS 3.3.11..."
 
-for param in net.ipv6.conf.all.accept_ra net.ipv6.conf.default.accept_ra; do
-    if grep -q "^$param" /etc/sysctl.conf; then
-        sed -i "s/^$param.*/$param = 0/" /etc/sysctl.conf
-    else
-        echo "$param = 0" >> /etc/sysctl.conf
-    fi
-done
+cat >> /etc/sysctl.d/60-netipv6_sysctl.conf << 'EOF'
+# CIS 3.3.11 - Do not accept IPv6 router advertisements
+net.ipv6.conf.all.accept_ra = 0
+net.ipv6.conf.default.accept_ra = 0
+EOF
+
+sysctl -w net.ipv6.conf.all.accept_ra=0 2>/dev/null
+sysctl -w net.ipv6.conf.default.accept_ra=0 2>/dev/null
+sysctl -w net.ipv6.route.flush=1 2>/dev/null
+
+echo "Remediation complete for CIS 3.3.11"

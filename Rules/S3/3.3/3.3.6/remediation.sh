@@ -1,13 +1,16 @@
 #!/bin/bash
-# 3.3.6 Ensure secure icmp redirects are not accepted
+# CIS 3.3.6 Ensure secure ICMP redirects are not accepted
+
+echo "Applying remediation for CIS 3.3.6..."
+
+cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
+# CIS 3.3.6 - Do not accept secure ICMP redirects
+net.ipv4.conf.all.secure_redirects = 0
+net.ipv4.conf.default.secure_redirects = 0
+EOF
 
 sysctl -w net.ipv4.conf.all.secure_redirects=0
 sysctl -w net.ipv4.conf.default.secure_redirects=0
+sysctl -w net.ipv4.route.flush=1
 
-for param in net.ipv4.conf.all.secure_redirects net.ipv4.conf.default.secure_redirects; do
-    if grep -q "^$param" /etc/sysctl.conf; then
-        sed -i "s/^$param.*/$param = 0/" /etc/sysctl.conf
-    else
-        echo "$param = 0" >> /etc/sysctl.conf
-    fi
-done
+echo "Remediation complete for CIS 3.3.6"

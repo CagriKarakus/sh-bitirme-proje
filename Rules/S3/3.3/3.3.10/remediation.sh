@@ -1,10 +1,14 @@
 #!/bin/bash
-# 3.3.10 Ensure tcp syn cookies is enabled
+# CIS 3.3.10 Ensure TCP SYN cookies is enabled
+
+echo "Applying remediation for CIS 3.3.10..."
+
+cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
+# CIS 3.3.10 - Enable TCP SYN cookies
+net.ipv4.tcp_syncookies = 1
+EOF
 
 sysctl -w net.ipv4.tcp_syncookies=1
+sysctl -w net.ipv4.route.flush=1
 
-if grep -q "^net.ipv4.tcp_syncookies" /etc/sysctl.conf; then
-    sed -i 's/^net.ipv4.tcp_syncookies.*/net.ipv4.tcp_syncookies = 1/' /etc/sysctl.conf
-else
-    echo "net.ipv4.tcp_syncookies = 1" >> /etc/sysctl.conf
-fi
+echo "Remediation complete for CIS 3.3.10"

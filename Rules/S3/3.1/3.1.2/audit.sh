@@ -1,15 +1,48 @@
 #!/bin/bash
-# 3.1.2 Ensure wireless interfaces are disabled
+# CIS 3.1.2 Ensure wireless interfaces are disabled
 
-if command -v nmcli >/dev/null 2>&1; then
-    if nmcli radio all | grep -q "enabled"; then
-        echo "Wireless interfaces are enabled"
-        exit 1
+echo "Checking wireless interface status..."
+
+FAIL=0
+
+# Check if any wireless interfaces exist
+WIRELESS_FOUND=$(find /sys/class/net/*/ -type d -name wireless 2>/dev/null)
+
+if [ -n "$WIRELESS_FOUND" ]; then
+    echo "WARNING: Wireless interfaces found:"
+    echo "$WIRELESS_FOUND"
+    
+    # Check if wireless is blocked via rfkill
+    if command -v rfkill &>/dev/null; then
+        if rfkill list wifi 2>/dev/null | grep -q "Soft blocked: yes"; then
+            echo "INFO: Wireless is soft blocked via rfkill"
+        elif rfkill list wifi 2>/dev/null | grep -q "Hard blocked: yes"; then
+            echo "INFO: Wireless is hard blocked"
+        else
+            echo "FAIL: Wireless interfaces exist and are not blocked"
+            FAIL=1
+        fi
+    else
+        echo "FAIL: Wireless interfaces exist and rfkill is not available"
+        FAIL=1
     fi
-elif [ -n "$(find /sys/class/net/*/wireless 2>/dev/null)" ]; then
-    echo "Wireless interfaces found"
-    exit 1
+else
+    echo "PASS: No wireless interfaces found"
 fi
 
-echo "Wireless interfaces are disabled or not present"
-exit 0
+# Check if any wireless modules are loaded
+WIRELESS_MODULES=$(lsmod | grep -E "^(cfg80211|mac80211|iwlwifi|ath|rtl|brcm)" 2>/dev/null)
+if [ -n "$WIRELESS_MODULES" ]; then
+    echo "WARNING: Wireless kernel modules loaded:"
+    echo "$WIRELESS_MODULES"
+fi
+
+if [ "$FAIL" -eq 0 ]; then
+    echo ""
+    echo "AUDIT RESULT: PASS"
+    exit 0
+else
+    echo ""
+    echo "AUDIT RESULT: FAIL"
+    exit 1
+fi

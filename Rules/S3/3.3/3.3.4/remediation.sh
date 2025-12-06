@@ -1,10 +1,14 @@
 #!/bin/bash
-# 3.3.4 Ensure broadcast icmp requests are ignored
+# CIS 3.3.4 Ensure broadcast ICMP requests are ignored
+
+echo "Applying remediation for CIS 3.3.4..."
+
+cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
+# CIS 3.3.4 - Ignore broadcast ICMP requests
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+EOF
 
 sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=1
+sysctl -w net.ipv4.route.flush=1
 
-if grep -q "^net.ipv4.icmp_echo_ignore_broadcasts" /etc/sysctl.conf; then
-    sed -i 's/^net.ipv4.icmp_echo_ignore_broadcasts.*/net.ipv4.icmp_echo_ignore_broadcasts = 1/' /etc/sysctl.conf
-else
-    echo "net.ipv4.icmp_echo_ignore_broadcasts = 1" >> /etc/sysctl.conf
-fi
+echo "Remediation complete for CIS 3.3.4"
