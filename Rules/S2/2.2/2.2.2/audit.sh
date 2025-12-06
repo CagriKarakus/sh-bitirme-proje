@@ -1,10 +1,15 @@
 #!/bin/bash
-# 2.2.2 Ensure ldap client is not installed
+# CIS Benchmark 2.2.2 - Ensure ldap client is not installed
+audit_passed=true
+echo "Checking ldap client..."
 
-if dpkg -l | grep -q ldap-utils; then
-  echo "FAILED: ldap-utils is installed"
-  exit 1
+status=$(dpkg-query -W -f='${db:Status-Status}' ldap-utils 2>/dev/null)
+if [ "$status" = "installed" ]; then
+    echo "FAIL: ldap-utils client is installed"
+    audit_passed=false
+else
+    echo "PASS: ldap-utils client is not installed"
 fi
 
-echo "PASSED: ldap client is not installed"
-exit 0
+echo ""
+[ "$audit_passed" = true ] && echo "AUDIT RESULT: PASS" && exit 0 || echo "AUDIT RESULT: FAIL" && exit 1

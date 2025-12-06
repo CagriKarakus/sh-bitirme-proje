@@ -1,10 +1,15 @@
 #!/bin/bash
-# 2.2.4 Ensure rsh client is not installed
+# CIS Benchmark 2.2.4 - Ensure rsh client is not installed
+audit_passed=true
+echo "Checking rsh client..."
 
-if dpkg -l | grep -q rsh-client; then
-  echo "FAILED: rsh-client is installed"
-  exit 1
+status=$(dpkg-query -W -f='${db:Status-Status}' rsh-client 2>/dev/null)
+if [ "$status" = "installed" ]; then
+    echo "FAIL: rsh-client is installed"
+    audit_passed=false
+else
+    echo "PASS: rsh-client is not installed"
 fi
 
-echo "PASSED: rsh client is not installed"
-exit 0
+echo ""
+[ "$audit_passed" = true ] && echo "AUDIT RESULT: PASS" && exit 0 || echo "AUDIT RESULT: FAIL" && exit 1
