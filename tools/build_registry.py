@@ -82,6 +82,7 @@ def get_full_section_name(short_name: str) -> str:
         "S2": "Section 2 Services",
         "S3": "Section 3 Network",
         "S4": "Section 4 Host Based Firewall",
+        "S5": "Section 5 Access Control",
     }
     return section_map.get(short_name, short_name)
 
