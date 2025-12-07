@@ -3,7 +3,7 @@
 #
 # CIS Benchmark Audit & Remediation Script
 #
-# Generated on    : 2025-12-06 23:47:02
+# Generated on    : 2025-12-06 23:58:47
 # Source registry : Rules\index.json
 # Rule count      : 3
 #
@@ -384,10 +384,18 @@ AFTER_FAIL=0
 FIXED_COUNT=0
 
 for rule_id in "${RULES_LIST[@]}"; do
-    [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ] && ((BEFORE_PASS++)) || ((BEFORE_FAIL++))
-    [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ] && ((AFTER_PASS++)) || ((AFTER_FAIL++))
+    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ]; then
+        ((BEFORE_PASS++)) || true
+    else
+        ((BEFORE_FAIL++)) || true
+    fi
+    if [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
+        ((AFTER_PASS++)) || true
+    else
+        ((AFTER_FAIL++)) || true
+    fi
     if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
-        ((FIXED_COUNT++))
+        ((FIXED_COUNT++)) || true
     fi
 done
 
