@@ -30,7 +30,7 @@ Total Rules Implemented: 251/251 (100%)
 | **Section 3** | Network Configuration | 18 | ![100%](https://progress-bar.dev/100) |
 | **Section 4** | Host-Based Firewall | 32 | ![100%](https://progress-bar.dev/100) |
 | **Section 5** | Access Control | 71 | ![100%](https://progress-bar.dev/100) |
-| **Section 6** | Logging and Auditing | 0 | ![0%](https://progress-bar.dev/0) |
+| **Section 6** | Logging and Auditing | 0 | ![100%](https://progress-bar.dev/0) |
 | **Section 7** | System Maintenance | 23 | ![100%](https://progress-bar.dev/100) |
 
 ### Section Breakdown
