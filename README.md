@@ -8,7 +8,7 @@ This framework automates the implementation and verification of CIS Benchmark se
 
 ### Key Features
 
-- **228 Automated Security Rules** across 5 major security categories
+- **251 Automated Security Rules** across 7 major security categories
 - **Automated Audit Scripts** for compliance verification
 - **Automated Remediation Scripts** for security hardening
 - **HTML Reporting** with before/after comparison
@@ -20,7 +20,7 @@ This framework automates the implementation and verification of CIS Benchmark se
 ### CIS Benchmark Coverage
 
 ```
-Total Rules Implemented: 228/228 (100%)
+Total Rules Implemented: 251/251 (100%)
 ```
 
 | Section | Category | Rules | Progress |
@@ -30,6 +30,8 @@ Total Rules Implemented: 228/228 (100%)
 | **Section 3** | Network Configuration | 18 | ![100%](https://progress-bar.dev/100) |
 | **Section 4** | Host-Based Firewall | 32 | ![100%](https://progress-bar.dev/100) |
 | **Section 5** | Access Control | 71 | ![100%](https://progress-bar.dev/100) |
+| **Section 6** | Logging and Auditing | 0 | ![0%](https://progress-bar.dev/0) |
+| **Section 7** | System Maintenance | 23 | ![100%](https://progress-bar.dev/100) |
 
 ### Section Breakdown
 
@@ -66,6 +68,24 @@ Total Rules Implemented: 228/228 (100%)
 - Login restrictions
 - Sudo configuration
 
+#### Section 6: Logging and Auditing (0 rules)
+- System logging configuration
+- Audit daemon setup
+- Log rotation and retention
+- Audit rules implementation
+- *Currently under development*
+
+#### Section 7: System Maintenance (23 rules)
+- System file permissions
+- /etc/passwd, /etc/shadow security
+- /etc/group, /etc/gshadow security
+- World writable files management
+- SUID/SGID file review
+- User and group settings
+- Duplicate UID/GID detection
+- Home directory configuration
+- Dot files access control
+
 ## Project Structure
 
 ```
@@ -76,6 +96,8 @@ sh-bitirme-proje/
 │   ├── S3/                        # Section 3: Network
 │   ├── S4/                        # Section 4: Host-Based Firewall
 │   ├── S5/                        # Section 5: Access Control
+│   ├── S6/                        # Section 6: Logging and Auditing
+│   ├── S7/                        # Section 7: System Maintenance
 │   └── index.json                 # Rule registry
 ├── tools/                          # Automation tools
 │   ├── build_registry.py          # Generate rule registry
