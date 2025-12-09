@@ -4,6 +4,13 @@
 - Level 1 - Server
 - Level 1 - Workstation
 
+> ⚠️ **UYARI: Bu kural hesap kilitlemeye neden olabilir!**
+>
+> Bu kuralı uygulamadan ÖNCE şunları yapın:
+> 1. **5.3.3.1.1** - `deny` parametresini ayarlayın (varsayılan 3 çok düşük!)
+> 2. **5.3.3.1.2** - `unlock_time` parametresini ayarlayın
+> 3. **5.3.3.1.3** - Root kilitleme kuralını dikkatli değerlendirin
+
 ## Description
 The `pam_faillock` module is responsible for locking accounts after a specified number of failed login attempts.
 
