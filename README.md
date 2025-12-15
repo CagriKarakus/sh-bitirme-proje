@@ -11,6 +11,7 @@ This framework automates the implementation and verification of CIS Benchmark se
 - **251 Automated Security Rules** across 7 major security categories
 - **Automated Audit Scripts** for compliance verification
 - **Automated Remediation Scripts** for security hardening
+- **Ansible Automation** for centralized deployment and management
 - **HTML Reporting** with before/after comparison
 - **Modular Architecture** for flexible rule selection
 - **Production-Ready** scripts tested on Linux systems
@@ -101,8 +102,9 @@ sh-bitirme-proje/
 │   └── index.json                 # Rule registry
 ├── tools/                          # Automation tools
 │   ├── build_registry.py          # Generate rule registry
-│   └── compose_rule_scripts.py    # Compose audit/remediation scripts
-├── output/                         # Generated audit scripts
+│   ├── compose_rule_scripts.py    # Compose bash audit/remediation scripts
+│   └── compose_ansible.py         # Compose Ansible playbooks from selected rules
+├── output/                         # Generated scripts and playbooks
 ├── samples/                        # Sample configurations
 └── LICENSE                         # MIT License
 ```
@@ -185,7 +187,52 @@ The script will:
 3. Run final audit (AFTER state)
 4. Generate HTML report with comparison
 
-#### Option 3: View HTML Report
+#### Option 3: Ansible Automation (Recommended for Multiple Servers)
+
+Create a custom Ansible playbook with only the rules you want:
+
+```bash
+# Create playbook for specific rules
+python3 tools/compose_ansible.py 1.5.1 1.5.2 2.1.1 5.1.1 \
+    --output output/my_custom_hardening.yml
+
+# Create simple inventory file
+cat > inventory.ini << EOF
+[servers]
+server1.example.com
+server2.example.com
+
+[servers:vars]
+ansible_user=root
+EOF
+
+# Run the custom playbook
+ansible-playbook output/my_custom_hardening.yml -i inventory.ini
+
+# Dry-run (check mode)
+ansible-playbook output/my_custom_hardening.yml -i inventory.ini --check
+
+# Audit only (no remediation)
+ansible-playbook output/my_custom_hardening.yml -i inventory.ini \
+    --extra-vars "cis_apply_remediation=false"
+```
+
+**Common Use Cases:**
+```bash
+# SSH hardening
+python3 tools/compose_ansible.py 5.1.1 5.1.2 5.1.3 5.1.4 5.1.5 \
+    --output output/ssh_hardening.yml
+
+# Filesystem security
+python3 tools/compose_ansible.py 1.1.1.1 1.1.1.2 1.1.1.3 1.1.1.4 \
+    --output output/filesystem.yml
+
+# Basic system hardening
+python3 tools/compose_ansible.py 1.5.1 2.1.1 3.1.1 5.1.1 \
+    --output output/basic_hardening.yml
+```
+
+#### Option 4: View HTML Report
 
 After execution, open the generated report:
 ```bash
@@ -227,6 +274,41 @@ python3 tools/compose_rule_scripts.py [rule_ids...] \
 - Automated remediation workflow
 - HTML report generation
 - Color-coded console output
+
+### compose_ansible.py
+
+Creates a custom Ansible playbook from selected rules:
+
+```bash
+python3 tools/compose_ansible.py [rule_ids...] \
+    --registry Rules/index.json \
+    --output output/custom.yml
+```
+
+**Features:**
+- Select only the rules you want to apply
+- Generates a single, self-contained playbook
+- Perfect for centralized multi-server deployment
+- Easy to customize and version control
+- No complex role structure needed
+
+**Examples:**
+```bash
+# Specific rules
+python3 tools/compose_ansible.py 1.5.1 1.5.2 2.1.1 \
+    --output output/custom.yml
+
+# All filesystem rules
+python3 tools/compose_ansible.py 1.1.1.1 1.1.1.2 1.1.1.3 1.1.1.4 \
+    --output output/filesystem.yml
+
+# SSH hardening only
+python3 tools/compose_ansible.py 5.1.1 5.1.2 5.1.3 5.1.4 \
+    --output output/ssh_hardening.yml
+
+# Run the playbook
+ansible-playbook output/ssh_hardening.yml -i inventory.ini
+```
 
 ## Rule Documentation
 
@@ -336,9 +418,11 @@ For issues, questions, or contributions:
 
 ## Roadmap
 
+- [x] Bash script automation (compose_rule_scripts.py)
+- [x] Ansible playbook generation (compose_ansible.py)
+- [x] Centralized multi-server deployment
 - [ ] Additional Linux distribution support
 - [ ] Compliance report export (PDF, JSON)
-- [ ] Integration with configuration management tools
 - [ ] Automated rollback capability
 - [ ] Web-based management interface
 - [ ] Docker container support

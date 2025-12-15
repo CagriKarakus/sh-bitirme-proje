@@ -1993,5 +1993,166 @@
     "section": "S6",
     "audit": "Rules/S6/6.3/6.3.3/audit.sh",
     "remediation": "Rules/S6/6.3/6.3.3/remediation.sh"
+  },
+  {
+    "id": "7.1.1",
+    "title": "7.1.1",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.1/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.1/remediation.sh"
+  },
+  {
+    "id": "7.1.2",
+    "title": "7.1.2",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.2/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.2/remediation.sh"
+  },
+  {
+    "id": "7.1.3",
+    "title": "7.1.3",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.3/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.3/remediation.sh"
+  },
+  {
+    "id": "7.1.4",
+    "title": "7.1.4",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.4/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.4/remediation.sh"
+  },
+  {
+    "id": "7.1.5",
+    "title": "7.1.5",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.5/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.5/remediation.sh"
+  },
+  {
+    "id": "7.1.6",
+    "title": "7.1.6",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.6/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.6/remediation.sh"
+  },
+  {
+    "id": "7.1.7",
+    "title": "7.1.7",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.7/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.7/remediation.sh"
+  },
+  {
+    "id": "7.1.8",
+    "title": "7.1.8",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.8/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.8/remediation.sh"
+  },
+  {
+    "id": "7.1.9",
+    "title": "7.1.9",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.9/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.9/remediation.sh"
+  },
+  {
+    "id": "7.1.10",
+    "title": "7.1.10",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.10/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.10/remediation.sh"
+  },
+  {
+    "id": "7.1.11",
+    "title": "7.1.11",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.11/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.11/remediation.sh"
+  },
+  {
+    "id": "7.1.12",
+    "title": "7.1.12",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.12/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.12/remediation.sh"
+  },
+  {
+    "id": "7.1.13",
+    "title": "7.1.13",
+    "section": "S7",
+    "audit": "Rules/S7/7.1/7.1.13/audit.sh",
+    "remediation": "Rules/S7/7.1/7.1.13/remediation.sh"
+  },
+  {
+    "id": "7.2.1",
+    "title": "7.2.1",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.1/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.1/remediation.sh"
+  },
+  {
+    "id": "7.2.2",
+    "title": "7.2.2",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.2/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.2/remediation.sh"
+  },
+  {
+    "id": "7.2.3",
+    "title": "7.2.3",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.3/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.3/remediation.sh"
+  },
+  {
+    "id": "7.2.4",
+    "title": "7.2.4",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.4/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.4/remediation.sh"
+  },
+  {
+    "id": "7.2.5",
+    "title": "7.2.5",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.5/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.5/remediation.sh"
+  },
+  {
+    "id": "7.2.6",
+    "title": "7.2.6",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.6/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.6/remediation.sh"
+  },
+  {
+    "id": "7.2.7",
+    "title": "7.2.7",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.7/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.7/remediation.sh"
+  },
+  {
+    "id": "7.2.8",
+    "title": "7.2.8",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.8/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.8/remediation.sh"
+  },
+  {
+    "id": "7.2.9",
+    "title": "7.2.9",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.9/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.9/remediation.sh"
+  },
+  {
+    "id": "7.2.10",
+    "title": "7.2.10",
+    "section": "S7",
+    "audit": "Rules/S7/7.2/7.2.10/audit.sh",
+    "remediation": "Rules/S7/7.2/7.2.10/remediation.sh"
   }
 ]
