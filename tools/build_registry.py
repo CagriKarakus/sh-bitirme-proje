@@ -9,6 +9,8 @@ folder hierarchy beneath ``Rules/`` where each rule directory contains both an
 
 This script automatically scans all Section directories (Section 1 through Section 4)
 and generates the index.json file with all discovered rules.
+
+Updated to support multi-platform structure with platforms/ directory.
 """
 from __future__ import annotations
 
@@ -16,7 +18,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, Optional
 
 
 RuleEntry = dict
@@ -130,27 +132,128 @@ def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Generate rule registry JSON")
     parser.add_argument(
-        "--rules-dir", default="Rules", type=Path, help="Root directory containing rule folders"
+        "--rules-dir", type=Path, help="Root directory containing rule folders (legacy mode)"
     )
     parser.add_argument(
-        "--output", default=Path("Rules/index.json"), type=Path, help="Output registry path"
+        "--platform", type=str, help="Platform path (e.g., platforms/linux/ubuntu/desktop)"
+    )
+    parser.add_argument(
+        "--output", type=Path, help="Output registry path"
+    )
+    parser.add_argument(
+        "--auto-detect", action="store_true", help="Auto-detect current platform"
+    )
+    parser.add_argument(
+        "--all-platforms", action="store_true", help="Generate registry for all platforms"
     )
     return parser.parse_args()
+
+
+def process_platform(platform_path: Path) -> None:
+    """Process a single platform and generate its registry."""
+    rules_dir = platform_path / "rules"
+    if not rules_dir.exists():
+        print(f"Warning: Rules directory not found: {rules_dir}")
+        return
+
+    output_path = rules_dir / "index.json"
+
+    print(f"\nProcessing platform: {platform_path}")
+    print(f"Discovering rules in {rules_dir}...")
+    registry = discover_rules(rules_dir)
+
+    print(f"Found {len(registry)} rules")
+
+    if len(registry) > 0:
+        print(f"Writing to {output_path}...")
+        write_registry(registry, output_path)
+        print(f"[OK] Successfully generated {output_path}")
+    else:
+        print(f"[SKIP] No rules found in {rules_dir}")
 
 
 def main() -> None:
     """Main entry point for the script."""
     args = parse_args()
-    
-    print(f"Discovering rules in {args.rules_dir}...")
-    registry = discover_rules(args.rules_dir)
-    
-    print(f"\nFound {len(registry)} rules total")
-    print(f"Writing to {args.output}...")
-    write_registry(registry, args.output)
-    
-    print(f"\n[OK] Successfully generated {args.output}")
-    print(f"[OK] Total rules: {len(registry)}")
+
+    # Legacy mode: use --rules-dir (backward compatibility)
+    if args.rules_dir:
+        output = args.output or (args.rules_dir / "index.json")
+        print(f"[LEGACY MODE] Discovering rules in {args.rules_dir}...")
+        registry = discover_rules(args.rules_dir)
+
+        print(f"\nFound {len(registry)} rules total")
+        print(f"Writing to {output}...")
+        write_registry(registry, output)
+
+        print(f"\n[OK] Successfully generated {output}")
+        print(f"[OK] Total rules: {len(registry)}")
+        return
+
+    # All platforms mode
+    if args.all_platforms:
+        platforms_dir = Path("platforms")
+        if not platforms_dir.exists():
+            print(f"Error: Platforms directory not found: {platforms_dir}")
+            return
+
+        print("[ALL PLATFORMS MODE] Scanning all platforms...")
+
+        # Find all platform directories with metadata.json
+        for metadata_file in platforms_dir.rglob("metadata.json"):
+            platform_path = metadata_file.parent
+            process_platform(platform_path)
+
+        print("\n[OK] All platforms processed")
+        return
+
+    # Auto-detect mode
+    if args.auto_detect:
+        try:
+            from platform_detector import detect_platform
+
+            platform_info = detect_platform()
+            platform_path = Path(platform_info.get_rules_path()).parent
+
+            print(f"[AUTO-DETECT MODE]")
+            print(f"Detected: {platform_info.platform} / {platform_info.distribution} / {platform_info.variant}")
+
+            process_platform(platform_path)
+            return
+        except ImportError:
+            print("Error: platform_detector module not found")
+            return
+        except Exception as e:
+            print(f"Error: Could not auto-detect platform: {e}")
+            return
+
+    # Specific platform mode
+    if args.platform:
+        platform_path = Path(args.platform)
+        if not platform_path.exists():
+            print(f"Error: Platform path not found: {platform_path}")
+            return
+
+        process_platform(platform_path)
+        return
+
+    # Default: process legacy Rules directory if it exists
+    legacy_rules = Path("Rules")
+    if legacy_rules.exists():
+        output = args.output or (legacy_rules / "index.json")
+        print(f"[DEFAULT MODE] Using legacy Rules directory")
+        print(f"Discovering rules in {legacy_rules}...")
+        registry = discover_rules(legacy_rules)
+
+        print(f"\nFound {len(registry)} rules total")
+        print(f"Writing to {output}...")
+        write_registry(registry, output)
+
+        print(f"\n[OK] Successfully generated {output}")
+        print(f"[OK] Total rules: {len(registry)}")
+    else:
+        print("Error: Please specify --rules-dir, --platform, --auto-detect, or --all-platforms")
+        print("Run with --help for usage information")
 
 
 if __name__ == "__main__":

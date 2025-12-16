@@ -1,20 +1,51 @@
 # CIS Benchmark Automation Framework
 
-A comprehensive Linux security hardening automation framework based on CIS (Center for Internet Security) Benchmarks. This project provides automated audit and remediation scripts for securing Linux systems according to industry-standard security practices.
+A comprehensive **multi-platform** security hardening automation framework based on CIS (Center for Internet Security) Benchmarks. This project provides automated audit and remediation scripts for securing systems across Linux, Windows, and Android platforms according to industry-standard security practices.
 
 ## Overview
 
-This framework automates the implementation and verification of CIS Benchmark security controls for Linux systems. It provides a systematic approach to security hardening through automated audit checks and remediation scripts.
+This framework automates the implementation and verification of CIS Benchmark security controls for multiple operating systems and platforms. It provides a systematic approach to security hardening through automated audit checks and remediation scripts.
 
 ### Key Features
 
-- **251 Automated Security Rules** across 7 major security categories
+- **🌐 Multi-Platform Support** - Linux, Windows, Android (with plans for more)
+- **251+ Automated Security Rules** across multiple platforms
 - **Automated Audit Scripts** for compliance verification
 - **Automated Remediation Scripts** for security hardening
-- **Ansible Automation** for centralized deployment and management
+- **Multiple Automation Methods** - Bash, Ansible, PowerShell, DSC, ADB
 - **HTML Reporting** with before/after comparison
 - **Modular Architecture** for flexible rule selection
-- **Production-Ready** scripts tested on Linux systems
+- **Platform Auto-Detection** - automatically detect and apply correct rules
+- **Scalable Structure** - easily add new platforms and distributions
+- **Production-Ready** scripts tested on multiple platforms
+
+## Supported Platforms
+
+### 🐧 Linux
+- **Ubuntu**: Desktop & Server (20.04, 22.04, 24.04 LTS)
+- **Debian**: Desktop & Server (11, 12)
+- **RHEL**: Server (8, 9)
+- **CentOS**: Server (8, 9 Stream)
+- **Arch Linux**: Desktop
+- **Fedora**: Desktop
+- **Common**: Distribution-independent rules
+
+### 🪟 Windows
+- **Windows 11**: 21H2, 22H2, 23H2
+- **Windows 10**: 21H2, 22H2
+- **Windows Server 2022**: Standard, Datacenter
+- **Windows Server 2019**: Standard, Datacenter
+
+### 📱 Android
+- **Android 14** (API 34)
+- **Android 13** (API 33)
+- **Android 12** (API 32/31)
+- **Android 11** (API 30)
+
+### 🚀 Coming Soon
+- macOS (Ventura, Sonoma)
+- iOS
+- Additional Linux distributions
 
 ## Implementation Progress
 
@@ -91,7 +122,28 @@ Total Rules Implemented: 251/251 (100%)
 
 ```
 sh-bitirme-proje/
-├── Rules/                          # Security rule implementations
+├── platforms/                      # Multi-platform support
+│   ├── linux/
+│   │   ├── ubuntu/
+│   │   │   ├── desktop/rules/     # Ubuntu Desktop rules
+│   │   │   └── server/rules/      # Ubuntu Server rules
+│   │   ├── debian/
+│   │   ├── rhel/
+│   │   ├── centos/
+│   │   └── common/rules/          # Common Linux rules
+│   ├── windows/
+│   │   ├── desktop/
+│   │   │   ├── win11/rules/       # Windows 11 rules
+│   │   │   └── win10/rules/       # Windows 10 rules
+│   │   └── server/
+│   │       ├── 2022/rules/        # Server 2022 rules
+│   │       └── 2019/rules/        # Server 2019 rules
+│   └── android/
+│       └── rules/                 # Android rules
+│           ├── device-security/
+│           ├── app-security/
+│           └── network-security/
+├── Rules/                         # Legacy rules (backward compatibility)
 │   ├── S1/                        # Section 1: Initial Setup
 │   ├── S2/                        # Section 2: Services
 │   ├── S3/                        # Section 3: Network
@@ -101,10 +153,30 @@ sh-bitirme-proje/
 │   ├── S7/                        # Section 7: System Maintenance
 │   └── index.json                 # Rule registry
 ├── tools/                          # Automation tools
-│   ├── build_registry.py          # Generate rule registry
+│   ├── platform_detector.py       # Auto-detect current platform
+│   ├── build_registry.py          # Generate rule registry (multi-platform aware)
 │   ├── compose_rule_scripts.py    # Compose bash audit/remediation scripts
 │   └── compose_ansible.py         # Compose Ansible playbooks from selected rules
+├── templates/                      # Platform-specific templates
+│   ├── linux/
+│   │   ├── ansible/               # Ansible playbook templates
+│   │   └── bash/                  # Bash script templates
+│   ├── windows/
+│   │   ├── powershell/            # PowerShell templates
+│   │   └── dsc/                   # DSC templates
+│   └── android/
+│       └── adb/                   # ADB script templates
+├── docs/                           # Documentation
+│   ├── platforms/
+│   │   ├── linux.md               # Linux platform guide
+│   │   ├── windows.md             # Windows platform guide
+│   │   └── android.md             # Android platform guide
+│   └── development/
+│       └── adding-new-platform.md # Guide for adding platforms
 ├── output/                         # Generated scripts and playbooks
+│   ├── linux/
+│   ├── windows/
+│   └── android/
 ├── samples/                        # Sample configurations
 └── LICENSE                         # MIT License
 ```
@@ -125,10 +197,24 @@ Rules/SX/X.X/X.X.X/
 
 ### Prerequisites
 
-- Linux system (Ubuntu/Debian or RHEL/CentOS)
+**General:**
 - Python 3.6 or higher
+- Git
+
+**Linux:**
+- Linux system (Ubuntu, Debian, RHEL, CentOS, etc.)
 - Root/sudo access for audit and remediation
 - Bash shell
+
+**Windows:**
+- PowerShell 5.1 or higher
+- Administrator privileges
+- .NET Framework 4.5+
+
+**Android:**
+- Android Debug Bridge (ADB)
+- USB debugging enabled on device
+- Or MDM/EMM solution for enterprise deployment
 
 ### Installation
 
@@ -138,23 +224,69 @@ git clone https://github.com/yourusername/sh-bitirme-proje.git
 cd sh-bitirme-proje
 ```
 
-2. Build the rule registry:
+2. Detect your platform (optional):
 ```bash
-python3 tools/build_registry.py
+python3 tools/platform_detector.py
+```
+
+3. Build the rule registry:
+
+**Auto-detect current platform:**
+```bash
+python3 tools/build_registry.py --auto-detect
+```
+
+**Or build for all platforms:**
+```bash
+python3 tools/build_registry.py --all-platforms
+```
+
+**Or build for specific platform:**
+```bash
+# Linux Ubuntu Desktop
+python3 tools/build_registry.py --platform platforms/linux/ubuntu/desktop
+
+# Windows 11
+python3 tools/build_registry.py --platform platforms/windows/desktop/win11
+
+# Android
+python3 tools/build_registry.py --platform platforms/android
+```
+
+**Legacy mode (backward compatibility):**
+```bash
+python3 tools/build_registry.py --rules-dir Rules
 ```
 
 ### Usage
 
 #### Option 1: Run Individual Rules
 
-Execute a specific rule's audit:
+**Linux (Ubuntu Desktop):**
+```bash
+cd platforms/linux/ubuntu/desktop/rules/S1/1.5/1.5.1
+sudo ./audit.sh
+sudo ./remediation.sh  # if needed
+```
+
+**Windows (PowerShell):**
+```powershell
+cd platforms\windows\desktop\win11\rules\S1\1.1\1.1.1
+.\audit.ps1
+.\remediation.ps1  # if needed
+```
+
+**Android (via ADB):**
+```bash
+cd platforms/android/rules/device-security/screen-lock
+bash audit.sh
+bash remediation.sh  # if needed
+```
+
+**Legacy (backward compatibility):**
 ```bash
 cd Rules/S1/1.5/1.5.1
 sudo ./audit.sh
-```
-
-Apply remediation if needed:
-```bash
 sudo ./remediation.sh
 ```
 
@@ -416,16 +548,42 @@ For issues, questions, or contributions:
 - Review existing documentation in rule READMEs
 - Check the [ProjeYazılari](ProjeYazılari/) directory for additional documentation
 
+## Platform-Specific Documentation
+
+For detailed platform-specific information:
+- 📖 [Linux Platform Guide](docs/platforms/linux.md)
+- 📖 [Windows Platform Guide](docs/platforms/windows.md)
+- 📖 [Android Platform Guide](docs/platforms/android.md)
+- 📖 [Adding New Platforms](docs/development/adding-new-platform.md)
+
 ## Roadmap
 
-- [x] Bash script automation (compose_rule_scripts.py)
-- [x] Ansible playbook generation (compose_ansible.py)
+### Completed ✅
+- [x] Multi-platform architecture
+- [x] Linux support (Ubuntu, Debian, RHEL, CentOS)
+- [x] Windows support (Desktop & Server)
+- [x] Android support
+- [x] Platform auto-detection
+- [x] Bash script automation
+- [x] Ansible playbook generation
+- [x] PowerShell script support
 - [x] Centralized multi-server deployment
-- [ ] Additional Linux distribution support
-- [ ] Compliance report export (PDF, JSON)
-- [ ] Automated rollback capability
+
+### In Progress 🚧
+- [ ] Complete all Windows CIS rules
+- [ ] Complete all Android CIS rules
+- [ ] Enhanced reporting (PDF, JSON export)
 - [ ] Web-based management interface
+
+### Planned 🎯
+- [ ] macOS support (Ventura, Sonoma)
+- [ ] iOS support
+- [ ] FreeBSD support
 - [ ] Docker container support
+- [ ] Automated rollback capability
+- [ ] Kubernetes deployment
+- [ ] REST API for automation
+- [ ] Integration with SIEM systems
 
 ---
 
