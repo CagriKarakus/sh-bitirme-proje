@@ -63,6 +63,16 @@
     "remediation": "platforms/linux/ubuntu/desktop/rules/S1/1.1/1.1.1/1.1.1.9/usb-storage_remediation.sh"
   },
   {
+    "id": "1.1.1.10",
+    "title": "1.1.1.10 Ensure unused filesystems kernel modules are not available (Manual)",
+    "section": "Section 1 Initial Setup",
+    "audit": "platforms/linux/ubuntu/desktop/rules/S1/1.1/1.1.1/1.1.1.10/audit.sh",
+    "remediation": "platforms/linux/ubuntu/desktop/rules/S1/1.1/1.1.1/1.1.1.10/remediation_manual.sh",
+    "description": "Disables unused filesystem kernel modules to reduce attack surface. This is a MANUAL control - review README.md before running remediation.",
+    "level": "Level 1 - Server, Level 1 - Workstation",
+    "type": "Manual"
+  },
+  {
     "id": "1.1.2.1.1",
     "title": "1.1.2.1.1",
     "section": "Section 1 Initial Setup",

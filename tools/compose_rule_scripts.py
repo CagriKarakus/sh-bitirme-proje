@@ -45,7 +45,7 @@ NC='\\033[0m' # No Color
 
 # Results storage
 TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
-REPORT_DIR="${{REPORT_DIR:-/tmp/cis_report_$TIMESTAMP}}"
+REPORT_DIR="${{REPORT_DIR:-$HOME/cis_report_$TIMESTAMP}}"
 mkdir -p "$REPORT_DIR"
 
 # Arrays to store results
@@ -53,9 +53,35 @@ declare -A BEFORE_RESULTS
 declare -A AFTER_RESULTS
 declare -A BEFORE_OUTPUT
 declare -A AFTER_OUTPUT
+declare -A RULE_START_TIME
+declare -A RULE_END_TIME
+declare -A RULE_DURATION
 
 TOTAL_RULES={rule_count}
 RULES_LIST=({rule_ids_quoted})
+
+# Detailed log file
+DETAILED_LOG="$REPORT_DIR/cis_detailed_report.log"
+
+# Function to log with timestamp
+log_detailed() {{
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$DETAILED_LOG"
+}}
+
+# Initialize detailed log
+cat > "$DETAILED_LOG" << 'LOGHEADER'
+################################################################################
+#                                                                              #
+#                   CIS BENCHMARK DETAILED EXECUTION REPORT                    #
+#                                                                              #
+################################################################################
+
+LOGHEADER
+
+log_detailed "Report Directory: $REPORT_DIR"
+log_detailed "Total Rules to Check: $TOTAL_RULES"
+log_detailed "Execution Started: $(date '+%Y-%m-%d %H:%M:%S')"
+log_detailed ""
 
 echo -e "${{BLUE}}=============================================${{NC}}"
 echo -e "${{BLUE}}  CIS Benchmark Audit & Remediation Tool${{NC}}"
@@ -70,6 +96,11 @@ echo ""
 ###############################################################################
 echo -e "${{YELLOW}}=== PHASE 1: Initial Audit (BEFORE) ===${{NC}}"
 echo ""
+
+log_detailed "================================================================================"
+log_detailed "PHASE 1: INITIAL AUDIT (BEFORE)"
+log_detailed "================================================================================"
+log_detailed ""
 
 '''
 
@@ -98,14 +129,34 @@ remediate_{rule_id_safe}() {{
 
 BEFORE_AUDIT_BLOCK = '''
 # --- Before Audit: {rule_id} ---
+log_detailed "--------------------------------------------------------------------------------"
+log_detailed "Auditing Rule [{index}/{total}]: {rule_id}"
+RULE_START_TIME["{rule_id}"]=$(date +%s)
+log_detailed "Start Time: $(date '+%Y-%m-%d %H:%M:%S')"
+
 echo -n "[{index}/{total}] Auditing {rule_id}... "
 BEFORE_OUTPUT["{rule_id}"]=$(audit_{rule_id_safe} 2>&1)
 BEFORE_RESULTS["{rule_id}"]=$?
+
+RULE_END_TIME["{rule_id}"]=$(date +%s)
+RULE_DURATION["{rule_id}"]=$((RULE_END_TIME["{rule_id}"] - RULE_START_TIME["{rule_id}"]))
+
+log_detailed "End Time: $(date '+%Y-%m-%d %H:%M:%S')"
+log_detailed "Duration: ${{RULE_DURATION["{rule_id}"]}} seconds"
+log_detailed "Exit Code: ${{BEFORE_RESULTS["{rule_id}"]}}"
+
 if [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 0 ]; then
     echo -e "${{GREEN}}PASS${{NC}}"
+    log_detailed "Status: PASS"
 else
     echo -e "${{RED}}FAIL${{NC}}"
+    log_detailed "Status: FAIL"
 fi
+
+log_detailed ""
+log_detailed "OUTPUT:"
+log_detailed "${{BEFORE_OUTPUT["{rule_id}"]}}"
+log_detailed ""
 '''
 
 REMEDIATION_BLOCK = '''
@@ -116,29 +167,59 @@ echo ""
 echo -e "${YELLOW}=== PHASE 2: Remediation ===${NC}"
 echo ""
 
+log_detailed "================================================================================"
+log_detailed "PHASE 2: REMEDIATION"
+log_detailed "================================================================================"
+log_detailed ""
+
 REMEDIATED_COUNT=0
 for rule_id in "${RULES_LIST[@]}"; do
     if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ]; then
         echo -e "${BLUE}Remediating $rule_id...${NC}"
+        log_detailed "--------------------------------------------------------------------------------"
+        log_detailed "Remediating Rule: $rule_id"
+        log_detailed "Reason: Failed in initial audit (exit code: ${BEFORE_RESULTS[$rule_id]})"
+        log_detailed "Start Time: $(date '+%Y-%m-%d %H:%M:%S')"
+
+        REMEDIATION_START=$(date +%s)
+        REMEDIATION_OUTPUT=""
+
         case "$rule_id" in
 '''
 
 REMEDIATION_CASE_TEMPLATE = '''            "{rule_id}")
-                remediate_{rule_id_safe}
+                REMEDIATION_OUTPUT=$(remediate_{rule_id_safe} 2>&1)
+                REMEDIATION_EXIT=$?
                 ;;'''
 
 REMEDIATION_BLOCK_END = '''
         esac
+
+        REMEDIATION_END=$(date +%s)
+        REMEDIATION_DURATION=$((REMEDIATION_END - REMEDIATION_START))
+
+        log_detailed "End Time: $(date '+%Y-%m-%d %H:%M:%S')"
+        log_detailed "Duration: ${REMEDIATION_DURATION} seconds"
+        log_detailed "Exit Code: ${REMEDIATION_EXIT:-0}"
+        log_detailed ""
+        log_detailed "REMEDIATION OUTPUT:"
+        log_detailed "${REMEDIATION_OUTPUT:-No output captured}"
+        log_detailed ""
+
         ((REMEDIATED_COUNT++))
     fi
 done
 
 if [ "$REMEDIATED_COUNT" -eq 0 ]; then
     echo "No remediation needed - all rules passed!"
+    log_detailed "No remediation needed - all rules passed initial audit"
 else
     echo ""
     echo "Remediated $REMEDIATED_COUNT rule(s)"
+    log_detailed "Total rules remediated: $REMEDIATED_COUNT"
 fi
+
+log_detailed ""
 '''
 
 AFTER_AUDIT_BLOCK_HEADER = '''
@@ -149,31 +230,76 @@ echo ""
 echo -e "${YELLOW}=== PHASE 3: Final Audit (AFTER) ===${NC}"
 echo ""
 
+log_detailed "================================================================================"
+log_detailed "PHASE 3: FINAL AUDIT (AFTER)"
+log_detailed "================================================================================"
+log_detailed ""
+
 '''
 
 AFTER_AUDIT_TEMPLATE = '''
 # --- After Audit: {rule_id} ---
+log_detailed "--------------------------------------------------------------------------------"
+log_detailed "Re-auditing Rule [{index}/{total}]: {rule_id}"
+AFTER_START=$(date +%s)
+log_detailed "Start Time: $(date '+%Y-%m-%d %H:%M:%S')"
+
 echo -n "[{index}/{total}] Re-auditing {rule_id}... "
 AFTER_OUTPUT["{rule_id}"]=$(audit_{rule_id_safe} 2>&1)
 AFTER_RESULTS["{rule_id}"]=$?
+
+AFTER_END=$(date +%s)
+AFTER_DURATION=$((AFTER_END - AFTER_START))
+
+log_detailed "End Time: $(date '+%Y-%m-%d %H:%M:%S')"
+log_detailed "Duration: ${{AFTER_DURATION}} seconds"
+log_detailed "Exit Code: ${{AFTER_RESULTS["{rule_id}"]}}"
+
 if [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
     echo -e "${{GREEN}}PASS${{NC}}"
+    log_detailed "Status: PASS"
 else
     echo -e "${{RED}}FAIL${{NC}}"
+    log_detailed "Status: FAIL"
 fi
+
+log_detailed ""
+log_detailed "OUTPUT:"
+log_detailed "${{AFTER_OUTPUT["{rule_id}"]}}"
+log_detailed ""
+
+# Log comparison
+if [ "${{BEFORE_RESULTS["{rule_id}"]}}" -ne 0 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
+    log_detailed "RESULT: FIXED - Rule was failing, now passing after remediation"
+elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 0 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
+    log_detailed "RESULT: PASSED - Rule passed both before and after"
+elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -ne 0 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -ne 0 ]; then
+    log_detailed "RESULT: STILL FAILING - Rule failed before and after remediation"
+    log_detailed "WARNING: Remediation did not fix this rule. Manual intervention may be required."
+else
+    log_detailed "RESULT: REGRESSION - Rule was passing, now failing (unexpected)"
+    log_detailed "WARNING: This is unexpected and requires investigation!"
+fi
+log_detailed ""
 '''
 
 HTML_REPORT_GENERATOR = '''
 ###############################################################################
-# PHASE 4: GENERATE HTML REPORT
+# PHASE 4: GENERATE REPORTS
 ###############################################################################
 echo ""
-echo -e "${YELLOW}=== PHASE 4: Generating HTML Report ===${NC}"
+echo -e "${YELLOW}=== PHASE 4: Generating Reports ===${NC}"
 echo ""
+
+log_detailed "================================================================================"
+log_detailed "PHASE 4: GENERATING REPORTS"
+log_detailed "================================================================================"
+log_detailed ""
 
 REPORT_FILE="$REPORT_DIR/cis_report.html"
 HOSTNAME=$(hostname)
 REPORT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+EXECUTION_END=$(date '+%Y-%m-%d %H:%M:%S')
 
 # Count results
 BEFORE_PASS=0
@@ -346,11 +472,78 @@ sed -i "s/AFTER_PASS_PLACEHOLDER/$AFTER_PASS/g" "$REPORT_FILE"
 sed -i "s/AFTER_FAIL_PLACEHOLDER/$AFTER_FAIL/g" "$REPORT_FILE"
 sed -i "s/FIXED_PLACEHOLDER/$FIXED_COUNT/g" "$REPORT_FILE"
 
+# Finalize detailed log with summary
+log_detailed "================================================================================"
+log_detailed "EXECUTION SUMMARY"
+log_detailed "================================================================================"
+log_detailed ""
+log_detailed "Execution Completed: $EXECUTION_END"
+log_detailed ""
+log_detailed "OVERALL STATISTICS:"
+log_detailed "  Total Rules Checked: $TOTAL_RULES"
+log_detailed "  Before Audit - Passed: $BEFORE_PASS"
+log_detailed "  Before Audit - Failed: $BEFORE_FAIL"
+log_detailed "  Rules Remediated: $REMEDIATED_COUNT"
+log_detailed "  After Audit - Passed: $AFTER_PASS"
+log_detailed "  After Audit - Failed: $AFTER_FAIL"
+log_detailed "  Successfully Fixed: $FIXED_COUNT"
+log_detailed ""
+
+# List failed rules after remediation
+if [ "$AFTER_FAIL" -gt 0 ]; then
+    log_detailed "RULES STILL FAILING AFTER REMEDIATION:"
+    for rule_id in "${RULES_LIST[@]}"; do
+        if [ "${AFTER_RESULTS[$rule_id]}" -ne 0 ]; then
+            log_detailed "  - $rule_id (exit code: ${AFTER_RESULTS[$rule_id]})"
+        fi
+    done
+    log_detailed ""
+fi
+
+# List successfully fixed rules
+if [ "$FIXED_COUNT" -gt 0 ]; then
+    log_detailed "SUCCESSFULLY FIXED RULES:"
+    for rule_id in "${RULES_LIST[@]}"; do
+        if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
+            log_detailed "  - $rule_id"
+        fi
+    done
+    log_detailed ""
+fi
+
+# List rules that passed from the start
+INITIAL_PASS=0
+for rule_id in "${RULES_LIST[@]}"; do
+    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
+        ((INITIAL_PASS++)) || true
+    fi
+done
+
+if [ "$INITIAL_PASS" -gt 0 ]; then
+    log_detailed "RULES THAT PASSED FROM THE START:"
+    for rule_id in "${RULES_LIST[@]}"; do
+        if [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
+            log_detailed "  - $rule_id"
+        fi
+    done
+    log_detailed ""
+fi
+
+log_detailed "================================================================================"
+log_detailed "GENERATED FILES:"
+log_detailed "  HTML Report: $REPORT_FILE"
+log_detailed "  Detailed Log: $DETAILED_LOG"
+log_detailed "================================================================================"
+log_detailed ""
+log_detailed "End of report."
+
 echo -e "${GREEN}=============================================${NC}"
-echo -e "${GREEN}  Report generated successfully!${NC}"
+echo -e "${GREEN}  Reports generated successfully!${NC}"
 echo -e "${GREEN}=============================================${NC}"
 echo ""
-echo "Report location: $REPORT_FILE"
+echo "Report locations:"
+echo "  HTML Report:    $REPORT_FILE"
+echo "  Detailed Log:   $DETAILED_LOG"
 echo ""
 echo "Summary:"
 echo "  Before: $BEFORE_PASS passed, $BEFORE_FAIL failed"
@@ -514,6 +707,12 @@ def main() -> None:
     print(f"\nTo run on target:")
     print(f"  1. Copy to target: scp {args.output} user@host:~/")
     print(f"  2. Run: sudo bash {args.output.name}")
+    print(f"\nTo download reports after execution:")
+    print(f"  # Find latest report:")
+    print(f"  ssh user@host \"ls -d ~/cis_report_* | tail -1\"")
+    print(f"  ")
+    print(f"  # Download (replace user@host and timestamp):")
+    print(f"  scp -r user@host:~/cis_report_YYYYMMDD_HHMMSS ~/Downloads/")
 
 
 if __name__ == "__main__":
