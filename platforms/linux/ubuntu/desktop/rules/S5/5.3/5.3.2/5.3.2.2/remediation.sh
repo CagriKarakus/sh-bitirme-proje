@@ -48,7 +48,7 @@ if [ -z "$deny_value" ]; then
     log_error "Önce 5.3.3.1.1 kuralını uygulayın!"
     echo ""
     echo "Çözüm: echo 'deny = 5' >> /etc/security/faillock.conf"
-    exit 1
+    return 1
 fi
 
 if [ -z "$unlock_time" ]; then
@@ -56,7 +56,7 @@ if [ -z "$unlock_time" ]; then
     log_error "Önce 5.3.3.1.2 kuralını uygulayın!"
     echo ""
     echo "Çözüm: echo 'unlock_time = 900' >> /etc/security/faillock.conf"
-    exit 1
+    return 1
 fi
 
 log_info "Mevcut yapılandırma: deny=$deny_value, unlock_time=$unlock_time"
@@ -69,7 +69,7 @@ fi
 if grep -q 'pam_faillock\.so' /etc/pam.d/common-auth 2>/dev/null; then
     log_info "pam_faillock zaten etkin"
     grep pam_faillock /etc/pam.d/common-auth
-    exit 0
+    return 0
 fi
 
 # PAM dosyalarını yedekle
@@ -83,7 +83,7 @@ if pam-auth-update --enable faillock 2>/dev/null; then
     if grep -q 'pam_faillock\.so' /etc/pam.d/common-auth 2>/dev/null; then
         log_success "pam_faillock modülü pam-auth-update ile etkinleştirildi"
         grep pam_faillock /etc/pam.d/common-auth
-        exit 0
+        return 0
     fi
 fi
 
@@ -126,5 +126,5 @@ else
     log_error "Yapılandırma başarısız!"
     log_warn "Yedekler geri yükleniyor..."
     cp "$BACKUP_DIR"/* /etc/pam.d/
-    exit 1
+    return 1
 fi

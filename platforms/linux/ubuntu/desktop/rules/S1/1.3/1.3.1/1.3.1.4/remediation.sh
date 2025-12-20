@@ -1,18 +1,32 @@
 #!/bin/bash
 # CIS 1.3.1.4 Remediation - Level 2 (ENFORCE ONLY)
 
-set -euo pipefail
-
-[[ $EUID -ne 0 ]] && { echo "ERROR: Run as root"; exit 1; }
+# Check for root
+if [[ $EUID -ne 0 ]]; then
+    echo "ERROR: Must run as root"
+    return 1
+fi
 
 # Install utils if needed
-command -v aa-enforce >/dev/null 2>&1 || apt-get install -y apparmor-utils >/dev/null 2>&1
+if ! command -v aa-enforce >/dev/null 2>&1; then
+    apt-get install -y apparmor-utils >/dev/null 2>&1 || {
+        echo "ERROR: Could not install apparmor-utils"
+        return 1
+    }
+fi
 
 # Ensure service is running
-systemctl is-active --quiet apparmor || systemctl start apparmor
-systemctl enable apparmor >/dev/null 2>&1
+if ! systemctl is-active --quiet apparmor; then
+    systemctl start apparmor || {
+        echo "ERROR: Could not start apparmor service"
+        return 1
+    }
+fi
 
-# Remove any symlinks from force-complain directory (forces complain mode)
+# Enable service
+systemctl enable apparmor >/dev/null 2>&1 || true
+
+# Remove any symlinks from force-complain directory
 if [[ -d /etc/apparmor.d/force-complain ]]; then
     echo "Removing profiles from force-complain directory..."
     rm -f /etc/apparmor.d/force-complain/* 2>/dev/null || true
@@ -31,29 +45,28 @@ for profile in /etc/apparmor.d/*; do
 done
 
 # Reload AppArmor
-systemctl reload apparmor
+systemctl reload apparmor || true
 
 # Wait a moment for reload to complete
 sleep 1
 
 # Verify no complain mode profiles remain
-complain=$(apparmor_status | grep "profiles are in complain mode" | awk '{print $1}' || echo "0")
+complain=$(apparmor_status 2>/dev/null | grep "profiles are in complain mode" | awk '{print $1}' || echo "0")
 if [[ "$complain" -gt 0 ]]; then
-    echo "⚠ WARNING: $complain profiles still in complain mode"
+    echo "WARNING: $complain profiles still in complain mode"
     echo "Profiles in complain mode:"
-    apparmor_status | sed -n '/profiles are in complain mode/,/profiles are in enforce mode/p' | grep "^   " || true
+    apparmor_status 2>/dev/null | sed -n '/profiles are in complain mode/,/profiles are in enforce mode/p' | grep "^   " || true
 else
-    echo "✓ All profiles in enforce mode"
+    echo "SUCCESS: All profiles in enforce mode"
 fi
 
 # Check for unconfined processes
-unconfined=$(apparmor_status | grep "processes are unconfined but have a profile defined" | awk '{print $1}' || echo "0")
+unconfined=$(apparmor_status 2>/dev/null | grep "processes are unconfined but have a profile defined" | awk '{print $1}' || echo "0")
 if [[ "$unconfined" -gt 0 ]]; then
-    echo "⚠ WARNING: $unconfined unconfined processes - restart required"
-    apparmor_status | sed -n '/processes are unconfined/,/^$/p' | grep "^   " || true
+    echo "WARNING: $unconfined unconfined processes - restart may be required"
+    apparmor_status 2>/dev/null | sed -n '/processes are unconfined/,/^$/p' | grep "^   " || true
 else
-    echo "✓ All processes confined"
+    echo "SUCCESS: All processes confined"
 fi
 
-echo "✓ Level 2 remediation completed"
-exit 0
+echo "SUCCESS: Level 2 remediation completed"

@@ -21,7 +21,7 @@ log_info "pam_unix için use_authtok yapılandırılıyor..."
 # Zaten var mı kontrol et (duplicate önleme)
 if grep -Pi '^\s*password\s+.*pam_unix\.so.*\buse_authtok\b' "$PAM_PASSWORD" &>/dev/null; then
     log_info "use_authtok zaten yapılandırılmış"
-    exit 0
+    return 0
 fi
 
 # use_authtok ekle
@@ -33,5 +33,5 @@ if grep -Pi '^\s*password\s+.*pam_unix\.so.*\buse_authtok\b' "$PAM_PASSWORD" &>/
     grep -i pam_unix "$PAM_PASSWORD" | grep password
 else
     echo "[ERROR] Yapılandırma başarısız!"
-    exit 1
+    return 1
 fi

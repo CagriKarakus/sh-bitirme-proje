@@ -13,7 +13,7 @@ fi
 if grep -Pi -- '^\h*auth\h+required\h+pam_wheel\.so\h+use_uid\h+group=' /etc/pam.d/su &>/dev/null; then
     echo "INFO: su access already restricted"
     grep -Pi -- '^\h*auth\h+\H+\h+pam_wheel\.so' /etc/pam.d/su
-    exit 0
+    return 0
 fi
 
 # Remove any existing pam_wheel.so line (commented or not)

@@ -6,7 +6,7 @@ echo "Applying remediation for CIS 2.3.3..."
 chrony_status=$(dpkg-query -W -f='${db:Status-Status}' chrony 2>/dev/null)
 if [ "$chrony_status" != "installed" ]; then
     echo "INFO: chrony is not installed, skipping"
-    exit 0
+    return 0
 fi
 
 config_file="/etc/chrony/chrony.conf"

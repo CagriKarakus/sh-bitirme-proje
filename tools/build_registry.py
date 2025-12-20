@@ -25,11 +25,14 @@ RuleEntry = dict
 
 
 def parse_rule_directory(rule_dir: Path, section: str) -> RuleEntry | None:
-    """Return a registry entry if audit/remediation scripts exist.
+    """Return a registry entry if audit script exists.
     
     Supports both naming conventions:
     - Standard: audit.sh and remediation.sh
     - Custom: *_audit.sh and *_remediation.sh
+    
+    Rules with audit.sh but no remediation.sh will have remediation: null
+    (audit-only rules).
     """
     # Try to find audit script (audit.sh or *_audit.sh)
     audit_path = rule_dir / "audit.sh"
@@ -41,14 +44,12 @@ def parse_rule_directory(rule_dir: Path, section: str) -> RuleEntry | None:
         if audit_candidates:
             audit_path = audit_candidates[0]
         else:
-            return None
+            return None  # No audit script = not a valid rule
     
     # Try to find remediation script (*remediation*.sh or remediation.sh)
     remediation_candidates = sorted(rule_dir.glob("*remediation*.sh"))
-    if not remediation_candidates:
-        return None
+    remediation_path = remediation_candidates[0] if remediation_candidates else None
 
-    remediation_path = remediation_candidates[0]
     rule_name = rule_dir.name
 
     if " " in rule_name:
@@ -61,19 +62,21 @@ def parse_rule_directory(rule_dir: Path, section: str) -> RuleEntry | None:
         "title": title,
         "section": section,
         "audit": str(audit_path.as_posix()),
-        "remediation": str(remediation_path.as_posix()),
+        "remediation": str(remediation_path.as_posix()) if remediation_path else None,
     }
 
 
 def natural_key(rule_id: str) -> Tuple:
     """Produce a key that keeps numeric rule fragments in order."""
     fragments = re.split(r"(\d+)", rule_id)
-    key_parts: List[int | str] = []
+    key_parts: List[Tuple[int, int | str]] = []
     for fragment in fragments:
         if fragment.isdigit():
-            key_parts.append(int(fragment))
+            # Use (0, int) for numbers so they sort before strings
+            key_parts.append((0, int(fragment)))
         elif fragment:
-            key_parts.append(fragment)
+            # Use (1, str) for strings
+            key_parts.append((1, fragment))
     return tuple(key_parts)
 
 

@@ -50,7 +50,7 @@ if [ $? -eq 0 ]; then
     echo "   [OK] Applied successfully"
 else
     echo "   [ERROR] Failed to apply kernel parameter"
-    exit 1
+    return 1
 fi
 
 # Verify
@@ -62,9 +62,8 @@ echo "   $PARAM_NAME = $NEW_VALUE"
 if [ "$NEW_VALUE" = "$PARAM_VALUE" ]; then
     echo ""
     echo "[SUCCESS] ASLR is now enabled with value $PARAM_VALUE"
-    exit 0
 else
     echo ""
     echo "[ERROR] Failed to set ASLR value"
-    exit 1
+    return 1
 fi

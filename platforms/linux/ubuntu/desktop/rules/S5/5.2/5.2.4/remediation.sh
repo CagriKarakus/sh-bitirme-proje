@@ -14,5 +14,5 @@ else
     echo "MANUAL ACTION REQUIRED:"
     echo "Edit the above files and remove or comment out lines containing NOPASSWD"
     echo "Use 'visudo' or 'visudo -f <file>' to safely edit sudoers files"
-    exit 1
+    return 1
 fi

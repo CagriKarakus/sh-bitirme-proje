@@ -22,7 +22,7 @@ log_info "Güçlü parola hash algoritması yapılandırılıyor..."
 if grep -Pi '^\s*password\s+.*pam_unix\.so.*\b(sha512|yescrypt)\b' "$PAM_PASSWORD" &>/dev/null; then
     current=$(grep -Pi '^\s*password\s+.*pam_unix\.so' "$PAM_PASSWORD" | grep -oE '(sha512|yescrypt)')
     log_info "Güçlü hash algoritması zaten yapılandırılmış: $current"
-    exit 0
+    return 0
 fi
 
 # Eski hash algoritmalarını kaldır (duplicate önleme)
@@ -46,7 +46,7 @@ else
         log_success "Güçlü hash algoritması (sha512) yapılandırılmış"
     else
         echo "[ERROR] Yapılandırma başarısız!"
-        exit 1
+        return 1
     fi
 fi
 

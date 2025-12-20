@@ -7,7 +7,7 @@ echo "Applying remediation for CIS 2.4.2.1..."
 if ! dpkg -l | grep -q "^ii.*\bat\b"; then
     echo "INFO: at is not installed - no remediation needed"
     echo "Remediation complete for CIS 2.4.2.1"
-    exit 0
+    return 0
 fi
 
 # Remove at.deny if it exists

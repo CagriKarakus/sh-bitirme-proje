@@ -6,7 +6,7 @@ echo "Applying remediation for CIS 2.3.4..."
 ntp_status=$(dpkg-query -W -f='${db:Status-Status}' ntp 2>/dev/null)
 if [ "$ntp_status" != "installed" ]; then
     echo "INFO: ntp is not installed, skipping"
-    exit 0
+    return 0
 fi
 
 config_file="/etc/ntp.conf"

@@ -7,7 +7,7 @@ echo "Enabling pam_pwquality module..."
 if grep -q 'pam_pwquality\.so' /etc/pam.d/common-password 2>/dev/null; then
     echo "INFO: pam_pwquality already enabled"
     grep pam_pwquality /etc/pam.d/common-password
-    exit 0
+    return 0
 fi
 
 # Try pam-auth-update first
@@ -16,7 +16,7 @@ if pam-auth-update --enable pwquality 2>/dev/null; then
     if grep -q 'pam_pwquality\.so' /etc/pam.d/common-password 2>/dev/null; then
         echo "SUCCESS: pam_pwquality module enabled via pam-auth-update"
         grep pam_pwquality /etc/pam.d/common-password
-        exit 0
+        return 0
     fi
 fi
 
@@ -38,5 +38,5 @@ if grep -q 'pam_pwquality\.so' /etc/pam.d/common-password; then
     grep pam_pwquality /etc/pam.d/common-password
 else
     echo "FAIL: Could not configure pam_pwquality"
-    exit 1
+    return 1
 fi

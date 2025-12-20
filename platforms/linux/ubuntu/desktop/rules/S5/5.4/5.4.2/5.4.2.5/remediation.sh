@@ -65,5 +65,5 @@ if [ $issues_found -eq 0 ]; then
 else
     echo ""
     echo "Manual intervention required to fix the above issues"
-    exit 1
+    return 1
 fi

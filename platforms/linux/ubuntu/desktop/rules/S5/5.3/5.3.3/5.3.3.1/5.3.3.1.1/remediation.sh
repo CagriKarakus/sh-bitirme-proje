@@ -47,7 +47,7 @@ if grep -qi "^\s*deny\s*=\s*$DENY_VALUE" "$FAILLOCK_CONF"; then
     log_success "Parola kilitleme yapılandırıldı: $DENY_VALUE başarısız denemede hesap kilitlenecek"
 else
     log_error "Yapılandırma doğrulanamadı!"
-    exit 1
+    return 1
 fi
 
 echo ""

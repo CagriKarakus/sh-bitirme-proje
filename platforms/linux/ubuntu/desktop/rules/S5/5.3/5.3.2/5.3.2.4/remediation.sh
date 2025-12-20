@@ -7,7 +7,7 @@ echo "Enabling pam_pwhistory module..."
 if grep -q 'pam_pwhistory\.so' /etc/pam.d/common-password 2>/dev/null; then
     echo "INFO: pam_pwhistory already enabled"
     grep pam_pwhistory /etc/pam.d/common-password
-    exit 0
+    return 0
 fi
 
 # Manual configuration
@@ -28,5 +28,5 @@ if grep -q 'pam_pwhistory\.so' /etc/pam.d/common-password; then
     grep pam_pwhistory /etc/pam.d/common-password
 else
     echo "FAIL: Could not configure pam_pwhistory"
-    exit 1
+    return 1
 fi

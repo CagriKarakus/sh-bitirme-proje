@@ -21,16 +21,12 @@ if [ "$gdm_status" = "installed" ]; then
         echo "Successfully purged gdm3"
     else
         echo "ERROR: Failed to purge gdm3"
-        exit 1
+        return 1
     fi
     
     # Remove unused dependencies
     echo "Removing unused dependencies..."
-    if apt autoremove -y; then
-        echo "Successfully removed unused dependencies"
-    else
-        echo "WARNING: Failed to autoremove dependencies"
-    fi
+    apt autoremove -y || echo "WARNING: Failed to autoremove dependencies"
 else
     echo "gdm3 is not installed, no action needed"
 fi

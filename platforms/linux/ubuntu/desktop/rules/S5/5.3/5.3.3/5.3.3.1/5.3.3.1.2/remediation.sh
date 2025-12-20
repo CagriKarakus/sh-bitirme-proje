@@ -44,7 +44,7 @@ if grep -qi "^\s*unlock_time\s*=\s*$UNLOCK_TIME" "$FAILLOCK_CONF"; then
     log_success "Kilit açma süresi yapılandırıldı: $UNLOCK_TIME saniye (15 dakika)"
 else
     log_error "Yapılandırma doğrulanamadı!"
-    exit 1
+    return 1
 fi
 
 echo ""

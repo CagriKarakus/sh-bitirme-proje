@@ -44,7 +44,7 @@ if [ -t 0 ]; then
     read -p "Devam etmek istiyor musunuz? (evet/hayır): " confirm
     if [[ "$confirm" != "evet" && "$confirm" != "EVET" && "$confirm" != "e" && "$confirm" != "E" ]]; then
         log_warn "İptal edildi."
-        exit 0
+        return 0
     fi
 fi
 
@@ -89,7 +89,7 @@ if grep -qi '^\s*even_deny_root' "$FAILLOCK_CONF" && grep -qi "^\s*root_unlock_t
     echo "  - root_unlock_time: $ROOT_UNLOCK_TIME saniye sonra otomatik açılacak"
 else
     log_error "Yapılandırma doğrulanamadı!"
-    exit 1
+    return 1
 fi
 
 echo ""

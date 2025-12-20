@@ -148,6 +148,9 @@ log_detailed "Exit Code: ${{BEFORE_RESULTS["{rule_id}"]}}"
 if [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 0 ]; then
     echo -e "${{GREEN}}PASS${{NC}}"
     log_detailed "Status: PASS"
+elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 2 ]; then
+    echo -e "${{YELLOW}}N/A${{NC}}"
+    log_detailed "Status: NOT_APPLICABLE"
 else
     echo -e "${{RED}}FAIL${{NC}}"
     log_detailed "Status: FAIL"
@@ -173,8 +176,18 @@ log_detailed "==================================================================
 log_detailed ""
 
 REMEDIATED_COUNT=0
+SKIPPED_NA_COUNT=0
 for rule_id in "${RULES_LIST[@]}"; do
-    if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ]; then
+    # Skip if NOT_APPLICABLE (exit code 2)
+    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 2 ]; then
+        echo -e "${YELLOW}Skipping $rule_id (NOT_APPLICABLE)${NC}"
+        log_detailed "Skipping Rule: $rule_id (NOT_APPLICABLE - exit code 2)"
+        ((SKIPPED_NA_COUNT++)) || true
+        continue
+    fi
+    
+    # Only remediate if FAIL (exit code 1)
+    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 1 ]; then
         echo -e "${BLUE}Remediating $rule_id...${NC}"
         log_detailed "--------------------------------------------------------------------------------"
         log_detailed "Remediating Rule: $rule_id"
@@ -210,13 +223,17 @@ REMEDIATION_BLOCK_END = '''
     fi
 done
 
-if [ "$REMEDIATED_COUNT" -eq 0 ]; then
+if [ "$REMEDIATED_COUNT" -eq 0 ] && [ "$SKIPPED_NA_COUNT" -eq 0 ]; then
     echo "No remediation needed - all rules passed!"
     log_detailed "No remediation needed - all rules passed initial audit"
+elif [ "$REMEDIATED_COUNT" -eq 0 ]; then
+    echo "No remediation needed - rules either passed or not applicable"
+    log_detailed "No remediation needed. Skipped (N/A): $SKIPPED_NA_COUNT"
 else
     echo ""
-    echo "Remediated $REMEDIATED_COUNT rule(s)"
+    echo "Remediated $REMEDIATED_COUNT rule(s), skipped $SKIPPED_NA_COUNT (N/A)"
     log_detailed "Total rules remediated: $REMEDIATED_COUNT"
+    log_detailed "Total rules skipped (N/A): $SKIPPED_NA_COUNT"
 fi
 
 log_detailed ""
@@ -258,6 +275,9 @@ log_detailed "Exit Code: ${{AFTER_RESULTS["{rule_id}"]}}"
 if [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
     echo -e "${{GREEN}}PASS${{NC}}"
     log_detailed "Status: PASS"
+elif [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 2 ]; then
+    echo -e "${{YELLOW}}N/A${{NC}}"
+    log_detailed "Status: NOT_APPLICABLE"
 else
     echo -e "${{RED}}FAIL${{NC}}"
     log_detailed "Status: FAIL"
@@ -268,15 +288,17 @@ log_detailed "OUTPUT:"
 log_detailed "${{AFTER_OUTPUT["{rule_id}"]}}"
 log_detailed ""
 
-# Log comparison
-if [ "${{BEFORE_RESULTS["{rule_id}"]}}" -ne 0 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
+# Log comparison (handle N/A cases)
+if [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 2 ] || [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 2 ]; then
+    log_detailed "RESULT: NOT_APPLICABLE - Rule is not applicable to this system"
+elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 1 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
     log_detailed "RESULT: FIXED - Rule was failing, now passing after remediation"
 elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 0 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 0 ]; then
     log_detailed "RESULT: PASSED - Rule passed both before and after"
-elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -ne 0 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -ne 0 ]; then
+elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 1 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 1 ]; then
     log_detailed "RESULT: STILL FAILING - Rule failed before and after remediation"
     log_detailed "WARNING: Remediation did not fix this rule. Manual intervention may be required."
-else
+elif [ "${{BEFORE_RESULTS["{rule_id}"]}}" -eq 0 ] && [ "${{AFTER_RESULTS["{rule_id}"]}}" -eq 1 ]; then
     log_detailed "RESULT: REGRESSION - Rule was passing, now failing (unexpected)"
     log_detailed "WARNING: This is unexpected and requires investigation!"
 fi
@@ -304,22 +326,31 @@ EXECUTION_END=$(date '+%Y-%m-%d %H:%M:%S')
 # Count results
 BEFORE_PASS=0
 BEFORE_FAIL=0
+BEFORE_NA=0
 AFTER_PASS=0
 AFTER_FAIL=0
+AFTER_NA=0
 FIXED_COUNT=0
 
 for rule_id in "${RULES_LIST[@]}"; do
+    # Before counts
     if [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ]; then
         ((BEFORE_PASS++)) || true
+    elif [ "${BEFORE_RESULTS[$rule_id]}" -eq 2 ]; then
+        ((BEFORE_NA++)) || true
     else
         ((BEFORE_FAIL++)) || true
     fi
+    # After counts
     if [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
         ((AFTER_PASS++)) || true
+    elif [ "${AFTER_RESULTS[$rule_id]}" -eq 2 ]; then
+        ((AFTER_NA++)) || true
     else
         ((AFTER_FAIL++)) || true
     fi
-    if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
+    # Fixed count (only if before was FAIL and after is PASS)
+    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 1 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
         ((FIXED_COUNT++)) || true
     fi
 done
@@ -352,6 +383,7 @@ cat > "$REPORT_FILE" << 'HTMLEOF'
         .status.pass { background: rgba(0,255,136,0.2); color: #00ff88; }
         .status.fail { background: rgba(255,71,87,0.2); color: #ff4757; }
         .status.fixed { background: rgba(255,215,0,0.2); color: #ffd700; }
+        .status.na { background: rgba(128,128,128,0.2); color: #888; }
         .toggle-btn { background: rgba(0,212,255,0.2); border: none; color: #00d4ff; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em; }
         .toggle-btn:hover { background: rgba(0,212,255,0.4); }
         .output { display: none; background: #0a0a15; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; font-size: 0.85em; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
@@ -419,10 +451,29 @@ for rule_id in "${RULES_LIST[@]}"; do
     overall_status="FAIL"
     overall_class="fail"
     
-    [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ] && before_status="PASS" && before_class="pass"
-    [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ] && after_status="PASS" && after_class="pass"
+    # Before status
+    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 0 ]; then
+        before_status="PASS"
+        before_class="pass"
+    elif [ "${BEFORE_RESULTS[$rule_id]}" -eq 2 ]; then
+        before_status="N/A"
+        before_class="na"
+    fi
     
-    if [ "${BEFORE_RESULTS[$rule_id]}" -ne 0 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
+    # After status
+    if [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
+        after_status="PASS"
+        after_class="pass"
+    elif [ "${AFTER_RESULTS[$rule_id]}" -eq 2 ]; then
+        after_status="N/A"
+        after_class="na"
+    fi
+    
+    # Overall status
+    if [ "${BEFORE_RESULTS[$rule_id]}" -eq 2 ] || [ "${AFTER_RESULTS[$rule_id]}" -eq 2 ]; then
+        overall_status="N/A"
+        overall_class="na"
+    elif [ "${BEFORE_RESULTS[$rule_id]}" -eq 1 ] && [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then
         overall_status="FIXED"
         overall_class="fixed"
     elif [ "${AFTER_RESULTS[$rule_id]}" -eq 0 ]; then

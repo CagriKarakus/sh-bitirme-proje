@@ -24,7 +24,7 @@ if dpkg-query -s prelink &>/dev/null; then
         echo "Successfully removed prelink"
     else
         echo "ERROR: Failed to remove prelink"
-        exit 1
+        return 1
     fi
 else
     echo "prelink is not installed, no action needed"

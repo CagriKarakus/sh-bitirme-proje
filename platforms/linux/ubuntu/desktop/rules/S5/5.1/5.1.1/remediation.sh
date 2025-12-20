@@ -9,5 +9,5 @@ if [ -f /etc/ssh/sshd_config ]; then
     echo "SUCCESS: Permissions set to 600, owner set to root:root"
 else
     echo "ERROR: /etc/ssh/sshd_config not found"
-    exit 1
+    return 1
 fi

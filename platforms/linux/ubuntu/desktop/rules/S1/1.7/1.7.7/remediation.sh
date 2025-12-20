@@ -8,7 +8,7 @@ echo "Applying remediation for CIS 1.7.7 - Ensure GDM disabling automatic mounti
 if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installed"; then
     echo "INFO: GDM (gdm3) is not installed"
     echo "      No action needed - this rule is not applicable"
-    exit 0
+    return 0
 fi
 
 echo "GDM is installed, configuring automatic mounting override prevention..."

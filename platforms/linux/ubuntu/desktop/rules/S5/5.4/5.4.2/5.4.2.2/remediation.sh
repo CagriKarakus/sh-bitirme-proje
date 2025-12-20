@@ -14,7 +14,7 @@ non_root_gid0=$(awk -F: '($1 !~ /^(root|sync|shutdown|halt|operator)/ && $4=="0"
 
 if [ -z "$non_root_gid0" ]; then
     echo "SUCCESS: Only root has primary GID 0"
-    exit 0
+    return 0
 fi
 
 echo "WARNING: The following non-root accounts have primary GID 0:"
@@ -24,4 +24,4 @@ echo "Manual action required:"
 echo "For each account listed above, run:"
 echo "  usermod -g <new_gid> <username>"
 echo ""
-exit 1
+return 1

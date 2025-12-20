@@ -10,11 +10,11 @@ root_status=$(passwd -S root | awk '{print $2}')
 case "$root_status" in
     P)
         echo "Root account already has a password set"
-        exit 0
+        return 0
         ;;
     L)
         echo "Root account is already locked"
-        exit 0
+        return 0
         ;;
     *)
         echo "Root account is not secured (status: $root_status)"

@@ -14,7 +14,7 @@ sed -i '/\/nologin/d' /etc/shells
 # Verify
 if grep -Ps '^\h*([^#\n\r]+)?\/nologin\b' /etc/shells > /dev/null; then
     echo "FAIL: Could not remove nologin from /etc/shells"
-    exit 1
+    return 1
 else
     echo "SUCCESS: nologin removed from /etc/shells"
 fi

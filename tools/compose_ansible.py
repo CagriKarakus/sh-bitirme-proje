@@ -76,7 +76,11 @@ class AnsiblePlaybookComposer:
         return '\n'.join(lines).strip()
 
     def _create_remediation_shell_command(self, script_content: str) -> str:
-        """Create shell command for remediation script."""
+        """Create shell command for remediation script.
+        
+        Note: Ansible shell module runs scripts in a non-function context,
+        so we need to convert 'return' statements to 'exit' statements.
+        """
         lines = []
         for line in script_content.split('\n'):
             stripped = line.strip()
@@ -87,6 +91,11 @@ class AnsiblePlaybookComposer:
                 continue
             if stripped.startswith('echo ""'):
                 continue
+            # Convert return to exit for Ansible shell compatibility
+            if 'return 0' in line:
+                line = line.replace('return 0', 'exit 0')
+            if 'return 1' in line:
+                line = line.replace('return 1', 'exit 1')
             lines.append(line)
         return '\n'.join(lines).strip()
 
@@ -158,21 +167,34 @@ class AnsiblePlaybookComposer:
             playbook_lines.append('      check_mode: false')
             playbook_lines.append('')
 
-            # Remediation task
+            # Remediation task - only run if FAIL (rc == 1), skip for N/A (rc == 2)
             playbook_lines.append(f'    - name: "[{idx}/{len(self.rule_ids)}] Remediate {rule_id}: {description}"')
             playbook_lines.append('      shell: |')
             for line in self._create_remediation_shell_command(remediation_content).split('\n'):
                 if line.strip():
                     playbook_lines.append(f'        {line}')
-            playbook_lines.append(f'      when: audit_{safe_id}.rc != 0 and cis_apply_remediation | bool')
+            playbook_lines.append(f'      when: audit_{safe_id}.rc == 1 and cis_apply_remediation | bool')
             playbook_lines.append(f'      register: remediate_{safe_id}')
+            playbook_lines.append('      ignore_errors: true')
             playbook_lines.append('')
 
-            # Display result
+            # AFTER audit - re-check after remediation
+            playbook_lines.append(f'    - name: "[{idx}/{len(self.rule_ids)}] Verify {rule_id} after remediation"')
+            playbook_lines.append('      shell: |')
+            for line in self._create_audit_shell_command(audit_content).split('\n'):
+                playbook_lines.append(f'        {line}')
+            playbook_lines.append(f'      register: after_audit_{safe_id}')
+            playbook_lines.append('      failed_when: false')
+            playbook_lines.append('      changed_when: false')
+            playbook_lines.append('      check_mode: false')
+            playbook_lines.append(f'      when: remediate_{safe_id} is defined and remediate_{safe_id}.changed')
+            playbook_lines.append('')
+
+            # Display result - handle PASS, FAIL, N/A, FIXED states
             playbook_lines.append(f'    - name: "[{idx}/{len(self.rule_ids)}] Display result for {rule_id}"')
             playbook_lines.append('      debug:')
             playbook_lines.append('        msg: |')
-            playbook_lines.append(f'          Rule {rule_id}: {{{{ "PASS" if audit_{safe_id}.rc == 0 else "FAIL -> REMEDIATED" if remediate_{safe_id} is defined and remediate_{safe_id}.changed else "FAIL" }}}}')
+            playbook_lines.append(f'          Rule {rule_id}: {{{{ "PASS" if audit_{safe_id}.rc == 0 else "N/A" if audit_{safe_id}.rc == 2 else "FIXED" if after_audit_{safe_id} is defined and after_audit_{safe_id}.rc == 0 else "REMEDIATED (unverified)" if remediate_{safe_id} is defined and remediate_{safe_id}.changed else "FAIL" }}}}')
             playbook_lines.append('')
 
         # Post tasks

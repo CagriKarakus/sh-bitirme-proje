@@ -9,7 +9,7 @@ if grep -qE '^\s*(AllowUsers|AllowGroups|DenyUsers|DenyGroups)\s+' /etc/ssh/sshd
     grep -E '^\s*(AllowUsers|AllowGroups|DenyUsers|DenyGroups)\s+' /etc/ssh/sshd_config
     echo ""
     echo "No changes made."
-    exit 0
+    return 0
 fi
 
 # Remove any commented directives

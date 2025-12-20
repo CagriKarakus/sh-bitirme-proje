@@ -10,7 +10,7 @@ non_root_uid0=$(awk -F: '($3 == 0 && $1 != "root") { print $1 }' /etc/passwd)
 if [ -z "$non_root_uid0" ]; then
     echo "No non-root accounts with UID 0 found"
     echo "SUCCESS: Only root has UID 0"
-    exit 0
+    return 0
 fi
 
 echo "WARNING: The following non-root accounts have UID 0:"
@@ -21,4 +21,4 @@ echo "For each account listed above, run:"
 echo "  usermod -u <new_uid> <username>"
 echo ""
 echo "Example: usermod -u 1001 baduser"
-exit 1
+return 1

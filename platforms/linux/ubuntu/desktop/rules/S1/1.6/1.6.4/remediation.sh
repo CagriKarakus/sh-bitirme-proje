@@ -20,7 +20,7 @@ if [ -e "$motd_file" ]; then
             echo "Successfully set ownership to root:root"
         else
             echo "ERROR: Failed to set ownership"
-            exit 1
+            return 1
         fi
         
         # Set permissions to 644
@@ -29,7 +29,7 @@ if [ -e "$motd_file" ]; then
             echo "Successfully set permissions to 644"
         else
             echo "ERROR: Failed to set permissions"
-            exit 1
+            return 1
         fi
         
         # Display new status
@@ -38,7 +38,7 @@ if [ -e "$motd_file" ]; then
         stat -Lc 'Access: (%#a/%A) Uid: ( %u/ %U) Gid: ( %g/ %G)' "$real_file"
     else
         echo "ERROR: Could not resolve $motd_file"
-        exit 1
+        return 1
     fi
 else
     echo "INFO: $motd_file does not exist, no action needed"
