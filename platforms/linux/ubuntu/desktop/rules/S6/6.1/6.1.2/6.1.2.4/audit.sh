@@ -11,14 +11,27 @@ echo "Storage: ${storage:-Not configured (default: auto)}"
 
 if [ -n "$storage" ]; then
     if echo "$storage" | grep -Eqi "persistent|auto"; then
-        echo "PASS: Storage is configured to persistent or auto"
+        echo ""
+        echo "AUDIT RESULT: PASS - Storage is configured to persistent or auto"
         exit 0
     else
-        echo "FAIL: Storage is not configured to persistent or auto"
+        echo ""
+        echo "AUDIT RESULT: FAIL - Storage is set to: $storage (should be persistent or auto)"
         exit 1
     fi
 else
-    echo "WARNING: Storage is not explicitly configured (default: auto)"
-    echo "Consider setting Storage=persistent for persistent logging"
-    exit 1
+    # Default is 'auto' which behaves as 'persistent' if /var/log/journal exists
+    # This is acceptable per CIS benchmark
+    if [ -d /var/log/journal ]; then
+        echo "INFO: /var/log/journal exists, default 'auto' will use persistent storage"
+        echo ""
+        echo "AUDIT RESULT: PASS - Default 'auto' with /var/log/journal is acceptable"
+        exit 0
+    else
+        echo "INFO: /var/log/journal does not exist"
+        echo "Default 'auto' will use volatile storage (logs lost on reboot)"
+        echo ""
+        echo "AUDIT RESULT: FAIL - Create /var/log/journal or set Storage=persistent"
+        exit 1
+    fi
 fi
