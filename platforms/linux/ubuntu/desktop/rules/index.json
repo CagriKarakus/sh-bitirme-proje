@@ -1029,13 +1029,6 @@
     "remediation": null
   },
   {
-    "id": "4.4.2",
-    "title": "4.4.2",
-    "section": "Section 4 Host Based Firewall",
-    "audit": "platforms/linux/ubuntu/desktop/rules/S4/4.4/4.4.2/audit.sh",
-    "remediation": "platforms/linux/ubuntu/desktop/rules/S4/4.4/4.4.2/remediation.sh"
-  },
-  {
     "id": "4.4.2.1",
     "title": "4.4.2.1",
     "section": "Section 4 Host Based Firewall",
@@ -1062,13 +1055,6 @@
     "section": "Section 4 Host Based Firewall",
     "audit": "platforms/linux/ubuntu/desktop/rules/S4/4.4/4.4.2/4.4.2.4/audit.sh",
     "remediation": "platforms/linux/ubuntu/desktop/rules/S4/4.4/4.4.2/4.4.2.4/remediation.sh"
-  },
-  {
-    "id": "4.4.3",
-    "title": "4.4.3",
-    "section": "Section 4 Host Based Firewall",
-    "audit": "platforms/linux/ubuntu/desktop/rules/S4/4.4/4.4.3/audit.sh",
-    "remediation": "platforms/linux/ubuntu/desktop/rules/S4/4.4/4.4.3/remediation.sh"
   },
   {
     "id": "4.4.3.1",
@@ -2189,12 +2175,5 @@
     "section": "S7",
     "audit": "platforms/linux/ubuntu/desktop/rules/S7/7.2/7.2.10/audit.sh",
     "remediation": "platforms/linux/ubuntu/desktop/rules/S7/7.2/7.2.10/remediation.sh"
-  },
-  {
-    "id": "common",
-    "title": "common",
-    "section": "S6",
-    "audit": "platforms/linux/ubuntu/desktop/rules/S6/common/audit_helpers.sh",
-    "remediation": null
   }
 ]

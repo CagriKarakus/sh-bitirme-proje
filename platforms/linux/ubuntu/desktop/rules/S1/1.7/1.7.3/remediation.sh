@@ -8,7 +8,7 @@ echo "Applying remediation for CIS 1.7.3 - Ensure GDM disable-user-list option i
 if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installed"; then
     echo "INFO: GDM (gdm3) is not installed"
     echo "      No action needed - this rule is not applicable"
-    return 0
+    exit 0
 fi
 
 echo "GDM is installed, configuring disable-user-list..."
@@ -18,11 +18,10 @@ dconf_profile="/etc/dconf/profile/gdm"
 echo "Creating/updating dconf profile at $dconf_profile..."
 
 mkdir -p /etc/dconf/profile
-cat > "$dconf_profile" << 'EOF'
-user-db:user
-system-db:gdm
-file-db:/usr/share/gdm/greeter-dconf-defaults
-EOF
+printf '%s\n' \
+    "user-db:user" \
+    "system-db:gdm" \
+    "file-db:/usr/share/gdm/greeter-dconf-defaults" > "$dconf_profile"
 
 echo "Created dconf profile"
 
@@ -33,11 +32,10 @@ login_screen_config="$login_screen_config_dir/00-login-screen"
 echo "Creating login-screen configuration at $login_screen_config..."
 
 mkdir -p "$login_screen_config_dir"
-cat > "$login_screen_config" << 'EOF'
-[org/gnome/login-screen]
-# Do not show the user list
-disable-user-list=true
-EOF
+printf '%s\n' \
+    "[org/gnome/login-screen]" \
+    "# Do not show the user list" \
+    "disable-user-list=true" > "$login_screen_config"
 
 echo "Created login-screen configuration"
 

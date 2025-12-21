@@ -55,11 +55,10 @@ if systemctl list-unit-files 2>/dev/null | grep -q coredump; then
     
     # Create override configuration
     override_file="$coredump_dir/99-disable-coredump.conf"
-    cat > "$override_file" << 'EOF'
-[Coredump]
-Storage=none
-ProcessSizeMax=0
-EOF
+    printf '%s\n' \
+        "[Coredump]" \
+        "Storage=none" \
+        "ProcessSizeMax=0" > "$override_file"
     echo "Created $override_file with Storage=none and ProcessSizeMax=0"
     
     # Reload systemd daemon

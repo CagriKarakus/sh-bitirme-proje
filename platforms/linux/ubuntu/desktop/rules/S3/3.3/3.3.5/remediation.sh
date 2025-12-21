@@ -3,17 +3,15 @@
 
 echo "Applying remediation for CIS 3.3.5..."
 
-cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
-# CIS 3.3.5 - Do not accept ICMP redirects
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv4.conf.default.accept_redirects = 0
-EOF
+printf '%s\n' \
+    "# CIS 3.3.5 - Do not accept ICMP redirects" \
+    "net.ipv4.conf.all.accept_redirects = 0" \
+    "net.ipv4.conf.default.accept_redirects = 0" >> /etc/sysctl.d/60-netipv4_sysctl.conf
 
-cat >> /etc/sysctl.d/60-netipv6_sysctl.conf << 'EOF'
-# CIS 3.3.5 - Do not accept ICMP redirects (IPv6)
-net.ipv6.conf.all.accept_redirects = 0
-net.ipv6.conf.default.accept_redirects = 0
-EOF
+printf '%s\n' \
+    "# CIS 3.3.5 - Do not accept ICMP redirects (IPv6)" \
+    "net.ipv6.conf.all.accept_redirects = 0" \
+    "net.ipv6.conf.default.accept_redirects = 0" >> /etc/sysctl.d/60-netipv6_sysctl.conf
 
 sysctl -w net.ipv4.conf.all.accept_redirects=0
 sysctl -w net.ipv4.conf.default.accept_redirects=0

@@ -31,11 +31,10 @@ for brc in /etc/bashrc /etc/bash.bashrc; do
 done
 
 # Create new TMOUT configuration
-cat > /etc/profile.d/50-tmout.sh << EOF
-# CIS 5.4.3.2 - Shell timeout configuration
-TMOUT=$TMOUT_VALUE
-readonly TMOUT
-export TMOUT
-EOF
+printf '%s\n' \
+    "# CIS 5.4.3.2 - Shell timeout configuration" \
+    "TMOUT=$TMOUT_VALUE" \
+    "readonly TMOUT" \
+    "export TMOUT" > /etc/profile.d/50-tmout.sh
 
 echo "SUCCESS: Shell timeout configured to $TMOUT_VALUE seconds in /etc/profile.d/50-tmout.sh"

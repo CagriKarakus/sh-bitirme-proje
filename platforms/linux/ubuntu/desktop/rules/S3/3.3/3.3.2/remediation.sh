@@ -3,11 +3,10 @@
 
 echo "Applying remediation for CIS 3.3.2..."
 
-cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
-# CIS 3.3.2 - Disable packet redirect sending
-net.ipv4.conf.all.send_redirects = 0
-net.ipv4.conf.default.send_redirects = 0
-EOF
+printf '%s\n' \
+    "# CIS 3.3.2 - Disable packet redirect sending" \
+    "net.ipv4.conf.all.send_redirects = 0" \
+    "net.ipv4.conf.default.send_redirects = 0" >> /etc/sysctl.d/60-netipv4_sysctl.conf
 
 sysctl -w net.ipv4.conf.all.send_redirects=0
 sysctl -w net.ipv4.conf.default.send_redirects=0

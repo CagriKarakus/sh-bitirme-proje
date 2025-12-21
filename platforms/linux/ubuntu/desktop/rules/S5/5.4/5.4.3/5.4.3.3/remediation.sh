@@ -33,9 +33,8 @@ if [ -n "$l_output2" ]; then
 fi
 
 # Create umask configuration
-cat > /etc/profile.d/50-systemwide_umask.sh << 'EOF'
-# CIS 5.4.3.3 - Default user umask
-umask 027
-EOF
+printf '%s\n' \
+    "# CIS 5.4.3.3 - Default user umask" \
+    "umask 027" > /etc/profile.d/50-systemwide_umask.sh
 
 echo "SUCCESS: Created /etc/profile.d/50-systemwide_umask.sh with umask 027"

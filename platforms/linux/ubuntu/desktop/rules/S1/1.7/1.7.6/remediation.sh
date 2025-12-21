@@ -8,7 +8,7 @@ echo "Applying remediation for CIS 1.7.6 - Ensure GDM automatic mounting of remo
 if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installed"; then
     echo "INFO: GDM (gdm3) is not installed"
     echo "      No action needed - this rule is not applicable"
-    return 0
+    exit 0
 fi
 
 echo "GDM is installed, configuring automatic mounting settings..."
@@ -18,10 +18,9 @@ dconf_profile="/etc/dconf/profile/user"
 if [ ! -f "$dconf_profile" ]; then
     echo "Creating dconf profile at $dconf_profile..."
     mkdir -p /etc/dconf/profile
-    cat > "$dconf_profile" << 'EOF'
-user-db:user
-system-db:local
-EOF
+    printf '%s\n' \
+        "user-db:user" \
+        "system-db:local" > "$dconf_profile"
     echo "Created dconf profile"
 else
     echo "dconf profile already exists at $dconf_profile"
@@ -34,11 +33,10 @@ automount_config="$automount_config_dir/00-media-automount"
 echo "Creating automount configuration at $automount_config..."
 
 mkdir -p "$automount_config_dir"
-cat > "$automount_config" << 'EOF'
-[org/gnome/desktop/media-handling]
-automount=false
-automount-open=false
-EOF
+printf '%s\n' \
+    "[org/gnome/desktop/media-handling]" \
+    "automount=false" \
+    "automount-open=false" > "$automount_config"
 
 echo "Created automount configuration"
 

@@ -22,14 +22,13 @@ for module in $WIRELESS_MODULES; do
 done
 
 # Create blacklist file to prevent loading at boot
-cat > /etc/modprobe.d/disable-wireless.conf << 'EOF'
-# CIS 3.1.2 - Disable wireless modules
-install iwlwifi /bin/true
-install ath9k /bin/true
-install ath10k_pci /bin/true
-install rtl8xxxu /bin/true
-install brcmfmac /bin/true
-EOF
+printf '%s\n' \
+    "# CIS 3.1.2 - Disable wireless modules" \
+    "install iwlwifi /bin/true" \
+    "install ath9k /bin/true" \
+    "install ath10k_pci /bin/true" \
+    "install rtl8xxxu /bin/true" \
+    "install brcmfmac /bin/true" > /etc/modprobe.d/disable-wireless.conf
 
 echo "Created /etc/modprobe.d/disable-wireless.conf"
 echo ""

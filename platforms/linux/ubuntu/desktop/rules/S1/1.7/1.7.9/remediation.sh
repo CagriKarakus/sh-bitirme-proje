@@ -8,7 +8,7 @@ echo "Applying remediation for CIS 1.7.9 - Ensure GDM autorun-never is not overr
 if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installed"; then
     echo "INFO: GDM (gdm3) is not installed"
     echo "      No action needed - this rule is not applicable"
-    return 0
+    exit 0
 fi
 
 echo "GDM is installed, configuring autorun-never override prevention..."
@@ -21,10 +21,9 @@ echo "Creating locks directory at $locks_dir..."
 mkdir -p "$locks_dir"
 
 echo "Creating locks configuration at $locks_file..."
-cat > "$locks_file" << 'EOF'
-# Lock autorun-never setting
-/org/gnome/desktop/media-handling/autorun-never
-EOF
+printf '%s\n' \
+    "# Lock autorun-never setting" \
+    "/org/gnome/desktop/media-handling/autorun-never" > "$locks_file"
 
 echo "Created locks configuration"
 
@@ -33,10 +32,9 @@ dconf_profile="/etc/dconf/profile/user"
 if [ ! -f "$dconf_profile" ]; then
     echo "Creating dconf profile at $dconf_profile..."
     mkdir -p /etc/dconf/profile
-    cat > "$dconf_profile" << 'EOF'
-user-db:user
-system-db:local
-EOF
+    printf '%s\n' \
+        "user-db:user" \
+        "system-db:local" > "$dconf_profile"
     echo "Created dconf profile"
 else
     echo "dconf profile already exists at $dconf_profile"

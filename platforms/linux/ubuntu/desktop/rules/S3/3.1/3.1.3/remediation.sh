@@ -23,11 +23,10 @@ if command -v rfkill &>/dev/null; then
 fi
 
 # Create blacklist file for bluetooth modules
-cat > /etc/modprobe.d/disable-bluetooth.conf << 'EOF'
-# CIS 3.1.3 - Disable bluetooth modules
-install bluetooth /bin/true
-install btusb /bin/true
-EOF
+printf '%s\n' \
+    "# CIS 3.1.3 - Disable bluetooth modules" \
+    "install bluetooth /bin/true" \
+    "install btusb /bin/true" > /etc/modprobe.d/disable-bluetooth.conf
 
 echo "Created /etc/modprobe.d/disable-bluetooth.conf"
 echo ""

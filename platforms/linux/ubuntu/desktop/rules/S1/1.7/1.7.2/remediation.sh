@@ -11,7 +11,7 @@ BANNER_MESSAGE="Authorized uses only. All activity may be monitored and reported
 if ! dpkg-query -W -f='${db:Status-Status}' gdm3 2>/dev/null | grep -q "installed"; then
     echo "INFO: GDM (gdm3) is not installed"
     echo "      No action needed - this rule is not applicable"
-    return 0
+    exit 0
 fi
 
 echo "GDM is installed, configuring login banner..."
@@ -21,11 +21,10 @@ dconf_profile="/etc/dconf/profile/gdm"
 echo "Creating/updating dconf profile at $dconf_profile..."
 
 mkdir -p /etc/dconf/profile
-cat > "$dconf_profile" << 'EOF'
-user-db:user
-system-db:gdm
-file-db:/usr/share/gdm/greeter-dconf-defaults
-EOF
+printf '%s\n' \
+    "user-db:user" \
+    "system-db:gdm" \
+    "file-db:/usr/share/gdm/greeter-dconf-defaults" > "$dconf_profile"
 
 echo "Created dconf profile"
 
@@ -36,11 +35,10 @@ banner_config="$banner_config_dir/01-banner-message"
 echo "Creating banner configuration at $banner_config..."
 
 mkdir -p "$banner_config_dir"
-cat > "$banner_config" << EOF
-[org/gnome/login-screen]
-banner-message-enable=true
-banner-message-text='$BANNER_MESSAGE'
-EOF
+printf '%s\n' \
+    "[org/gnome/login-screen]" \
+    "banner-message-enable=true" \
+    "banner-message-text='$BANNER_MESSAGE'" > "$banner_config"
 
 echo "Created banner configuration"
 

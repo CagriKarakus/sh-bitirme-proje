@@ -14,11 +14,10 @@ if [ -f "$config_file" ]; then
 fi
 
 # Create configuration
-cat > "$config_file" << EOF
-[Time]
-NTP=$NTP_SERVERS
-FallbackNTP=$FALLBACK_NTP
-EOF
+printf '%s\n' \
+    "[Time]" \
+    "NTP=$NTP_SERVERS" \
+    "FallbackNTP=$FALLBACK_NTP" > "$config_file"
 
 echo "Configured NTP servers:"
 cat "$config_file"

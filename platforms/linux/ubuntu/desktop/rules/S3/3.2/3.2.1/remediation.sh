@@ -6,11 +6,10 @@ MODULE="dccp"
 echo "Applying remediation for CIS 3.2.1..."
 
 # Create modprobe configuration file
-cat > /etc/modprobe.d/${MODULE}.conf << EOF
-# CIS 3.2.1 - Disable $MODULE module
-install $MODULE /bin/true
-blacklist $MODULE
-EOF
+printf '%s\n' \
+    "# CIS 3.2.1 - Disable $MODULE module" \
+    "install $MODULE /bin/true" \
+    "blacklist $MODULE" > /etc/modprobe.d/${MODULE}.conf
 
 echo "Created /etc/modprobe.d/${MODULE}.conf"
 

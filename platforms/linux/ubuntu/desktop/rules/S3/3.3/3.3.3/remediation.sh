@@ -3,10 +3,9 @@
 
 echo "Applying remediation for CIS 3.3.3..."
 
-cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
-# CIS 3.3.3 - Ignore bogus ICMP responses
-net.ipv4.icmp_ignore_bogus_error_responses = 1
-EOF
+printf '%s\n' \
+    "# CIS 3.3.3 - Ignore bogus ICMP responses" \
+    "net.ipv4.icmp_ignore_bogus_error_responses = 1" >> /etc/sysctl.d/60-netipv4_sysctl.conf
 
 sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=1
 sysctl -w net.ipv4.route.flush=1

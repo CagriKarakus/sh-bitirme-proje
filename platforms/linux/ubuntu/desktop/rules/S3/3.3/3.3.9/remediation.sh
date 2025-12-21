@@ -3,11 +3,10 @@
 
 echo "Applying remediation for CIS 3.3.9..."
 
-cat >> /etc/sysctl.d/60-netipv4_sysctl.conf << 'EOF'
-# CIS 3.3.9 - Log suspicious packets (martians)
-net.ipv4.conf.all.log_martians = 1
-net.ipv4.conf.default.log_martians = 1
-EOF
+printf '%s\n' \
+    "# CIS 3.3.9 - Log suspicious packets (martians)" \
+    "net.ipv4.conf.all.log_martians = 1" \
+    "net.ipv4.conf.default.log_martians = 1" >> /etc/sysctl.d/60-netipv4_sysctl.conf
 
 sysctl -w net.ipv4.conf.all.log_martians=1
 sysctl -w net.ipv4.conf.default.log_martians=1
