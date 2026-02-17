@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# CIS 1.1.1.8 Remediation - Disable usb-storage kernel module
+# CIS 1.1.1.8 Remediation - Disable udf kernel module
 
-mod_name="usb-storage"
+mod_name="udf"
 rule_id="1.1.1.8"
 conf_dir="/etc/modprobe.d"
-conf_file="${conf_dir}/cis-usb-storage.conf"
+conf_file="${conf_dir}/cis-udf.conf"
 kernel_ver="$(uname -r)"
 
 # Managed block markers

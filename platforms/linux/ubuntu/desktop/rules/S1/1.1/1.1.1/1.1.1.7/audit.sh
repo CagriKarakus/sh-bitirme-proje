@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # CIS 1.1.1.7 Audit - Ensure squashfs kernel module is not available
 
-mod_name="cramfs"
+mod_name="squashfs"
 conf_dir="/etc/modprobe.d"
-conf_file="${conf_dir}/cramfs.conf"
+conf_file="${conf_dir}/squashfs.conf"
 kernel_ver="$(uname -r)"
 
 # Exit codes for integration

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# CIS 1.1.1.7 Remediation - Disable udf kernel module
+# CIS 1.1.1.7 Remediation - Disable squashfs kernel module
 
-mod_name="udf"
+mod_name="squashfs"
 rule_id="1.1.1.7"
 conf_dir="/etc/modprobe.d"
 conf_file="${conf_dir}/cis-${mod_name}.conf"

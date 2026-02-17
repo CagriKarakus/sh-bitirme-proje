@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# CIS 1.1.1.9 Remediation - Disable dccp kernel module
+# CIS 1.1.1.9 Remediation - Disable usb-storage kernel module
 
-mod_name="dccp"
+mod_name="usb-storage"
 rule_id="1.1.1.9"
 conf_dir="/etc/modprobe.d"
 conf_file="${conf_dir}/cis-${mod_name}.conf"

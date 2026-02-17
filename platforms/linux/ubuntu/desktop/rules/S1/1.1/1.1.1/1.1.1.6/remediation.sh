@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# CIS 1.1.1.6 Remediation - Disable squashfs kernel module
+# CIS 1.1.1.6 Remediation - Disable overlayfs kernel module
 
-mod_name="squashfs"
+mod_name="overlayfs"
 rule_id="1.1.1.6"
 conf_dir="/etc/modprobe.d"
 conf_file="${conf_dir}/cis-${mod_name}.conf"
