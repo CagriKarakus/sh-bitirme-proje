@@ -1,10 +1,14 @@
-"""Artifact generator – produces Ansible playbooks (Ubuntu) and PS1 scripts (Windows)."""
+"""Artifact generator – multi-format output for Ubuntu and Windows."""
 
 from __future__ import annotations
 
 import hashlib
 import json
+import shutil
+import subprocess
 import uuid
+import zipfile
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
@@ -35,23 +39,25 @@ def _ensure_artifact_dir() -> tuple[str, Path]:
     return artifact_id, out_dir
 
 
-# ── Ubuntu – Ansible Playbook ────────────────────────────────────────────────
-
-def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
-    """Read remediation.sh scripts and wrap them in an Ansible playbook."""
+def _load_ubuntu_index() -> list[dict] | None:
+    """Load Ubuntu rule index."""
     index_path = PROJECT_ROOT / "platforms" / "linux" / "ubuntu" / "desktop" / "rules" / "index.json"
     if not index_path.exists():
-        return {"success": False, "message": "Ubuntu index.json bulunamadı."}
-
+        return None
     with open(index_path, "r", encoding="utf-8") as f:
-        entries = json.load(f)
+        return json.load(f)
 
-    # Build lookup: rule_id → index entry
+
+def _collect_ubuntu_scripts(rule_ids: List[str]) -> tuple[list[dict], list[str]]:
+    """Collect remediation scripts for the given Ubuntu rule IDs."""
+    entries = _load_ubuntu_index()
+    if not entries:
+        return [], rule_ids[:]
+
     lookup = {e["id"]: e for e in entries}
-
-    # Collect tasks
     tasks = []
     skipped = []
+
     for rid in rule_ids:
         entry = lookup.get(rid)
         if not entry:
@@ -76,6 +82,15 @@ def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
             "script": script_content,
         })
 
+    return tasks, skipped
+
+
+# ── Ubuntu – Ansible Playbook ────────────────────────────────────────────────
+
+def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
+    """Read remediation.sh scripts and wrap them in an Ansible playbook."""
+    tasks, skipped = _collect_ubuntu_scripts(rule_ids)
+
     if not tasks:
         return {
             "success": False,
@@ -83,7 +98,6 @@ def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
                        f"Atlanan: {', '.join(skipped) if skipped else 'yok'}",
         }
 
-    # Build YAML playbook
     lines = [
         "---",
         "# CIS Ubuntu Desktop Hardening Playbook",
@@ -111,7 +125,6 @@ def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
 
     playbook_content = "\n".join(lines) + "\n"
 
-    # Write to artifact directory
     artifact_id, out_dir = _ensure_artifact_dir()
     filename = "cis_ubuntu_hardening.yml"
     out_path = out_dir / filename
@@ -121,7 +134,7 @@ def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
 
     msg = f"{len(tasks)} kural için Ansible playbook oluşturuldu."
     if skipped:
-        msg += f" ({len(skipped)} kural atlandı: remediation scripti bulunamadı)"
+        msg += f" ({len(skipped)} kural atlandı)"
 
     return {
         "success": True,
@@ -132,7 +145,115 @@ def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
     }
 
 
-# ── Windows – PowerShell Script ──────────────────────────────────────────────
+# ── Ubuntu – Bash Script ─────────────────────────────────────────────────────
+
+def _generate_ubuntu_bash(rule_ids: List[str]) -> dict:
+    """Concatenate remediation.sh scripts into a single executable bash script."""
+    tasks, skipped = _collect_ubuntu_scripts(rule_ids)
+
+    if not tasks:
+        return {
+            "success": False,
+            "message": f"Seçilen kurallardan hiçbiri için remediation scripti bulunamadı. "
+                       f"Atlanan: {', '.join(skipped) if skipped else 'yok'}",
+        }
+
+    lines = [
+        "#!/usr/bin/env bash",
+        "# ============================================================================",
+        "# CIS Ubuntu Desktop Hardening Script",
+        f"# Generated for {len(tasks)} rules",
+        f"# Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        "# WARNING: Review each rule before applying to production systems.",
+        "# ============================================================================",
+        "",
+        "set -euo pipefail",
+        "",
+        "# Colors",
+        'RED="\\033[0;31m"',
+        'GREEN="\\033[0;32m"',
+        'CYAN="\\033[0;36m"',
+        'NC="\\033[0m"',
+        "",
+        "PASS_COUNT=0",
+        "FAIL_COUNT=0",
+        "TOTAL=0",
+        "",
+        "apply_rule() {",
+        '    local rule_id="$1"',
+        '    local title="$2"',
+        "    TOTAL=$((TOTAL + 1))",
+        '    echo ""',
+        '    echo -e "${CYAN}[APPLY] ${rule_id}: ${title}${NC}"',
+        '    if "$3"; then',
+        "        PASS_COUNT=$((PASS_COUNT + 1))",
+        '        echo -e "${GREEN}[OK] ${rule_id} applied successfully${NC}"',
+        "    else",
+        "        FAIL_COUNT=$((FAIL_COUNT + 1))",
+        '        echo -e "${RED}[FAIL] ${rule_id} failed${NC}"',
+        "    fi",
+        "}",
+        "",
+        "# Check root",
+        'if [[ "$EUID" -ne 0 ]]; then',
+        '    echo -e "${RED}[ERROR] This script must be run as root${NC}"',
+        "    exit 1",
+        "fi",
+        "",
+        'echo "================================================================"',
+        f'echo "  CIS Ubuntu Desktop Hardening – {len(tasks)} Rules"',
+        'echo "================================================================"',
+        "",
+    ]
+
+    for t in tasks:
+        func_name = t["rule_id"].replace(".", "_")
+        lines.append(f"# ── CIS {t['rule_id']}: {t['section']} ──")
+        lines.append(f"rule_{func_name}() {{")
+
+        for script_line in t["script"].splitlines():
+            # Skip shebang lines in individual scripts
+            if script_line.strip().startswith("#!/"):
+                continue
+            lines.append(f"    {script_line}")
+
+        lines.append("}")
+        lines.append(f'apply_rule "{t["rule_id"]}" "{t["title"]}" rule_{func_name}')
+        lines.append("")
+
+    # Summary
+    lines.extend([
+        '# ── Summary ──',
+        'echo ""',
+        'echo "================================================================"',
+        'echo -e "Applied: ${GREEN}${PASS_COUNT}${NC}  |  Failed: ${RED}${FAIL_COUNT}${NC}  |  Total: ${TOTAL}"',
+        'echo "================================================================"',
+        "",
+    ])
+
+    script_content = "\n".join(lines) + "\n"
+
+    artifact_id, out_dir = _ensure_artifact_dir()
+    filename = "cis_ubuntu_hardening.sh"
+    out_path = out_dir / filename
+    out_path.write_text(script_content, encoding="utf-8")
+
+    sha256 = _sha256(out_path)
+
+    msg = f"{len(tasks)} kural için Bash scripti oluşturuldu."
+    if skipped:
+        msg += f" ({len(skipped)} kural atlandı)"
+
+    return {
+        "success": True,
+        "message": msg,
+        "artifact_id": artifact_id,
+        "filename": filename,
+        "sha256": sha256,
+    }
+
+
+# ── Windows – Helpers ────────────────────────────────────────────────────────
 
 def _load_windows_rule_json(rule_id: str) -> dict | None:
     """Find and load a Windows rule JSON by rule_id."""
@@ -151,6 +272,28 @@ def _load_windows_rule_json(rule_id: str) -> dict | None:
                 continue
     return None
 
+
+def _find_windows_rule_files(rule_ids: List[str]) -> list[Path]:
+    """Find the JSON file paths for given Windows rule IDs."""
+    win_base = PROJECT_ROOT / "platforms" / "windows"
+    files = []
+    id_set = set(rule_ids)
+
+    for rules_dir in [win_base / "rules", win_base / "manual_rules"]:
+        if not rules_dir.exists():
+            continue
+        for json_file in rules_dir.rglob("*.json"):
+            try:
+                with open(json_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if data.get("rule_id") in id_set:
+                    files.append(json_file)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                continue
+    return files
+
+
+# ── Windows – PowerShell Script ──────────────────────────────────────────────
 
 def _generate_windows_ps1(rule_ids: List[str]) -> dict:
     """Build a consolidated PowerShell hardening script from rule JSONs."""
@@ -191,7 +334,6 @@ def _generate_windows_ps1(rule_ids: List[str]) -> dict:
                        f"Atlanan: {', '.join(skipped) if skipped else 'yok'}",
         }
 
-    # Build PS1 script
     lines = [
         "#Requires -RunAsAdministrator",
         "<#",
@@ -228,7 +370,6 @@ def _generate_windows_ps1(rule_ids: List[str]) -> dict:
         "",
     ]
 
-    # Per-rule functions
     for r in rules_data:
         func_name = r["rule_id"].replace(".", "_")
         safe_title = r["title"].replace('"', '`"')
@@ -249,7 +390,6 @@ def _generate_windows_ps1(rule_ids: List[str]) -> dict:
         lines.append(f'            return')
         lines.append(f'        }}')
 
-        # Indent the PowerShell script
         for ps_line in r["script"].replace("\\n", "\n").splitlines():
             lines.append(f"        {ps_line}")
 
@@ -261,51 +401,173 @@ def _generate_windows_ps1(rule_ids: List[str]) -> dict:
         lines.append(f"}}")
         lines.append(f"")
 
-    # Main orchestrator
-    lines.append("")
-    lines.append("# ══════════════════════════════════════════════════════════════")
-    lines.append("# Main Execution")
-    lines.append("# ══════════════════════════════════════════════════════════════")
-    lines.append("")
-    lines.append('Write-Host ""')
-    lines.append('Write-Host "================================================================" -ForegroundColor Cyan')
-    lines.append(f'Write-Host "  CIS Windows Hardening – {len(rules_data)} Rules" -ForegroundColor Cyan')
-    lines.append('Write-Host "================================================================" -ForegroundColor Cyan')
-    lines.append('Write-Host ""')
-    lines.append("")
+    lines.extend([
+        "",
+        "# ══════════════════════════════════════════════════════════════",
+        "# Main Execution",
+        "# ══════════════════════════════════════════════════════════════",
+        "",
+        'Write-Host ""',
+        'Write-Host "================================================================" -ForegroundColor Cyan',
+        f'Write-Host "  CIS Windows Hardening – {len(rules_data)} Rules" -ForegroundColor Cyan',
+        'Write-Host "================================================================" -ForegroundColor Cyan',
+        'Write-Host ""',
+        "",
+    ])
 
     for r in rules_data:
         func_name = r["rule_id"].replace(".", "_")
         lines.append(f"Apply-CIS_{func_name}")
 
-    lines.append("")
-    lines.append("# Summary")
-    lines.append('Write-Host ""')
-    lines.append('Write-Host "================================================================" -ForegroundColor Cyan')
-    lines.append('$applied = ($Script:Results | Where-Object Status -eq "APPLIED").Count')
-    lines.append('$failed  = ($Script:Results | Where-Object Status -eq "FAIL").Count')
-    lines.append('$skipped = ($Script:Results | Where-Object Status -eq "SKIPPED").Count')
-    lines.append('Write-Host "Applied: $applied  |  Failed: $failed  |  Skipped: $skipped" -ForegroundColor White')
-    lines.append('Write-Host "================================================================" -ForegroundColor Cyan')
-    lines.append("")
+    lines.extend([
+        "",
+        "# Summary",
+        'Write-Host ""',
+        'Write-Host "================================================================" -ForegroundColor Cyan',
+        '$applied = ($Script:Results | Where-Object Status -eq "APPLIED").Count',
+        '$failed  = ($Script:Results | Where-Object Status -eq "FAIL").Count',
+        '$skipped = ($Script:Results | Where-Object Status -eq "SKIPPED").Count',
+        'Write-Host "Applied: $applied  |  Failed: $failed  |  Skipped: $skipped" -ForegroundColor White',
+        'Write-Host "================================================================" -ForegroundColor Cyan',
+        "",
+    ])
 
     script_content = "\r\n".join(lines) + "\r\n"
 
-    # Write to artifact directory
     artifact_id, out_dir = _ensure_artifact_dir()
     filename = "CIS_Windows_Hardening.ps1"
     out_path = out_dir / filename
-    out_path.write_text(script_content, encoding="utf-8-sig")  # BOM for PowerShell compatibility
+    out_path.write_text(script_content, encoding="utf-8-sig")
 
     sha256 = _sha256(out_path)
 
     msg = f"{len(rules_data)} kural için PowerShell scripti oluşturuldu."
     if skipped:
-        msg += f" ({len(skipped)} kural atlandı: implementation bulunamadı)"
+        msg += f" ({len(skipped)} kural atlandı)"
 
     return {
         "success": True,
         "message": msg,
+        "artifact_id": artifact_id,
+        "filename": filename,
+        "sha256": sha256,
+    }
+
+
+# ── Windows – GPO Backup ────────────────────────────────────────────────────
+
+def _generate_windows_gpo(rule_ids: List[str]) -> dict:
+    """Generate GPO backup by calling the existing PowerShell toolkit, then zip."""
+
+    tools_dir = PROJECT_ROOT / "platforms" / "windows" / "tools"
+    generator_ps1 = tools_dir / "generator.ps1"
+
+    if not generator_ps1.exists():
+        return {"success": False, "message": "Windows generator.ps1 bulunamadı."}
+
+    # Find which rule files match the selected IDs
+    rule_files = _find_windows_rule_files(rule_ids)
+    if not rule_files:
+        return {
+            "success": False,
+            "message": "Seçilen kurallardan hiçbiri bulunamadı.",
+        }
+
+    artifact_id, out_dir = _ensure_artifact_dir()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Create a temporary rules directory with only selected rule files
+    temp_rules_dir = out_dir / "_selected_rules"
+    temp_rules_dir.mkdir(exist_ok=True)
+    for rf in rule_files:
+        shutil.copy2(rf, temp_rules_dir / rf.name)
+
+    # Build a custom generator script that uses our selected rules
+    custom_script = f"""
+$ErrorActionPreference = "Stop"
+
+$scriptDir  = "{tools_dir.as_posix()}"
+$rulesPath  = "{temp_rules_dir.as_posix()}"
+$outputPath = "{out_dir.as_posix()}"
+
+# Load builder modules
+. (Join-Path $scriptDir "ps_script_builder.ps1")
+. (Join-Path $scriptDir "gpo_builder.ps1")
+. (Join-Path $scriptDir "registry_pol_writer.ps1")
+
+# Process selected rules
+$rules = Get-ChildItem -Path $rulesPath -Filter "*.json" -Recurse
+$processedRules = @()
+foreach ($file in $rules) {{
+    $content = Get-Content $file.FullName -Raw | ConvertFrom-Json
+    # Skip manual rules (automated only)
+    if ($content.automated -eq $false) {{ continue }}
+    $processedRules += [PSCustomObject]@{{ Rule = $content }}
+}}
+
+if ($processedRules.Count -eq 0) {{
+    Write-Error "No processable rules found"
+    exit 1
+}}
+
+# Generate GPO Backup only
+$gpoOutput = Join-Path $outputPath "GPO_Backup_{timestamp}"
+if (-not (Test-Path $gpoOutput)) {{
+    New-Item -Path $gpoOutput -ItemType Directory -Force | Out-Null
+}}
+New-GPOBackup -Rules $processedRules -OutputPath $gpoOutput -GPOName "CIS_Hardening_{timestamp}"
+Write-Host "GPO_OUTPUT_DIR=$gpoOutput"
+"""
+
+    custom_script_path = out_dir / "_run_gpo.ps1"
+    custom_script_path.write_text(custom_script, encoding="utf-8-sig")
+
+    try:
+        result = subprocess.run(
+            ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(custom_script_path)],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            cwd=str(tools_dir),
+        )
+
+        if result.returncode != 0:
+            error_msg = result.stderr.strip() if result.stderr else "Unknown error"
+            return {
+                "success": False,
+                "message": f"GPO oluşturma hatası: {error_msg[:200]}",
+            }
+
+    except subprocess.TimeoutExpired:
+        return {"success": False, "message": "GPO oluşturma zaman aşımına uğradı (60s)."}
+    except FileNotFoundError:
+        return {"success": False, "message": "PowerShell bulunamadı. GPO oluşturma için PowerShell gereklidir."}
+
+    # Find the generated GPO backup directory
+    gpo_dir = out_dir / f"GPO_Backup_{timestamp}"
+    if not gpo_dir.exists():
+        return {"success": False, "message": "GPO backup klasörü oluşturulamadı."}
+
+    # Zip the GPO backup folder
+    filename = f"CIS_GPO_Backup_{timestamp}.zip"
+    zip_path = out_dir / filename
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for file_path in gpo_dir.rglob("*"):
+            if file_path.is_file():
+                arcname = file_path.relative_to(gpo_dir.parent)
+                zf.write(file_path, arcname)
+
+    # Clean up temp files
+    shutil.rmtree(temp_rules_dir, ignore_errors=True)
+    shutil.rmtree(gpo_dir, ignore_errors=True)
+    custom_script_path.unlink(missing_ok=True)
+
+    sha256 = _sha256(zip_path)
+
+    return {
+        "success": True,
+        "message": f"{len(rule_files)} kural için GPO backup oluşturuldu.",
         "artifact_id": artifact_id,
         "filename": filename,
         "sha256": sha256,
@@ -317,9 +579,15 @@ def _generate_windows_ps1(rule_ids: List[str]) -> dict:
 def generate(os_name: str, rule_ids: List[str], fmt: str) -> dict:
     """Generate configuration artifact for the given OS and format."""
     if os_name == "ubuntu":
-        return _generate_ubuntu_ansible(rule_ids)
+        if fmt == "bash":
+            return _generate_ubuntu_bash(rule_ids)
+        else:  # default: ansible
+            return _generate_ubuntu_ansible(rule_ids)
     elif os_name == "windows":
-        return _generate_windows_ps1(rule_ids)
+        if fmt == "gpo":
+            return _generate_windows_gpo(rule_ids)
+        else:  # default: powershell
+            return _generate_windows_ps1(rule_ids)
     else:
         return {"success": False, "message": f"Desteklenmeyen OS: {os_name}"}
 
@@ -329,5 +597,6 @@ def get_artifact_path(artifact_id: str) -> Path | None:
     art_dir = ARTIFACTS_DIR / artifact_id
     if not art_dir.exists():
         return None
-    files = list(art_dir.iterdir())
+    # Return the first non-hidden file
+    files = [f for f in art_dir.iterdir() if f.is_file() and not f.name.startswith("_")]
     return files[0] if files else None

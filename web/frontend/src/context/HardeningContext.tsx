@@ -17,6 +17,7 @@ export type SelectedOS = "ubuntu" | "windows";
 
 interface HardeningState {
     selectedOS: SelectedOS;
+    selectedFormat: string;
     rules: RuleItem[];
     sections: Record<string, RuleItem[]>;
     selectedRuleIds: Set<string>;
@@ -45,6 +46,7 @@ type Action =
     | { type: "SET_GENERATING"; generating: boolean }
     | { type: "SET_GENERATE_RESULT"; result: GenerateResponse }
     | { type: "CLEAR_GENERATE_RESULT" }
+    | { type: "SET_FORMAT"; format: string }
     | { type: "SET_ERROR"; error: string | null }
     | { type: "SET_SEARCH"; query: string }
     | { type: "SET_LEVEL_FILTER"; level: number | null }
@@ -52,6 +54,7 @@ type Action =
 
 const initialState: HardeningState = {
     selectedOS: "ubuntu",
+    selectedFormat: "ansible",
     rules: [],
     sections: {},
     selectedRuleIds: new Set(),
@@ -72,6 +75,7 @@ function reducer(state: HardeningState, action: Action): HardeningState {
             return {
                 ...state,
                 selectedOS: action.os,
+                selectedFormat: action.os === "ubuntu" ? "ansible" : "powershell",
                 rules: [],
                 sections: {},
                 selectedRuleIds: new Set(),
@@ -149,6 +153,9 @@ function reducer(state: HardeningState, action: Action): HardeningState {
         case "SET_LEVEL_FILTER":
             return { ...state, levelFilter: action.level };
 
+        case "SET_FORMAT":
+            return { ...state, selectedFormat: action.format, generateResult: null };
+
         case "SET_AUTOMATED_FILTER":
             return { ...state, automatedFilter: action.automated };
 
@@ -168,6 +175,7 @@ interface HardeningContextValue {
     selectSection: (section: string) => void;
     runResolve: () => Promise<void>;
     runGenerate: () => Promise<void>;
+    setFormat: (format: string) => void;
     setSearch: (query: string) => void;
     setLevelFilter: (level: number | null) => void;
     setAutomatedFilter: (automated: boolean | null) => void;
@@ -211,6 +219,7 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
     const selectSection = useCallback((s: string) => dispatch({ type: "SELECT_SECTION", section: s }), []);
     const setSearch = useCallback((q: string) => dispatch({ type: "SET_SEARCH", query: q }), []);
     const setLevelFilter = useCallback((l: number | null) => dispatch({ type: "SET_LEVEL_FILTER", level: l }), []);
+    const setFormat = useCallback((f: string) => dispatch({ type: "SET_FORMAT", format: f }), []);
     const setAutomatedFilter = useCallback((a: boolean | null) => dispatch({ type: "SET_AUTOMATED_FILTER", automated: a }), []);
 
     const runResolve = useCallback(async () => {
@@ -232,18 +241,17 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
         if (state.selectedRuleIds.size === 0) return;
         dispatch({ type: "SET_GENERATING", generating: true });
         try {
-            const fmt = state.selectedOS === "ubuntu" ? "ansible" : "powershell";
             const result = await generateConfig(
                 state.selectedOS,
                 Array.from(state.selectedRuleIds),
-                fmt
+                state.selectedFormat
             );
             dispatch({ type: "SET_GENERATE_RESULT", result });
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : "Oluşturma hatası";
             dispatch({ type: "SET_ERROR", error: msg });
         }
-    }, [state.selectedOS, state.selectedRuleIds]);
+    }, [state.selectedOS, state.selectedRuleIds, state.selectedFormat]);
 
     return (
         <HardeningContext.Provider
@@ -256,6 +264,7 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
                 selectSection,
                 runResolve,
                 runGenerate,
+                setFormat,
                 setSearch,
                 setLevelFilter,
                 setAutomatedFilter,

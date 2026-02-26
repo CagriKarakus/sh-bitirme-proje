@@ -1,10 +1,21 @@
-/* ValidationPanel – resolve results, generate button, SHA256, download, verify checklist */
+/* ValidationPanel – resolve results, format selection, generate, SHA256, download, verify checklist */
 
 import { useHardening } from "../context/HardeningContext";
 import { downloadArtifact } from "../services/api";
 
+const FORMAT_OPTIONS = {
+    ubuntu: [
+        { value: "ansible", label: "Ansible Playbook", ext: ".yml", icon: "📘" },
+        { value: "bash", label: "Bash Script", ext: ".sh", icon: "🐧" },
+    ],
+    windows: [
+        { value: "powershell", label: "PowerShell Script", ext: ".ps1", icon: "⚡" },
+        { value: "gpo", label: "GPO Backup", ext: ".zip", icon: "🏛️" },
+    ],
+} as const;
+
 export default function ValidationPanel() {
-    const { state, runResolve, runGenerate } = useHardening();
+    const { state, runResolve, runGenerate, setFormat } = useHardening();
     const {
         selectedRuleIds,
         validationResult,
@@ -12,11 +23,13 @@ export default function ValidationPanel() {
         isGenerating,
         generateResult,
         selectedOS,
+        selectedFormat,
     } = state;
 
     const count = selectedRuleIds.size;
     const hasErrors = validationResult?.errors && validationResult.errors.length > 0;
     const isValid = validationResult && !hasErrors;
+    const formats = FORMAT_OPTIONS[selectedOS] || [];
 
     return (
         <div className="validation-panel">
@@ -96,11 +109,29 @@ export default function ValidationPanel() {
                         Yapılandırma Oluştur
                     </h3>
 
-                    <p className="vp-hint">
-                        {selectedOS === "ubuntu"
-                            ? "Seçili kurallar için Ansible playbook (.yml) oluşturulacak."
-                            : "Seçili kurallar için PowerShell scripti (.ps1) oluşturulacak."}
-                    </p>
+                    {/* ── Format Selector ──────────────────────────────── */}
+                    <div className="vp-format-selector">
+                        <span className="vp-format-label">Format:</span>
+                        <div className="vp-format-options">
+                            {formats.map((f) => (
+                                <label
+                                    key={f.value}
+                                    className={`vp-format-option ${selectedFormat === f.value ? "vp-format-option--active" : ""}`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="generate-format"
+                                        value={f.value}
+                                        checked={selectedFormat === f.value}
+                                        onChange={() => setFormat(f.value)}
+                                    />
+                                    <span className="vp-format-icon">{f.icon}</span>
+                                    <span className="vp-format-name">{f.label}</span>
+                                    <span className="vp-format-ext">{f.ext}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
 
                     <button
                         className="vp-btn vp-btn--generate"
@@ -133,7 +164,6 @@ export default function ValidationPanel() {
                                 <p>{generateResult.message}</p>
                             </div>
 
-                            {/* File info */}
                             <div className="vp-file-info">
                                 <div className="vp-file-row">
                                     <span className="vp-label">Dosya:</span>
@@ -145,7 +175,6 @@ export default function ValidationPanel() {
                                 </div>
                             </div>
 
-                            {/* Download button */}
                             {generateResult.download_url && (
                                 <button
                                     className="vp-btn vp-btn--download"
@@ -178,9 +207,13 @@ export default function ValidationPanel() {
                                     </li>
                                     <li>
                                         <span className="vp-check">☐</span>
-                                        {selectedOS === "ubuntu"
+                                        {selectedFormat === "ansible"
                                             ? "Ansible playbook'u bir test ortamında --check modunda çalıştırın."
-                                            : "PowerShell scriptini -WhatIf modunda çalıştırın."}
+                                            : selectedFormat === "bash"
+                                                ? "Bash scriptini bir test ortamında --dry-run ile gözden geçirin."
+                                                : selectedFormat === "gpo"
+                                                    ? "GPO backup'ı bir test OU'suna import edip test edin."
+                                                    : "PowerShell scriptini -WhatIf modunda çalıştırın."}
                                     </li>
                                     <li>
                                         <span className="vp-check">☐</span>
