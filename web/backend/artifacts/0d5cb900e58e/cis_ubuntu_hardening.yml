@@ -1,0 +1,63 @@
+---
+# CIS Ubuntu Desktop Hardening Playbook
+# Generated for 3 rules
+# WARNING: Review each task before applying to production systems.
+
+- name: CIS Ubuntu Desktop Hardening
+  hosts: all
+  become: true
+  tasks:
+
+    # ── 7.1.1: S7 ──
+    - name: "CIS 7.1.1 - 7.1.1"
+      ansible.builtin.shell: |
+        #!/bin/bash
+        
+        # 7.1.1 Ensure permissions on /etc/passwd are configured (Automated)
+        
+        echo "Configuring permissions on /etc/passwd..."
+        
+        chown root:root /etc/passwd
+        chmod u-x,go-wx /etc/passwd
+        
+        echo "/etc/passwd permissions have been configured"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      tags: ["cis", "7.1.1"]
+
+    # ── 7.1.2: S7 ──
+    - name: "CIS 7.1.2 - 7.1.2"
+      ansible.builtin.shell: |
+        #!/bin/bash
+        
+        # 7.1.2 Ensure permissions on /etc/passwd- are configured (Automated)
+        
+        echo "Configuring permissions on /etc/passwd-..."
+        
+        chown root:root /etc/passwd-
+        chmod u-x,go-wx /etc/passwd-
+        
+        echo "/etc/passwd- permissions have been configured"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      tags: ["cis", "7.1.2"]
+
+    # ── 7.1.3: S7 ──
+    - name: "CIS 7.1.3 - 7.1.3"
+      ansible.builtin.shell: |
+        #!/bin/bash
+        
+        # 7.1.3 Ensure permissions on /etc/group are configured (Automated)
+        
+        echo "Configuring permissions on /etc/group..."
+        
+        chown root:root /etc/group
+        chmod u-x,go-wx /etc/group
+        
+        echo "/etc/group permissions have been configured"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      tags: ["cis", "7.1.3"]

@@ -1,0 +1,212 @@
+/* ValidationPanel – resolve results, generate button, SHA256, download, verify checklist */
+
+import { useHardening } from "../context/HardeningContext";
+import { downloadArtifact } from "../services/api";
+
+export default function ValidationPanel() {
+    const { state, runResolve, runGenerate } = useHardening();
+    const {
+        selectedRuleIds,
+        validationResult,
+        isResolving,
+        isGenerating,
+        generateResult,
+        selectedOS,
+    } = state;
+
+    const count = selectedRuleIds.size;
+    const hasErrors = validationResult?.errors && validationResult.errors.length > 0;
+    const isValid = validationResult && !hasErrors;
+
+    return (
+        <div className="validation-panel">
+            {/* ── Resolve (Hesapla) ──────────────────────────────────── */}
+            <div className="vp-section">
+                <h3 className="vp-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                    </svg>
+                    Doğrulama
+                </h3>
+
+                <button
+                    className="vp-btn vp-btn--resolve"
+                    disabled={count === 0 || isResolving}
+                    onClick={runResolve}
+                    id="btn-resolve"
+                >
+                    {isResolving ? (
+                        <>
+                            <span className="spinner" />
+                            Hesaplanıyor…
+                        </>
+                    ) : (
+                        <>Hesapla ({count} kural)</>
+                    )}
+                </button>
+
+                {validationResult && (
+                    <div className="vp-results">
+                        {validationResult.warnings.map((w, i) => (
+                            <div key={`w-${i}`} className="vp-msg vp-msg--warn">
+                                <span className="vp-icon">⚠️</span>
+                                <div>
+                                    <strong>{w.rule_id}</strong>
+                                    <p>{w.message}</p>
+                                    {w.missing_dependency && (
+                                        <code>Eksik bağımlılık: {w.missing_dependency}</code>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+
+                        {validationResult.errors.map((e, i) => (
+                            <div key={`e-${i}`} className="vp-msg vp-msg--error">
+                                <span className="vp-icon">❌</span>
+                                <div>
+                                    <strong>{e.rule_id}</strong>
+                                    <p>{e.message}</p>
+                                    <code>Çakışan kural: {e.conflicting_rule}</code>
+                                </div>
+                            </div>
+                        ))}
+
+                        {isValid && validationResult.warnings.length === 0 && (
+                            <div className="vp-msg vp-msg--success">
+                                <span className="vp-icon">✅</span>
+                                <p>Tüm kurallar uyumlu – çakışma veya eksik bağımlılık yok.</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* ── Generate Artifact ─────────────────────────────────── */}
+            {isValid && (
+                <div className="vp-section vp-generate">
+                    <h3 className="vp-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="12" y1="18" x2="12" y2="12" />
+                            <line x1="9" y1="15" x2="12" y2="12" />
+                            <line x1="15" y1="15" x2="12" y2="12" />
+                        </svg>
+                        Yapılandırma Oluştur
+                    </h3>
+
+                    <p className="vp-hint">
+                        {selectedOS === "ubuntu"
+                            ? "Seçili kurallar için Ansible playbook (.yml) oluşturulacak."
+                            : "Seçili kurallar için PowerShell scripti (.ps1) oluşturulacak."}
+                    </p>
+
+                    <button
+                        className="vp-btn vp-btn--generate"
+                        disabled={isGenerating}
+                        onClick={runGenerate}
+                        id="btn-generate"
+                    >
+                        {isGenerating ? (
+                            <>
+                                <span className="spinner" />
+                                Oluşturuluyor…
+                            </>
+                        ) : (
+                            <>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                Artifact Oluştur
+                            </>
+                        )}
+                    </button>
+
+                    {/* ── Generate Result ──────────────────────────────── */}
+                    {generateResult && generateResult.success && (
+                        <div className="vp-artifact-result">
+                            <div className="vp-msg vp-msg--success">
+                                <span className="vp-icon">🎉</span>
+                                <p>{generateResult.message}</p>
+                            </div>
+
+                            {/* File info */}
+                            <div className="vp-file-info">
+                                <div className="vp-file-row">
+                                    <span className="vp-label">Dosya:</span>
+                                    <code className="vp-value">{generateResult.filename}</code>
+                                </div>
+                                <div className="vp-file-row">
+                                    <span className="vp-label">SHA-256:</span>
+                                    <code className="vp-value vp-sha256">{generateResult.sha256}</code>
+                                </div>
+                            </div>
+
+                            {/* Download button */}
+                            {generateResult.download_url && (
+                                <button
+                                    className="vp-btn vp-btn--download"
+                                    onClick={() => downloadArtifact(generateResult.download_url!)}
+                                    id="btn-download"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" y1="15" x2="12" y2="3" />
+                                    </svg>
+                                    İndir
+                                </button>
+                            )}
+
+                            {/* ── Verify Checklist ────────────────────────── */}
+                            <div className="vp-checklist">
+                                <h4 className="vp-checklist-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                        <path d="M9 11l3 3L22 4" />
+                                    </svg>
+                                    Doğrulama Kontrol Listesi
+                                </h4>
+
+                                <ul className="vp-checklist-list">
+                                    <li>
+                                        <span className="vp-check">☐</span>
+                                        İndirilen dosyanın SHA-256 hash değerini yukarıdaki değerle karşılaştırın.
+                                    </li>
+                                    <li>
+                                        <span className="vp-check">☐</span>
+                                        {selectedOS === "ubuntu"
+                                            ? "Ansible playbook'u bir test ortamında --check modunda çalıştırın."
+                                            : "PowerShell scriptini -WhatIf modunda çalıştırın."}
+                                    </li>
+                                    <li>
+                                        <span className="vp-check">☐</span>
+                                        Her kuralın beklenen değişikliği yaptığını doğrulayın.
+                                    </li>
+                                    <li>
+                                        <span className="vp-check">☐</span>
+                                        Üretim ortamına uygulamadan önce yedek alın.
+                                    </li>
+                                    <li>
+                                        <span className="vp-check">☐</span>
+                                        Uygulama sonrası audit scriptiyle uyumluluğu kontrol edin.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+
+                    {generateResult && !generateResult.success && (
+                        <div className="vp-msg vp-msg--error">
+                            <span className="vp-icon">❌</span>
+                            <p>{generateResult.message}</p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
