@@ -4,19 +4,18 @@ A comprehensive **multi-platform** security hardening automation framework based
 
 ## Overview
 
-This framework automates the implementation and verification of CIS Benchmark security controls for multiple operating systems and platforms. It provides a systematic approach to security hardening through automated audit checks and remediation scripts.
+This framework automates the implementation and verification of CIS Benchmark security controls for multiple operating systems. It provides a systematic approach to security hardening through a **modern web interface (React/FastAPI)**, automated audit checks, and versatile artifact generation.
 
 ### Key Features
 
 - **🌐 Multi-Platform Support** - Linux, Windows, Android (with plans for more)
-- **251+ Automated Security Rules** across multiple platforms
-- **Automated Audit Scripts** for compliance verification
-- **Automated Remediation Scripts** for security hardening
-- **Multiple Automation Methods** - Bash, Ansible, PowerShell, DSC, ADB
+- **🖥️ Web-Based Management Interface** - React frontend with FastAPI backend for easy rule selection and execution
+- **📦 Multi-Format Artifact Generation** - Generate Ansible playbooks, Bash scripts, PowerShell scripts, and GPO backup files (`.zip`)
+- **Automated Audit & Remediation Scripts** for compliance verification and security hardening
+- **JSON-based Rule Definitions** for Windows enabling easier maintainability
 - **HTML Reporting** with before/after comparison
 - **Modular Architecture** for flexible rule selection
 - **Platform Auto-Detection** - automatically detect and apply correct rules
-- **Scalable Structure** - easily add new platforms and distributions
 - **Production-Ready** scripts tested on multiple platforms
 
 ## Supported Platforms
@@ -51,9 +50,8 @@ This framework automates the implementation and verification of CIS Benchmark se
 
 ### CIS Benchmark Coverage
 
-```
-Total Rules Implemented: 251/251 (100%)
-```
+The project is currently tracking progress across multiple platforms, with a focus on comprehensive Windows and Linux coverage.
+*See `CLAUDE.md` for specific rule definition structures.*
 
 | Section | Category | Rules | Progress |
 |---------|----------|-------|----------|
@@ -127,57 +125,29 @@ sh-bitirme-proje/
 │   │   ├── ubuntu/
 │   │   │   ├── desktop/rules/     # Ubuntu Desktop rules
 │   │   │   └── server/rules/      # Ubuntu Server rules
-│   │   ├── debian/
-│   │   ├── rhel/
-│   │   ├── centos/
 │   │   └── common/rules/          # Common Linux rules
 │   ├── windows/
-│   │   ├── desktop/
-│   │   │   ├── win11/rules/       # Windows 11 rules
-│   │   │   └── win10/rules/       # Windows 10 rules
-│   │   └── server/
-│   │       ├── 2022/rules/        # Server 2022 rules
-│   │       └── 2019/rules/        # Server 2019 rules
+│   │   ├── rules/                 # Windows JSON rule definitions
+│   │   │   ├── S1_Account_Policies/
+│   │   │   ├── S2_Local_Policies/
+│   │   │   ├── S5_System_Services/
+│   │   │   └── S18_Administrative_Templates/
+│   │   └── tools/                 # PowerShell Generators (GPO/Script)
 │   └── android/
 │       └── rules/                 # Android rules
-│           ├── device-security/
-│           ├── app-security/
-│           └── network-security/
-├── Rules/                         # Legacy rules (backward compatibility)
-│   ├── S1/                        # Section 1: Initial Setup
-│   ├── S2/                        # Section 2: Services
-│   ├── S3/                        # Section 3: Network
-│   ├── S4/                        # Section 4: Host-Based Firewall
-│   ├── S5/                        # Section 5: Access Control
-│   ├── S6/                        # Section 6: Logging and Auditing
-│   ├── S7/                        # Section 7: System Maintenance
-│   └── index.json                 # Rule registry
-├── tools/                          # Automation tools
-│   ├── platform_detector.py       # Auto-detect current platform
-│   ├── build_registry.py          # Generate rule registry (multi-platform aware)
-│   ├── compose_rule_scripts.py    # Compose bash audit/remediation scripts
-│   └── compose_ansible.py         # Compose Ansible playbooks from selected rules
-├── templates/                      # Platform-specific templates
-│   ├── linux/
-│   │   ├── ansible/               # Ansible playbook templates
-│   │   └── bash/                  # Bash script templates
-│   ├── windows/
-│   │   ├── powershell/            # PowerShell templates
-│   │   └── dsc/                   # DSC templates
-│   └── android/
-│       └── adb/                   # ADB script templates
+├── web/                            # Web-based Management Interface
+│   ├── backend/                    # FastAPI Application
+│   │   ├── routers/                # API Endpoints
+│   │   ├── services/               # Rule Loading & Artifact Generation
+│   │   └── main.py                 # App Entry Point
+│   └── frontend/                   # React + TypeScript Frontend
+│       ├── src/components/         # UI Components
+│       ├── src/pages/              # Views
+│       └── src/services/           # API Client
+├── Tools/                          # Python CLI tools
 ├── docs/                           # Documentation
-│   ├── platforms/
-│   │   ├── linux.md               # Linux platform guide
-│   │   ├── windows.md             # Windows platform guide
-│   │   └── android.md             # Android platform guide
-│   └── development/
-│       └── adding-new-platform.md # Guide for adding platforms
-├── output/                         # Generated scripts and playbooks
-│   ├── linux/
-│   ├── windows/
-│   └── android/
-├── samples/                        # Sample configurations
+│   └── WINDOWS_HARDENING_ARCHITECTURE.md # Windows Architecture Specs
+├── output/                         # Generated custom scripts and playbooks
 └── LICENSE                         # MIT License
 ```
 
@@ -224,88 +194,52 @@ git clone https://github.com/yourusername/sh-bitirme-proje.git
 cd sh-bitirme-proje
 ```
 
-2. Detect your platform (optional):
+### Running the Web Platform (Recommended)
+
+The Web Platform provides the easiest way to browse rules, resolve dependencies, and generate artifact scripts/playbooks for target environments.
+
+**Backend (FastAPI):**
 ```bash
-python3 tools/platform_detector.py
+cd web/backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-3. Build the rule registry:
-
-**Auto-detect current platform:**
+**Frontend (React/Vite):**
 ```bash
-python3 tools/build_registry.py --auto-detect
+cd web/frontend
+npm install
+npm run dev        # Starts Vite server on :5173
 ```
 
-**Or build for all platforms:**
+#### Option 1: Web Platform Generation (Recommended)
+
+1. Open the Web Platform in your browser (`http://localhost:5173`).
+2. Navigate to the Rules section for your desired OS.
+3. Select the rules you want to apply.
+4. Click "Generate Artifact".
+5. Choose your desired output format:
+   - **Windows:** PowerShell script (`.ps1`) or GPO Backup (`.zip`)
+   - **Linux:** Ansible Playbook (`.yml`) or Bash script (`.sh`)
+6. Download the generated artifact and apply it to your target machine.
+
+#### Option 2: Run Individual Rules (CLI)
+
+You can still run individual rules manually if needed.
+
+**Linux (Ubuntu):**
 ```bash
-python3 tools/build_registry.py --all-platforms
-```
-
-**Or build for specific platform:**
-```bash
-# Linux Ubuntu Desktop
-python3 tools/build_registry.py --platform platforms/linux/ubuntu/desktop
-
-# Windows 11
-python3 tools/build_registry.py --platform platforms/windows/desktop/win11
-
-# Android
-python3 tools/build_registry.py --platform platforms/android
-```
-
-**Legacy mode (backward compatibility):**
-```bash
-python3 tools/build_registry.py --rules-dir Rules
-```
-
-### Usage
-
-#### Option 1: Run Individual Rules
-
-**Linux (Ubuntu Desktop):**
-```bash
-cd platforms/linux/ubuntu/desktop/rules/S1/1.5/1.5.1
+cd platforms/linux/ubuntu/server/rules/S1/1.5/1.5.1
 sudo ./audit.sh
 sudo ./remediation.sh  # if needed
 ```
 
 **Windows (PowerShell):**
+Some rules have raw PowerShell scripts, though generation via the web app is highly recommended.
 ```powershell
-cd platforms\windows\desktop\win11\rules\S1\1.1\1.1.1
-.\audit.ps1
-.\remediation.ps1  # if needed
-```
-
-**Android (via ADB):**
-```bash
-cd platforms/android/rules/device-security/screen-lock
-bash audit.sh
-bash remediation.sh  # if needed
-```
-
-**Legacy (backward compatibility):**
-```bash
-cd Rules/S1/1.5/1.5.1
-sudo ./audit.sh
-sudo ./remediation.sh
-```
-
-#### Option 2: Automated Batch Execution
-
-Generate a combined audit and remediation script:
-
-```bash
-# Create script for specific rules
-python3 tools/compose_rule_scripts.py \
-    --registry Rules/index.json \
-    --output output/cis_audit.sh \
-    1.5.1 1.5.2 1.5.3 2.1.1 2.1.2
-
-# Or run all rules in a section
-python3 tools/compose_rule_scripts.py \
-    --registry Rules/index.json \
-    --output output/section1_audit.sh \
-    $(jq -r '.[] | select(.section == "Section 1 Initial Setup") | .id' Rules/index.json)
+# Requires Administrator
+cd platforms\windows\rules\S1_Account_Policies\
+# (Note: Windows rules are primarily defined in JSON and executed via generated artifacts)
 ```
 
 Run the generated script:
@@ -372,133 +306,60 @@ After execution, open the generated report:
 firefox /tmp/cis_report_*/cis_report.html
 ```
 
-## Tools
+## Architecture & Documentation
 
-### build_registry.py
+### Web Platform Architecture
+- **Backend**: FastAPI serves the REST API, validating rule selections and resolving dependencies (`web/backend/services/resolver.py`).
+- **Generators**: Artifact generation logic invokes Python/PowerShell scripts under the hood to compile the selected JSON/Bash rules into deployable formats.
+- **Frontend**: React application for easy browsing of the CIS rules.
 
-Scans the Rules directory and generates `index.json` registry:
+### Rule Documentation
 
-```bash
-python3 tools/build_registry.py \
-    --rules-dir Rules \
-    --output Rules/index.json
-```
-
-**Features:**
-- Automatic rule discovery
-- Natural sorting of rule IDs
-- Metadata extraction
-- Section categorization
-
-### compose_rule_scripts.py
-
-Combines multiple rules into a single executable script:
-
-```bash
-python3 tools/compose_rule_scripts.py [rule_ids...] \
-    --registry Rules/index.json \
-    --output output/script.sh
-```
-
-**Features:**
-- Modular rule selection
-- Before/after audit comparison
-- Automated remediation workflow
-- HTML report generation
-- Color-coded console output
-
-### compose_ansible.py
-
-Creates a custom Ansible playbook from selected rules:
-
-```bash
-python3 tools/compose_ansible.py [rule_ids...] \
-    --registry Rules/index.json \
-    --output output/custom.yml
-```
-
-**Features:**
-- Select only the rules you want to apply
-- Generates a single, self-contained playbook
-- Perfect for centralized multi-server deployment
-- Easy to customize and version control
-- No complex role structure needed
-
-**Examples:**
-```bash
-# Specific rules
-python3 tools/compose_ansible.py 1.5.1 1.5.2 2.1.1 \
-    --output output/custom.yml
-
-# All filesystem rules
-python3 tools/compose_ansible.py 1.1.1.1 1.1.1.2 1.1.1.3 1.1.1.4 \
-    --output output/filesystem.yml
-
-# SSH hardening only
-python3 tools/compose_ansible.py 5.1.1 5.1.2 5.1.3 5.1.4 \
-    --output output/ssh_hardening.yml
-
-# Run the playbook
-ansible-playbook output/ssh_hardening.yml -i inventory.ini
-```
-
-## Rule Documentation
-
-Each rule includes comprehensive documentation:
+Each rule directory (Linux) or JSON file (Windows) includes comprehensive metadata:
 
 - **Profile Applicability**: Target system types (Server/Workstation, Level 1/2)
 - **Description**: Detailed explanation of the security control
 - **Rationale**: Security justification and threat mitigation
-- **Audit Instructions**: How to verify compliance
-- **Remediation Steps**: How to implement the control
-- **Default Values**: OS distribution defaults
-- **CIS Controls Mapping**: Alignment with CIS Controls framework
-- **MITRE ATT&CK Mapping**: Related attack techniques and mitigations
+- **Audit/Remediation Logic**: How to verify and implement the control
 
-Example: [1.5.1 - Address Space Layout Randomization](Rules/S1/1.5/1.5.1/README.md)
+Example: [Windows Architecture Guide](docs/WINDOWS_HARDENING_ARCHITECTURE.md)
 
 ## Development
 
 ### Adding New Rules
 
+**Windows:**
+Use the included workflow to generate a new Windows CIS rule definition in the appropriate JSON format:
+```bash
+# Discuss with the assistant or use the workflow
+/windows-hardening-rule
+```
+
+**Linux:**
 1. Create rule directory structure:
 ```bash
-mkdir -p Rules/SX/X.X/X.X.X
+mkdir -p platforms/linux/ubuntu/server/rules/SX/X.X/X.X.X
 ```
 
-2. Create audit script:
-```bash
-# Rules/SX/X.X/X.X.X/audit.sh
-#!/usr/bin/env bash
-# Audit logic here
-# exit 0 = PASS, exit 1 = FAIL
-```
-
-3. Create remediation script:
-```bash
-# Rules/SX/X.X/X.X.X/remediation.sh
-#!/usr/bin/env bash
-# Remediation logic here
-```
-
-4. Rebuild registry:
-```bash
-python3 tools/build_registry.py
-```
+2. Create `audit.sh` and `remediation.sh` scripts under the new directory.
+3. Reload rules starting the Web Platform or backend server.
 
 ### Testing
 
-Test individual rules:
+**Web Platform / API:**
+```bash
+cd web/backend
+pytest
+```
+
+**Individual Rule Scripts (Linux Example):**
 ```bash
 # Run audit
-sudo bash Rules/S1/1.5/1.5.1/audit.sh
+sudo bash platforms/linux/ubuntu/server/rules/S1/1.5/1.5.1/audit.sh
 echo $?  # Should be 0 (PASS) or 1 (FAIL)
 
 # Run remediation
-sudo bash Rules/S1/1.5/1.5.1/remediation.sh
-
-# Verify remediation
-sudo bash Rules/S1/1.5/1.5.1/audit.sh
+sudo bash platforms/linux/ubuntu/server/rules/S1/1.5/1.5.1/remediation.sh
 ```
 
 ## Security Considerations
@@ -576,9 +437,6 @@ For detailed platform-specific information:
 - [ ] Web-based management interface
 
 ### Planned 🎯
-- [ ] macOS support (Ventura, Sonoma)
-- [ ] iOS support
-- [ ] FreeBSD support
 - [ ] Docker container support
 - [ ] Automated rollback capability
 - [ ] Kubernetes deployment
