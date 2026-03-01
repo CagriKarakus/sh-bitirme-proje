@@ -1,0 +1,111 @@
+{
+  "app": {
+    "subtitle": "Güvenlik Sıkılaştırma Yapılandırma Sistemi"
+  },
+  "stats": {
+    "total_rules": "Toplam Kural",
+    "selected": "Seçilen",
+    "sections": "Bölüm"
+  },
+  "actions": {
+    "calculate": "Hesapla ({count})",
+    "calculating": "Hesaplanıyor...",
+    "select_all": "Tümünü Seç",
+    "clear_selection": "Seçimi Temizle"
+  },
+  "filter": {
+    "search_title": "Ara",
+    "search_placeholder": "Kural ID veya başlık ara...",
+    "cis_level_title": "CIS Seviyesi",
+    "all": "Tümü",
+    "automation_title": "Otomasyon",
+    "automated": "Otomatik",
+    "manual": "Manuel",
+    "selection_title": "Seçim ({selected} / {total})"
+  },
+  "rule_card": {
+    "automated": "Otomatik",
+    "manual": "Manuel",
+    "info_title": "Kural Açıklaması",
+    "info_aria": "Kural açıklamasını görüntüle"
+  },
+  "rule_list": {
+    "loading": "Kurallar yükleniyor...",
+    "error_title": "Hata",
+    "not_found_title": "Kural bulunamadı",
+    "not_found_text": "Arama veya filtre kriterlerini değiştirin.",
+    "section_select_all": "Tümünü Seç",
+    "section_deselect": "Kaldır"
+  },
+  "drawer": {
+    "close_aria": "Kapat",
+    "automated": "Otomatik",
+    "manual": "Manuel",
+    "severity_label": "Önem",
+    "category_label": "Kategori",
+    "subcategory_label": "Alt Kategori",
+    "section_label": "Bölüm",
+    "description_title": "Kısa Açıklama",
+    "description_placeholder": "Bu kural için açıklama henüz eklenmedi.",
+    "detail_btn": "Detaylı Açıklama"
+  },
+  "validation": {
+    "title": "Doğrulama",
+    "calculate": "Hesapla ({count} kural)",
+    "calculating": "Hesaplanıyor…",
+    "missing_dep": "Eksik bağımlılık: {missing}",
+    "conflicting_rule": "Çakışan kural: {conflicting}",
+    "success": "Tüm kurallar uyumlu – çakışma veya eksik bağımlılık yok.",
+    "generate_title": "Yapılandırma Oluştur",
+    "format_label": "Format:",
+    "generate_btn": "Artifact Oluştur",
+    "generating": "Oluşturuluyor…",
+    "file_label": "Dosya:",
+    "sha_label": "SHA-256:",
+    "download_btn": "İndir",
+    "checklist_title": "Doğrulama Kontrol Listesi",
+    "checklist_sha": "İndirilen dosyanın SHA-256 hash değerini yukarıdaki değerle karşılaştırın.",
+    "checklist_ansible": "Ansible playbook'u bir test ortamında --check modunda çalıştırın.",
+    "checklist_bash": "Bash scriptini bir test ortamında --dry-run ile gözden geçirin.",
+    "checklist_gpo": "GPO backup'ı bir test OU'suna import edip test edin.",
+    "checklist_powershell": "PowerShell scriptini -WhatIf modunda çalıştırın.",
+    "checklist_verify": "Her kuralın beklenen değişikliği yaptığını doğrulayın.",
+    "checklist_backup": "Üretim ortamına uygulamadan önce yedek alın.",
+    "checklist_audit": "Uygulama sonrası audit scriptiyle uyumluluğu kontrol edin.",
+    "shareable_toggle": "Kaydet & Paylaş",
+    "shareable_hint": "Diğer kullanıcıların bu artifact'ı bulup indirebilmesi için paylaşım kodu oluşturur.",
+    "shareable_code_label": "Paylaşım Kodu:",
+    "shareable_code_hint": "Bu kodu 'Artifact Ara' panelinde girerek artifact'ı yeniden indirebilirsiniz.",
+    "shareable_copy": "Kopyala",
+    "not_saved_hint": "Bu artifact kaydedilmedi. Arama panelinden bulunabilmesi için 'Kaydet & Paylaş' seçeneğini işaretleyip tekrar oluşturun."
+  },
+  "detail": {
+    "back": "Geri Dön",
+    "cis_level": "CIS Level {level}",
+    "automated": "Otomatik",
+    "manual": "Manuel",
+    "section_label": "Bölüm",
+    "category_label": "Kategori",
+    "subcategory_label": "Alt Kategori",
+    "os_label": "İşletim Sistemi",
+    "description_title": "Açıklama",
+    "description_placeholder": "Bu kural için detaylı açıklama henüz eklenmedi.",
+    "rationale_title": "Gerekçe",
+    "rationale_placeholder": "Bu kural için gerekçe henüz eklenmedi.",
+    "remediation_title": "Düzeltme Adımları",
+    "remediation_placeholder": "Bu kural için düzeltme adımları henüz eklenmedi."
+  },
+  "lang_toggle": {
+    "label": "Dil"
+  },
+  "artifact_search": {
+    "title": "Artifact Ara",
+    "hint": "Paylaşılan 12 karakterlik kodu girerek önceden oluşturulmuş bir artifact'ı bulun ve indirin.",
+    "placeholder": "12 karakter kod...",
+    "search_btn": "Ara",
+    "searching": "Aranıyor...",
+    "found": "Artifact bulundu – indirebilirsiniz.",
+    "not_found": "\"{id}\" koduna ait artifact bulunamadı.",
+    "error": "Arama sırasında bir hata oluştu. Lütfen tekrar deneyin."
+  }
+}

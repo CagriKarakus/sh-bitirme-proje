@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { HardeningProvider, useHardening } from "./context/HardeningContext";
+import { LocaleProvider, useLocale } from "./context/LocaleContext";
 import OsSelector from "./components/OsSelector";
 import FilterSidebar from "./components/FilterSidebar";
 import RuleList from "./components/RuleList";
 import ValidationPanel from "./components/ValidationPanel";
+import ArtifactSearchPanel from "./components/ArtifactSearchPanel";
 import RuleDrawer from "./components/RuleDrawer";
 import RuleDetailPage from "./pages/RuleDetailPage";
 import type { RuleItem } from "./types";
@@ -13,6 +15,7 @@ import "./index.css";
 
 function Dashboard() {
   const { state, runResolve } = useHardening();
+  const { t } = useLocale();
   const selectedCount = state.selectedRuleIds.size;
 
   const [drawerRule, setDrawerRule] = useState<RuleItem | null>(null);
@@ -28,7 +31,7 @@ function Dashboard() {
           </svg>
           <div>
             <div className="app-header__title">CIS Hardening Platform</div>
-            <div className="app-header__subtitle">Güvenlik Sıkılaştırma Yapılandırma Sistemi</div>
+            <div className="app-header__subtitle">{t("app.subtitle")}</div>
           </div>
         </div>
         <div className="app-header__spacer" />
@@ -44,17 +47,17 @@ function Dashboard() {
         <div className="stats-bar">
           <div className="stats-bar__item">
             <span className="stats-bar__value">{state.rules.length}</span>
-            <span className="stats-bar__label">Toplam Kural</span>
+            <span className="stats-bar__label">{t("stats.total_rules")}</span>
           </div>
           <div className="stats-bar__divider" />
           <div className="stats-bar__item">
             <span className="stats-bar__value">{selectedCount}</span>
-            <span className="stats-bar__label">Seçilen</span>
+            <span className="stats-bar__label">{t("stats.selected")}</span>
           </div>
           <div className="stats-bar__divider" />
           <div className="stats-bar__item">
             <span className="stats-bar__value">{Object.keys(state.sections).length}</span>
-            <span className="stats-bar__label">Bölüm</span>
+            <span className="stats-bar__label">{t("stats.sections")}</span>
           </div>
 
           <div style={{ flex: 1 }} />
@@ -68,18 +71,21 @@ function Dashboard() {
             {state.isResolving ? (
               <>
                 <span className="btn__spinner" />
-                Hesaplanıyor...
+                {t("actions.calculating")}
               </>
             ) : (
               <>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z" />
                 </svg>
-                Hesapla ({selectedCount})
+                {t("actions.calculate", { count: selectedCount })}
               </>
             )}
           </button>
         </div>
+
+        {/* Artifact search */}
+        <ArtifactSearchPanel />
 
         {/* Validation results */}
         <ValidationPanel />
@@ -105,10 +111,12 @@ function Dashboard() {
 
 export default function App() {
   return (
-    <HardeningProvider>
-      <div className="app-layout">
-        <Dashboard />
-      </div>
-    </HardeningProvider>
+    <LocaleProvider>
+      <HardeningProvider>
+        <div className="app-layout">
+          <Dashboard />
+        </div>
+      </HardeningProvider>
+    </LocaleProvider>
   );
 }

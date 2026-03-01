@@ -31,6 +31,37 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def _mark_permanent(artifact_id: str) -> None:
+    """Create .permanent marker so the artifact is indexable/searchable."""
+    (ARTIFACTS_DIR / artifact_id / ".permanent").touch()
+
+
+def is_artifact_permanent(artifact_id: str) -> bool:
+    return (ARTIFACTS_DIR / artifact_id / ".permanent").exists()
+
+
+def delete_artifact(artifact_id: str) -> None:
+    """Remove the artifact directory entirely (used as a background task)."""
+    art_dir = ARTIFACTS_DIR / artifact_id
+    if art_dir.exists():
+        shutil.rmtree(art_dir, ignore_errors=True)
+
+
+def _find_permanent_by_sha256(sha256: str) -> str | None:
+    """Return the artifact_id of an existing permanent artifact whose file matches sha256."""
+    for art_dir in ARTIFACTS_DIR.iterdir():
+        if not art_dir.is_dir() or not (art_dir / ".permanent").exists():
+            continue
+        for f in art_dir.iterdir():
+            if f.is_file() and not f.name.startswith(".") and not f.name.startswith("_"):
+                try:
+                    if _sha256(f) == sha256:
+                        return art_dir.name
+                except OSError:
+                    continue
+    return None
+
+
 def _ensure_artifact_dir() -> tuple[str, Path]:
     """Create a unique sub-directory for this generation run."""
     artifact_id = uuid.uuid4().hex[:12]
@@ -576,20 +607,31 @@ Write-Host "GPO_OUTPUT_DIR=$gpoOutput"
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def generate(os_name: str, rule_ids: List[str], fmt: str) -> dict:
+def generate(os_name: str, rule_ids: List[str], fmt: str, permanent: bool = False) -> dict:
     """Generate configuration artifact for the given OS and format."""
     if os_name == "ubuntu":
         if fmt == "bash":
-            return _generate_ubuntu_bash(rule_ids)
+            result = _generate_ubuntu_bash(rule_ids)
         else:  # default: ansible
-            return _generate_ubuntu_ansible(rule_ids)
+            result = _generate_ubuntu_ansible(rule_ids)
     elif os_name == "windows":
         if fmt == "gpo":
-            return _generate_windows_gpo(rule_ids)
+            result = _generate_windows_gpo(rule_ids)
         else:  # default: powershell
-            return _generate_windows_ps1(rule_ids)
+            result = _generate_windows_ps1(rule_ids)
     else:
         return {"success": False, "message": f"Desteklenmeyen OS: {os_name}"}
+
+    if permanent and result.get("success") and result.get("artifact_id"):
+        existing_id = _find_permanent_by_sha256(result["sha256"])
+        if existing_id:
+            # Identical content already stored permanently — discard duplicate, reuse existing
+            delete_artifact(result["artifact_id"])
+            result["artifact_id"] = existing_id
+        else:
+            _mark_permanent(result["artifact_id"])
+
+    return result
 
 
 def get_artifact_path(artifact_id: str) -> Path | None:
@@ -597,6 +639,22 @@ def get_artifact_path(artifact_id: str) -> Path | None:
     art_dir = ARTIFACTS_DIR / artifact_id
     if not art_dir.exists():
         return None
-    # Return the first non-hidden file
-    files = [f for f in art_dir.iterdir() if f.is_file() and not f.name.startswith("_")]
+    # Return the first non-hidden, non-marker file
+    files = [
+        f for f in art_dir.iterdir()
+        if f.is_file() and not f.name.startswith((".", "_"))
+    ]
     return files[0] if files else None
+
+
+def get_artifact_info(artifact_id: str) -> dict | None:
+    """Return filename and sha256 for an existing permanent artifact, or None if not found."""
+    if not is_artifact_permanent(artifact_id):
+        return None
+    file_path = get_artifact_path(artifact_id)
+    if not file_path or not file_path.exists():
+        return None
+    return {
+        "filename": file_path.name,
+        "sha256": _sha256(file_path),
+    }

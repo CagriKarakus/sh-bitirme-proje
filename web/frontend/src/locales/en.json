@@ -1,0 +1,111 @@
+{
+  "app": {
+    "subtitle": "Security Hardening Configuration System"
+  },
+  "stats": {
+    "total_rules": "Total Rules",
+    "selected": "Selected",
+    "sections": "Sections"
+  },
+  "actions": {
+    "calculate": "Calculate ({count})",
+    "calculating": "Calculating...",
+    "select_all": "Select All",
+    "clear_selection": "Clear Selection"
+  },
+  "filter": {
+    "search_title": "Search",
+    "search_placeholder": "Search by rule ID or title...",
+    "cis_level_title": "CIS Level",
+    "all": "All",
+    "automation_title": "Automation",
+    "automated": "Automated",
+    "manual": "Manual",
+    "selection_title": "Selection ({selected} / {total})"
+  },
+  "rule_card": {
+    "automated": "Automated",
+    "manual": "Manual",
+    "info_title": "Rule Description",
+    "info_aria": "View rule description"
+  },
+  "rule_list": {
+    "loading": "Loading rules...",
+    "error_title": "Error",
+    "not_found_title": "No rules found",
+    "not_found_text": "Try changing the search or filter criteria.",
+    "section_select_all": "Select All",
+    "section_deselect": "Deselect"
+  },
+  "drawer": {
+    "close_aria": "Close",
+    "automated": "Automated",
+    "manual": "Manual",
+    "severity_label": "Severity",
+    "category_label": "Category",
+    "subcategory_label": "Subcategory",
+    "section_label": "Section",
+    "description_title": "Brief Description",
+    "description_placeholder": "No description has been added for this rule yet.",
+    "detail_btn": "Full Description"
+  },
+  "validation": {
+    "title": "Validation",
+    "calculate": "Calculate ({count} rules)",
+    "calculating": "Calculating…",
+    "missing_dep": "Missing dependency: {missing}",
+    "conflicting_rule": "Conflicting rule: {conflicting}",
+    "success": "All rules are compatible – no conflicts or missing dependencies.",
+    "generate_title": "Generate Configuration",
+    "format_label": "Format:",
+    "generate_btn": "Generate Artifact",
+    "generating": "Generating…",
+    "file_label": "File:",
+    "sha_label": "SHA-256:",
+    "download_btn": "Download",
+    "checklist_title": "Verification Checklist",
+    "checklist_sha": "Compare the SHA-256 hash of the downloaded file with the value above.",
+    "checklist_ansible": "Run the Ansible playbook in --check mode on a test environment.",
+    "checklist_bash": "Review the Bash script with --dry-run on a test environment.",
+    "checklist_gpo": "Import the GPO backup to a test OU and verify.",
+    "checklist_powershell": "Run the PowerShell script in -WhatIf mode.",
+    "checklist_verify": "Verify each rule made the expected change.",
+    "checklist_backup": "Take a backup before applying to the production environment.",
+    "checklist_audit": "Run the audit script after applying to verify compliance.",
+    "shareable_toggle": "Save & Share",
+    "shareable_hint": "Generates a share code so others can find and download this artifact.",
+    "shareable_code_label": "Share Code:",
+    "shareable_code_hint": "Enter this code in the 'Find Artifact' panel to download it again.",
+    "shareable_copy": "Copy",
+    "not_saved_hint": "This artifact was not saved. To find it via the search panel, check 'Save & Share' and generate again."
+  },
+  "detail": {
+    "back": "Go Back",
+    "cis_level": "CIS Level {level}",
+    "automated": "Automated",
+    "manual": "Manual",
+    "section_label": "Section",
+    "category_label": "Category",
+    "subcategory_label": "Subcategory",
+    "os_label": "Operating System",
+    "description_title": "Description",
+    "description_placeholder": "No detailed description has been added for this rule yet.",
+    "rationale_title": "Rationale",
+    "rationale_placeholder": "No rationale has been added for this rule yet.",
+    "remediation_title": "Remediation Steps",
+    "remediation_placeholder": "No remediation steps have been added for this rule yet."
+  },
+  "lang_toggle": {
+    "label": "Language"
+  },
+  "artifact_search": {
+    "title": "Find Artifact",
+    "hint": "Enter a shared 12-character code to find and download a previously generated artifact.",
+    "placeholder": "12-character code...",
+    "search_btn": "Search",
+    "searching": "Searching...",
+    "found": "Artifact found – ready to download.",
+    "not_found": "No artifact found for code \"{id}\".",
+    "error": "An error occurred while searching. Please try again."
+  }
+}

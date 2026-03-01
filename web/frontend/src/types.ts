@@ -47,6 +47,7 @@ export interface GenerateRequest {
   os: string;
   rule_ids: string[];
   format: string;
+  permanent: boolean;
 }
 
 export interface GenerateResponse {
@@ -55,4 +56,13 @@ export interface GenerateResponse {
   download_url: string | null;
   filename: string | null;
   sha256: string | null;
+  artifact_id: string | null;
+}
+
+export interface ArtifactInfoResponse {
+  found: boolean;
+  artifact_id: string | null;
+  filename: string | null;
+  sha256: string | null;
+  download_url: string | null;
 }

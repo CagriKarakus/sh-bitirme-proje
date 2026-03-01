@@ -58,6 +58,7 @@ class GenerateRequest(BaseModel):
     os: str
     rule_ids: list[str]
     format: str = "ansible"  # "ansible" | "bash" | "gpo" | "powershell"
+    permanent: bool = False
 
 
 class GenerateResponse(BaseModel):
@@ -66,3 +67,12 @@ class GenerateResponse(BaseModel):
     download_url: str | None = None
     filename: str | None = None
     sha256: str | None = None
+    artifact_id: str | None = None
+
+
+class ArtifactInfoResponse(BaseModel):
+    found: bool
+    artifact_id: str | None = None
+    filename: str | None = None
+    sha256: str | None = None
+    download_url: str | None = None

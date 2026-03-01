@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import type { RuleItem } from "../types";
+import { useLocale } from "../context/LocaleContext";
 
 interface Props {
     rule: RuleItem;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function RuleDetailPage({ rule, onClose }: Props) {
+    const { t } = useLocale();
     // Close on Escape
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
@@ -26,7 +28,7 @@ export default function RuleDetailPage({ rule, onClose }: Props) {
                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
                         <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
                     </svg>
-                    Geri Dön
+                    {t("detail.back")}
                 </button>
             </div>
 
@@ -40,11 +42,11 @@ export default function RuleDetailPage({ rule, onClose }: Props) {
                     <div className="rule-card__meta" style={{ marginTop: "var(--sp-md)" }}>
                         {rule.cis_level && (
                             <span className={`rule-card__badge rule-card__badge--level-${rule.cis_level}`}>
-                                CIS Level {rule.cis_level}
+                                {t("detail.cis_level", { level: rule.cis_level })}
                             </span>
                         )}
                         <span className={`rule-card__badge ${rule.automated ? "rule-card__badge--automated" : "rule-card__badge--manual"}`}>
-                            {rule.automated ? "Otomatik" : "Manuel"}
+                            {rule.automated ? t("detail.automated") : t("detail.manual")}
                         </span>
                         {rule.severity && (
                             <span className={`rule-card__severity rule-card__severity--${rule.severity}`}>
@@ -60,48 +62,48 @@ export default function RuleDetailPage({ rule, onClose }: Props) {
                 {/* Meta grid */}
                 <div className="detail-page__meta-grid">
                     <div className="detail-page__meta-card">
-                        <span className="detail-page__meta-label">Bölüm</span>
+                        <span className="detail-page__meta-label">{t("detail.section_label")}</span>
                         <span className="detail-page__meta-val">{rule.section}</span>
                     </div>
                     {rule.category && (
                         <div className="detail-page__meta-card">
-                            <span className="detail-page__meta-label">Kategori</span>
+                            <span className="detail-page__meta-label">{t("detail.category_label")}</span>
                             <span className="detail-page__meta-val">{rule.category}</span>
                         </div>
                     )}
                     {rule.subcategory && (
                         <div className="detail-page__meta-card">
-                            <span className="detail-page__meta-label">Alt Kategori</span>
+                            <span className="detail-page__meta-label">{t("detail.subcategory_label")}</span>
                             <span className="detail-page__meta-val">{rule.subcategory}</span>
                         </div>
                     )}
                     <div className="detail-page__meta-card">
-                        <span className="detail-page__meta-label">İşletim Sistemi</span>
+                        <span className="detail-page__meta-label">{t("detail.os_label")}</span>
                         <span className="detail-page__meta-val">{rule.os}</span>
                     </div>
                 </div>
 
                 {/* Description placeholder */}
                 <div className="detail-page__section">
-                    <h2 className="detail-page__section-title">Açıklama</h2>
+                    <h2 className="detail-page__section-title">{t("detail.description_title")}</h2>
                     <div className="detail-page__placeholder-block">
-                        <p>Bu kural için detaylı açıklama henüz eklenmedi.</p>
+                        <p>{t("detail.description_placeholder")}</p>
                     </div>
                 </div>
 
                 {/* Rationale placeholder */}
                 <div className="detail-page__section">
-                    <h2 className="detail-page__section-title">Gerekçe</h2>
+                    <h2 className="detail-page__section-title">{t("detail.rationale_title")}</h2>
                     <div className="detail-page__placeholder-block">
-                        <p>Bu kural için gerekçe henüz eklenmedi.</p>
+                        <p>{t("detail.rationale_placeholder")}</p>
                     </div>
                 </div>
 
                 {/* Remediation placeholder */}
                 <div className="detail-page__section">
-                    <h2 className="detail-page__section-title">Düzeltme Adımları</h2>
+                    <h2 className="detail-page__section-title">{t("detail.remediation_title")}</h2>
                     <div className="detail-page__placeholder-block">
-                        <p>Bu kural için düzeltme adımları henüz eklenmedi.</p>
+                        <p>{t("detail.remediation_placeholder")}</p>
                     </div>
                 </div>
             </div>

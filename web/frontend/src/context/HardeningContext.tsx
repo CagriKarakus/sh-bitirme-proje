@@ -174,7 +174,7 @@ interface HardeningContextValue {
     clearAll: () => void;
     selectSection: (section: string) => void;
     runResolve: () => Promise<void>;
-    runGenerate: () => Promise<void>;
+    runGenerate: (permanent?: boolean) => Promise<void>;
     setFormat: (format: string) => void;
     setSearch: (query: string) => void;
     setLevelFilter: (level: number | null) => void;
@@ -204,6 +204,7 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
                 dispatch({ type: "SET_RULES", rules: allRules, sections: data.sections });
             } catch (err: unknown) {
                 if (cancelled) return;
+                // TODO(i18n): error messages in async callbacks, not reactive to locale
                 const msg = err instanceof Error ? err.message : "Kurallar yüklenemedi";
                 dispatch({ type: "SET_ERROR", error: msg });
             }
@@ -232,22 +233,25 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
             );
             dispatch({ type: "SET_VALIDATION", result });
         } catch (err: unknown) {
+            // TODO(i18n): error messages in async callbacks, not reactive to locale
             const msg = err instanceof Error ? err.message : "Doğrulama hatası";
             dispatch({ type: "SET_ERROR", error: msg });
         }
     }, [state.selectedOS, state.selectedRuleIds]);
 
-    const runGenerate = useCallback(async () => {
+    const runGenerate = useCallback(async (permanent: boolean = false) => {
         if (state.selectedRuleIds.size === 0) return;
         dispatch({ type: "SET_GENERATING", generating: true });
         try {
             const result = await generateConfig(
                 state.selectedOS,
                 Array.from(state.selectedRuleIds),
-                state.selectedFormat
+                state.selectedFormat,
+                permanent
             );
             dispatch({ type: "SET_GENERATE_RESULT", result });
         } catch (err: unknown) {
+            // TODO(i18n): error messages in async callbacks, not reactive to locale
             const msg = err instanceof Error ? err.message : "Oluşturma hatası";
             dispatch({ type: "SET_ERROR", error: msg });
         }

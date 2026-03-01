@@ -1,21 +1,14 @@
 /* ValidationPanel – resolve results, format selection, generate, SHA256, download, verify checklist */
 
+import { useState } from "react";
 import { useHardening } from "../context/HardeningContext";
+import { useLocale } from "../context/LocaleContext";
 import { downloadArtifact } from "../services/api";
-
-const FORMAT_OPTIONS = {
-    ubuntu: [
-        { value: "ansible", label: "Ansible Playbook", ext: ".yml", icon: "📘" },
-        { value: "bash", label: "Bash Script", ext: ".sh", icon: "🐧" },
-    ],
-    windows: [
-        { value: "powershell", label: "PowerShell Script", ext: ".ps1", icon: "⚡" },
-        { value: "gpo", label: "GPO Backup", ext: ".zip", icon: "🏛️" },
-    ],
-} as const;
 
 export default function ValidationPanel() {
     const { state, runResolve, runGenerate, setFormat } = useHardening();
+    const { t } = useLocale();
+    const [permanent, setPermanent] = useState(false);
     const {
         selectedRuleIds,
         validationResult,
@@ -25,6 +18,17 @@ export default function ValidationPanel() {
         selectedOS,
         selectedFormat,
     } = state;
+
+    const FORMAT_OPTIONS = {
+        ubuntu: [
+            { value: "ansible", label: "Ansible Playbook", ext: ".yml", icon: "📘" },
+            { value: "bash", label: "Bash Script", ext: ".sh", icon: "🐧" },
+        ],
+        windows: [
+            { value: "powershell", label: "PowerShell Script", ext: ".ps1", icon: "⚡" },
+            { value: "gpo", label: "GPO Backup", ext: ".zip", icon: "🏛️" },
+        ],
+    } as const;
 
     const count = selectedRuleIds.size;
     const hasErrors = validationResult?.errors && validationResult.errors.length > 0;
@@ -40,7 +44,7 @@ export default function ValidationPanel() {
                         <path d="M9 11l3 3L22 4" />
                         <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
                     </svg>
-                    Doğrulama
+                    {t("validation.title")}
                 </h3>
 
                 <button
@@ -52,10 +56,10 @@ export default function ValidationPanel() {
                     {isResolving ? (
                         <>
                             <span className="spinner" />
-                            Hesaplanıyor…
+                            {t("validation.calculating")}
                         </>
                     ) : (
-                        <>Hesapla ({count} kural)</>
+                        <>{t("validation.calculate", { count })}</>
                     )}
                 </button>
 
@@ -68,7 +72,7 @@ export default function ValidationPanel() {
                                     <strong>{w.rule_id}</strong>
                                     <p>{w.message}</p>
                                     {w.missing_dependency && (
-                                        <code>Eksik bağımlılık: {w.missing_dependency}</code>
+                                        <code>{t("validation.missing_dep", { missing: w.missing_dependency })}</code>
                                     )}
                                 </div>
                             </div>
@@ -80,7 +84,7 @@ export default function ValidationPanel() {
                                 <div>
                                     <strong>{e.rule_id}</strong>
                                     <p>{e.message}</p>
-                                    <code>Çakışan kural: {e.conflicting_rule}</code>
+                                    <code>{t("validation.conflicting_rule", { conflicting: e.conflicting_rule })}</code>
                                 </div>
                             </div>
                         ))}
@@ -88,7 +92,7 @@ export default function ValidationPanel() {
                         {isValid && validationResult.warnings.length === 0 && (
                             <div className="vp-msg vp-msg--success">
                                 <span className="vp-icon">✅</span>
-                                <p>Tüm kurallar uyumlu – çakışma veya eksik bağımlılık yok.</p>
+                                <p>{t("validation.success")}</p>
                             </div>
                         )}
                     </div>
@@ -106,12 +110,12 @@ export default function ValidationPanel() {
                             <line x1="9" y1="15" x2="12" y2="12" />
                             <line x1="15" y1="15" x2="12" y2="12" />
                         </svg>
-                        Yapılandırma Oluştur
+                        {t("validation.generate_title")}
                     </h3>
 
                     {/* ── Format Selector ──────────────────────────────── */}
                     <div className="vp-format-selector">
-                        <span className="vp-format-label">Format:</span>
+                        <span className="vp-format-label">{t("validation.format_label")}</span>
                         <div className="vp-format-options">
                             {formats.map((f) => (
                                 <label
@@ -136,13 +140,13 @@ export default function ValidationPanel() {
                     <button
                         className="vp-btn vp-btn--generate"
                         disabled={isGenerating}
-                        onClick={runGenerate}
+                        onClick={() => runGenerate(permanent)}
                         id="btn-generate"
                     >
                         {isGenerating ? (
                             <>
                                 <span className="spinner" />
-                                Oluşturuluyor…
+                                {t("validation.generating")}
                             </>
                         ) : (
                             <>
@@ -151,10 +155,21 @@ export default function ValidationPanel() {
                                     <polyline points="7 10 12 15 17 10" />
                                     <line x1="12" y1="15" x2="12" y2="3" />
                                 </svg>
-                                Artifact Oluştur
+                                {t("validation.generate_btn")}
                             </>
                         )}
                     </button>
+
+                    {/* ── Save & Share Toggle (subtle, below primary action) ── */}
+                    <label className="vp-shareable-toggle" title={t("validation.shareable_hint")}>
+                        <input
+                            type="checkbox"
+                            checked={permanent}
+                            onChange={(e) => setPermanent(e.target.checked)}
+                        />
+                        <span className="vp-shareable-toggle__icon">🔗</span>
+                        <span className="vp-shareable-toggle__label">{t("validation.shareable_toggle")}</span>
+                    </label>
 
                     {/* ── Generate Result ──────────────────────────────── */}
                     {generateResult && generateResult.success && (
@@ -166,11 +181,11 @@ export default function ValidationPanel() {
 
                             <div className="vp-file-info">
                                 <div className="vp-file-row">
-                                    <span className="vp-label">Dosya:</span>
+                                    <span className="vp-label">{t("validation.file_label")}</span>
                                     <code className="vp-value">{generateResult.filename}</code>
                                 </div>
                                 <div className="vp-file-row">
-                                    <span className="vp-label">SHA-256:</span>
+                                    <span className="vp-label">{t("validation.sha_label")}</span>
                                     <code className="vp-value vp-sha256">{generateResult.sha256}</code>
                                 </div>
                             </div>
@@ -186,8 +201,24 @@ export default function ValidationPanel() {
                                         <polyline points="7 10 12 15 17 10" />
                                         <line x1="12" y1="15" x2="12" y2="3" />
                                     </svg>
-                                    İndir
+                                    {t("validation.download_btn")}
                                 </button>
+                            )}
+
+                            {generateResult.artifact_id ? (
+                                <div className="vp-share-box">
+                                    <span className="vp-label">{t("validation.shareable_code_label")}</span>
+                                    <code className="vp-share-box__code">{generateResult.artifact_id}</code>
+                                    <button
+                                        className="vp-share-box__copy"
+                                        onClick={() => navigator.clipboard.writeText(generateResult.artifact_id!)}
+                                    >
+                                        {t("validation.shareable_copy")}
+                                    </button>
+                                    <p className="vp-share-box__hint">{t("validation.shareable_code_hint")}</p>
+                                </div>
+                            ) : (
+                                <p className="vp-not-saved-hint">{t("validation.not_saved_hint")}</p>
                             )}
 
                             {/* ── Verify Checklist ────────────────────────── */}
@@ -197,35 +228,35 @@ export default function ValidationPanel() {
                                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                                         <path d="M9 11l3 3L22 4" />
                                     </svg>
-                                    Doğrulama Kontrol Listesi
+                                    {t("validation.checklist_title")}
                                 </h4>
 
                                 <ul className="vp-checklist-list">
                                     <li>
                                         <span className="vp-check">☐</span>
-                                        İndirilen dosyanın SHA-256 hash değerini yukarıdaki değerle karşılaştırın.
+                                        {t("validation.checklist_sha")}
                                     </li>
                                     <li>
                                         <span className="vp-check">☐</span>
                                         {selectedFormat === "ansible"
-                                            ? "Ansible playbook'u bir test ortamında --check modunda çalıştırın."
+                                            ? t("validation.checklist_ansible")
                                             : selectedFormat === "bash"
-                                                ? "Bash scriptini bir test ortamında --dry-run ile gözden geçirin."
+                                                ? t("validation.checklist_bash")
                                                 : selectedFormat === "gpo"
-                                                    ? "GPO backup'ı bir test OU'suna import edip test edin."
-                                                    : "PowerShell scriptini -WhatIf modunda çalıştırın."}
+                                                    ? t("validation.checklist_gpo")
+                                                    : t("validation.checklist_powershell")}
                                     </li>
                                     <li>
                                         <span className="vp-check">☐</span>
-                                        Her kuralın beklenen değişikliği yaptığını doğrulayın.
+                                        {t("validation.checklist_verify")}
                                     </li>
                                     <li>
                                         <span className="vp-check">☐</span>
-                                        Üretim ortamına uygulamadan önce yedek alın.
+                                        {t("validation.checklist_backup")}
                                     </li>
                                     <li>
                                         <span className="vp-check">☐</span>
-                                        Uygulama sonrası audit scriptiyle uyumluluğu kontrol edin.
+                                        {t("validation.checklist_audit")}
                                     </li>
                                 </ul>
                             </div>

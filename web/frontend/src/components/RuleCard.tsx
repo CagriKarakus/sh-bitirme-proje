@@ -2,6 +2,7 @@
 
 import type { RuleItem } from "../types";
 import { useHardening } from "../context/HardeningContext";
+import { useLocale } from "../context/LocaleContext";
 
 interface Props {
     rule: RuleItem;
@@ -10,6 +11,7 @@ interface Props {
 
 export default function RuleCard({ rule, onInfoClick }: Props) {
     const { state, toggleRule } = useHardening();
+    const { t } = useLocale();
     const isSelected = state.selectedRuleIds.has(rule.rule_id);
 
     return (
@@ -51,7 +53,7 @@ export default function RuleCard({ rule, onInfoClick }: Props) {
                                 : "rule-card__badge--manual"
                             }`}
                     >
-                        {rule.automated ? "Otomatik" : "Manuel"}
+                        {rule.automated ? t("rule_card.automated") : t("rule_card.manual")}
                     </span>
 
                     {/* Severity */}
@@ -73,12 +75,12 @@ export default function RuleCard({ rule, onInfoClick }: Props) {
             {/* Info button */}
             <button
                 className="rule-card__info-btn"
-                title="Kural Açıklaması"
+                title={t("rule_card.info_title")}
                 onClick={(e) => {
                     e.stopPropagation();
                     onInfoClick(rule);
                 }}
-                aria-label="Kural açıklamasını görüntüle"
+                aria-label={t("rule_card.info_aria")}
             >
                 <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />

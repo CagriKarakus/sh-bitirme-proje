@@ -1,6 +1,7 @@
 /* API service – communicates with the FastAPI backend */
 
 import type {
+    ArtifactInfoResponse,
     RulesResponse,
     ResolveRequest,
     ResolveResult,
@@ -40,13 +41,18 @@ export async function resolveRules(
 export async function generateConfig(
     os: string,
     ruleIds: string[],
-    format: string = "ansible"
+    format: string = "ansible",
+    permanent: boolean = false
 ): Promise<GenerateResponse> {
-    const body: GenerateRequest = { os, rule_ids: ruleIds, format };
+    const body: GenerateRequest = { os, rule_ids: ruleIds, format, permanent };
     return request<GenerateResponse>(`${API_BASE}/generate`, {
         method: "POST",
         body: JSON.stringify(body),
     });
+}
+
+export async function lookupArtifact(artifactId: string): Promise<ArtifactInfoResponse> {
+    return request<ArtifactInfoResponse>(`${API_BASE}/artifact/${artifactId}`);
 }
 
 /**

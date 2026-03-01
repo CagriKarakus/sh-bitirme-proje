@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useHardening } from "../context/HardeningContext";
+import { useLocale } from "../context/LocaleContext";
 import RuleCard from "./RuleCard";
 import type { RuleItem } from "../types";
 
@@ -11,6 +12,7 @@ interface Props {
 
 export default function RuleList({ onInfoClick }: Props) {
     const { state, selectSection } = useHardening();
+    const { t } = useLocale();
     const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
     // Apply filters
@@ -57,7 +59,7 @@ export default function RuleList({ onInfoClick }: Props) {
                 <div className="loading-dots">
                     <span /><span /><span />
                 </div>
-                <span>Kurallar yükleniyor...</span>
+                <span>{t("rule_list.loading")}</span>
             </div>
         );
     }
@@ -68,7 +70,7 @@ export default function RuleList({ onInfoClick }: Props) {
                 <svg className="empty-state__icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                 </svg>
-                <div className="empty-state__title">Hata</div>
+                <div className="empty-state__title">{t("rule_list.error_title")}</div>
                 <div className="empty-state__text">{state.error}</div>
             </div>
         );
@@ -80,8 +82,8 @@ export default function RuleList({ onInfoClick }: Props) {
                 <svg className="empty-state__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <div className="empty-state__title">Kural bulunamadı</div>
-                <div className="empty-state__text">Arama veya filtre kriterlerini değiştirin.</div>
+                <div className="empty-state__title">{t("rule_list.not_found_title")}</div>
+                <div className="empty-state__text">{t("rule_list.not_found_text")}</div>
             </div>
         );
     }
@@ -112,7 +114,7 @@ export default function RuleList({ onInfoClick }: Props) {
                                     selectSection(section);
                                 }}
                             >
-                                {allSelected ? "Kaldır" : "Tümünü Seç"}
+                                {allSelected ? t("rule_list.section_deselect") : t("rule_list.section_select_all")}
                             </button>
                         </div>
 

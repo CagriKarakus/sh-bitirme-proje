@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
 
 from models import (
+    ArtifactInfoResponse,
     GenerateRequest,
     GenerateResponse,
     ResolveRequest,
@@ -14,7 +15,7 @@ from models import (
 )
 from services.rule_loader import load_rules_grouped
 from services.resolver import resolve
-from services.generator import generate, get_artifact_path
+from services.generator import generate, get_artifact_info, get_artifact_path, is_artifact_permanent, delete_artifact
 
 router = APIRouter(prefix="/api", tags=["rules"])
 
@@ -51,7 +52,7 @@ async def generate_config(req: GenerateRequest):
     if not req.rule_ids:
         raise HTTPException(status_code=400, detail="En az bir kural seçilmelidir.")
 
-    result = generate(req.os, req.rule_ids, req.format)
+    result = generate(req.os, req.rule_ids, req.format, permanent=req.permanent)
 
     if not result.get("success"):
         return GenerateResponse(
@@ -66,11 +67,29 @@ async def generate_config(req: GenerateRequest):
         download_url=f"/api/download/{artifact_id}",
         filename=result["filename"],
         sha256=result["sha256"],
+        artifact_id=artifact_id if req.permanent else None,
+    )
+
+
+@router.get("/artifact/{artifact_id}", response_model=ArtifactInfoResponse)
+async def get_artifact_info_route(artifact_id: str):
+    """Return metadata for an existing artifact by its 12-char ID."""
+    if not artifact_id.isalnum() or len(artifact_id) != 12:
+        raise HTTPException(status_code=400, detail="Geçersiz artifact ID: 12 karakter alfanümerik olmalı")
+    info = get_artifact_info(artifact_id)
+    if not info:
+        return ArtifactInfoResponse(found=False)
+    return ArtifactInfoResponse(
+        found=True,
+        artifact_id=artifact_id,
+        filename=info["filename"],
+        sha256=info["sha256"],
+        download_url=f"/api/download/{artifact_id}",
     )
 
 
 @router.get("/download/{artifact_id}")
-async def download_artifact(artifact_id: str):
+async def download_artifact(artifact_id: str, background_tasks: BackgroundTasks):
     """Serve a generated artifact file for download."""
     # Sanitize: only allow hex characters
     if not artifact_id.isalnum():
@@ -79,6 +98,9 @@ async def download_artifact(artifact_id: str):
     file_path = get_artifact_path(artifact_id)
     if not file_path or not file_path.exists():
         raise HTTPException(status_code=404, detail="Artifact bulunamadı")
+
+    if not is_artifact_permanent(artifact_id):
+        background_tasks.add_task(delete_artifact, artifact_id)
 
     return FileResponse(
         path=str(file_path),
