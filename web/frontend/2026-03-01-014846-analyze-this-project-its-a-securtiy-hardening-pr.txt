@@ -1,0 +1,1709 @@
+
+╭─── Claude Code v2.1.63 ──────────────────────────────────────────────────────╮
+│                                                    │ Tips for getting        │
+│                 Welcome back Çağrı!                │ started                 │
+│                                                    │ Run /init to create a … │
+│                       ▐▛███▜▌                      │ ─────────────────────── │
+│                      ▝▜█████▛▘                     │ Recent activity         │
+│                        ▘▘ ▝▝                       │ No recent activity      │
+│                                                    │                         │
+│ Sonnet 4.6 · Claude Pro ·                          │                         │
+│ zt8sxfww5t@privaterelay.appleid.com's Organization │                         │
+│ ~\OneDrive\Belgeler\GitHub\sh-bitirme-proje\web\f… │                         │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+> Analyze this project. It's a securtiy hardening project. I made lots of   
+  things and I want to you to make changes on frontend. What I want is      
+  adding another rules description page. When users click on any rules, a   
+  rule line will open a window with sliding animation on same webpage. this 
+   window will display a brief explanation about the rule. If desired there 
+   will be anoother button on the windows to open a new webpage to explain  
+  rules detailed description. Just make the animation, window and new page. 
+   Dont add anything about the rules. I will add descriptions and briefings 
+   later.                                                                   
+
+● Recalled 1 memory, searched for 1 pattern, read 6 files (ctrl+o to expand)
+
+● Now I have a full picture of the project. Here's the plan:
+
+  - Install react-router-dom (no router exists yet)
+  - Add an info button (ⓘ) to each RuleCard that opens a sliding drawer panel
+  from the right
+  - The drawer shows a brief rule summary with a "Detailed Description" button
+  that navigates to a new page
+  - Create a RuleDetailPage for the full detail view
+  - Wire up routing in App.tsx
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && npm install react-router-dom)
+  ⎿  added 4 packages, and audited 183 packages in 2s
+
+     47 packages are looking for funding
+     … +3 lines (ctrl+o to expand)
+  ⎿  (timeout 1m)
+
+● Now I'll create all the components at once:
+
+● Write(src\components\RuleDrawer.tsx)
+  ⎿  Wrote 122 lines to
+     ..\..\..\..\..\..\..\..\c\Users\cagri\OneDrive\Belgeler\GitHub\sh-biti
+     rme-proje\web\frontend\src\components\RuleDrawer.tsx
+       1 /* RuleDrawer – sliding panel that opens when a rule's info butt
+         on is clicked */
+       2 
+       3 import { useEffect } from "react";
+       4 import { useNavigate } from "react-router-dom";
+       5 import type { RuleItem } from "../types";
+       6 
+       7 interface Props {
+       8     rule: RuleItem | null;
+       9     onClose: () => void;
+      10 }
+     … +112 lines (ctrl+o to expand)
+
+● Write(src\pages\RuleDetailPage.tsx)
+  ⎿  Wrote 117 lines to ..\..\..\..\..\..\..\..\c\Users\cagri\OneDrive\Belg
+     eler\GitHub\sh-bitirme-proje\web\frontend\src\pages\RuleDetailPage.tsx
+      1 /* RuleDetailPage – full-page detailed description for a single r
+        ule */
+      2 
+      3 import { useParams, useNavigate } from "react-router-dom";
+      4 import { useHardening } from "../context/HardeningContext";
+      5 
+      6 export default function RuleDetailPage() {
+      7     const { ruleId } = useParams<{ ruleId: string }>();
+      8     const navigate = useNavigate();
+      9     const { state } = useHardening();
+     … +107 lines (ctrl+o to expand)
+
+● Now update RuleCard to add the info button:
+
+● Write(src\components\RuleCard.tsx)
+  ⎿  Added 89 lines, removed 73 lines
+       1 -/* RuleCard – individual rule display with checkbox */        
+       2 -                                                              
+       3 -import type { RuleItem } from "../types";                     
+       4 -import { useHardening } from "../context/HardeningContext";   
+       5 -                                                              
+       6 -interface Props {                                             
+       7 -    rule: RuleItem;                                           
+       8 -}                                                             
+       9 -                                                              
+      10 -export default function RuleCard({ rule }: Props) {           
+      11 -    const { state, toggleRule } = useHardening();             
+      12 -    const isSelected = state.selectedRuleIds.has(rule.rule_id);
+         -                                                               
+      13 -                                                              
+      14 -    return (                                                  
+      15 -        <div                                                  
+      16 -            className={`rule-card${isSelected ? " rule-card--se
+         -lected" : ""}`}                                               
+      17 -            onClick={() => toggleRule(rule.rule_id)}          
+      18 -        >                                                     
+      19 -            {/* Checkbox */}                                  
+      20 -            <label className="rule-card__checkbox" onClick={(e)
+         - => e.stopPropagation()}>                                     
+      21 -                <input                                        
+      22 -                    type="checkbox"                           
+      23 -                    checked={isSelected}                      
+      24 -                    onChange={() => toggleRule(rule.rule_id)} 
+      25 -                />                                            
+      26 -                <span className="rule-card__checkbox-visual" />
+         -                                                               
+      27 -            </label>                                          
+      28 -                                                              
+      29 -            {/* Body */}                                      
+      30 -            <div className="rule-card__body">                 
+      31 -                <div className="rule-card__header">           
+      32 -                    <span className="rule-card__id">{rule.rule_
+         -id}</span>                                                    
+      33 -                </div>                                        
+      34 -                <div className="rule-card__title">{rule.title}<
+         -/div>                                                         
+      35 -                                                              
+      36 -                <div className="rule-card__meta">             
+      37 -                    {/* CIS Level badge */}                   
+      38 -                    {rule.cis_level && (                      
+      39 -                        <span                                 
+      40 -                            className={`rule-card__badge rule-c
+         -ard__badge--level-${rule.cis_level}`}                         
+      41 -                        >                                     
+      42 -                            L{rule.cis_level}                 
+      43 -                        </span>                               
+      44 -                    )}                                        
+      45 -                                                              
+      46 -                    {/* Automated / Manual */}                
+      47 -                    <span                                     
+      48 -                        className={`rule-card__badge ${rule.aut
+         -omated                                                        
+      49 -                                ? "rule-card__badge--automated"
+         -                                                               
+      50 -                                : "rule-card__badge--manual"  
+      51 -                            }`}                               
+      52 -                    >                                         
+      53 -                        {rule.automated ? "Otomatik" : "Manuel"
+         -}                                                             
+      54 -                    </span>                                   
+      55 -                                                              
+      56 -                    {/* Severity */}                          
+      57 -                    {rule.severity && (                       
+      58 -                        <span className={`rule-card__severity r
+         -ule-card__severity--${rule.severity}`}>                       
+      59 -                            {rule.severity}                   
+      60 -                        </span>                               
+      61 -                    )}                                        
+      62 -                                                              
+      63 -                    {/* Category as small text */}            
+      64 -                    {rule.subcategory && (                    
+      65 -                        <span style={{ fontSize: "0.65rem", col
+         -or: "var(--text-muted)" }}>                                   
+      66 -                            {rule.subcategory}                
+      67 -                        </span>                               
+      68 -                    )}                                        
+      69 -                </div>                                        
+      70 -            </div>                                            
+      71 -        </div>                                                
+      72 -    );                                                        
+      73 -}                                                             
+       1 +/* RuleCard – individual rule display with checkbox and info bu
+         +tton */                                                        
+       2 +                                                               
+       3 +import type { RuleItem } from "../types";                      
+       4 +import { useHardening } from "../context/HardeningContext";    
+       5 +                                                               
+       6 +interface Props {                                              
+       7 +    rule: RuleItem;                                            
+       8 +    onInfoClick: (rule: RuleItem) => void;                     
+       9 +}                                                              
+      10 +                                                               
+      11 +export default function RuleCard({ rule, onInfoClick }: Props) 
+         +{                                                              
+      12 +    const { state, toggleRule } = useHardening();              
+      13 +    const isSelected = state.selectedRuleIds.has(rule.rule_id);
+      14 +                                                               
+      15 +    return (                                                   
+      16 +        <div                                                   
+      17 +            className={`rule-card${isSelected ? " rule-card--se
+         +lected" : ""}`}                                                
+      18 +            onClick={() => toggleRule(rule.rule_id)}           
+      19 +        >                                                      
+      20 +            {/* Checkbox */}                                   
+      21 +            <label className="rule-card__checkbox" onClick={(e)
+         + => e.stopPropagation()}>                                      
+      22 +                <input                                         
+      23 +                    type="checkbox"                            
+      24 +                    checked={isSelected}                       
+      25 +                    onChange={() => toggleRule(rule.rule_id)}  
+      26 +                />                                             
+      27 +                <span className="rule-card__checkbox-visual" />
+      28 +            </label>                                           
+      29 +                                                               
+      30 +            {/* Body */}                                       
+      31 +            <div className="rule-card__body">                  
+      32 +                <div className="rule-card__header">            
+      33 +                    <span className="rule-card__id">{rule.rule_
+         +id}</span>                                                     
+      34 +                </div>                                         
+      35 +                <div className="rule-card__title">{rule.title}<
+         +/div>                                                          
+      36 +                                                               
+      37 +                <div className="rule-card__meta">              
+      38 +                    {/* CIS Level badge */}                    
+      39 +                    {rule.cis_level && (                       
+      40 +                        <span                                  
+      41 +                            className={`rule-card__badge rule-c
+         +ard__badge--level-${rule.cis_level}`}                          
+      42 +                        >                                      
+      43 +                            L{rule.cis_level}                  
+      44 +                        </span>                                
+      45 +                    )}                                         
+      46 +                                                               
+      47 +                    {/* Automated / Manual */}                 
+      48 +                    <span                                      
+      49 +                        className={`rule-card__badge ${rule.aut
+         +omated                                                         
+      50 +                                ? "rule-card__badge--automated"
+      51 +                                : "rule-card__badge--manual"   
+      52 +                            }`}                                
+      53 +                    >                                          
+      54 +                        {rule.automated ? "Otomatik" : "Manuel"
+         +}                                                              
+      55 +                    </span>                                    
+      56 +                                                               
+      57 +                    {/* Severity */}                           
+      58 +                    {rule.severity && (                        
+      59 +                        <span className={`rule-card__severity r
+         +ule-card__severity--${rule.severity}`}>                        
+      60 +                            {rule.severity}                    
+      61 +                        </span>                                
+      62 +                    )}                                         
+      63 +                                                               
+      64 +                    {/* Category as small text */}             
+      65 +                    {rule.subcategory && (                     
+      66 +                        <span style={{ fontSize: "0.65rem", col
+         +or: "var(--text-muted)" }}>                                    
+      67 +                            {rule.subcategory}                 
+      68 +                        </span>                                
+      69 +                    )}                                         
+      70 +                </div>                                         
+      71 +            </div>                                             
+      72 +                                                               
+      73 +            {/* Info button */}                                
+      74 +            <button                                            
+      75 +                className="rule-card__info-btn"                
+      76 +                title="Kural Açıklaması"                       
+      77 +                onClick={(e) => {                              
+      78 +                    e.stopPropagation();                       
+      79 +                    onInfoClick(rule);                         
+      80 +                }}                                             
+      81 +                aria-label="Kural açıklamasını görüntüle"      
+      82 +            >                                                  
+      83 +                <svg viewBox="0 0 24 24" fill="currentColor" wi
+         +dth="16" height="16">                                          
+      84 +                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 1
+         +0 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+         + />                                                            
+      85 +                </svg>                                         
+      86 +            </button>                                          
+      87 +        </div>                                                 
+      88 +    );                                                         
+      89 +}                                                              
+
+● Update RuleList to pass down the onInfoClick prop:
+
+● Update(src\components\RuleList.tsx)
+  ⎿  Added 4 lines
+       5  import RuleCard from "./RuleCard";
+       6  import type { RuleItem } from "../types";
+       7  
+       8 +interface Props {                                              
+       9 +    onInfoClick: (rule: RuleItem) => void;                     
+      10 +}                                                              
+      11 +                                                               
+      12  export default function RuleList() {
+      13      const { state, selectSection } = useHardening();
+      14      const [openSections, setOpenSections] = useState<Set<string
+          >>(new Set());
+
+● Update(src\components\RuleList.tsx)
+  ⎿  Added 1 line, removed 1 line
+       9      onInfoClick: (rule: RuleItem) => void;
+      10  }
+      11  
+      12 -export default function RuleList() {                           
+      12 +export default function RuleList({ onInfoClick }: Props) {     
+      13      const { state, selectSection } = useHardening();
+      14      const [openSections, setOpenSections] = useState<Set<string
+          >>(new Set());
+      15  
+
+● Update(src\components\RuleList.tsx)
+  ⎿  Added 1 line, removed 1 line
+      119                          {isOpen && (
+      120                              <div className="section-rules">
+      121                                  {rules.map((rule) => (
+      122 -                                    <RuleCard key={rule.rule_i
+          -d} rule={rule} />                                             
+      122 +                                    <RuleCard key={rule.rule_i
+          +d} rule={rule} onInfoClick={onInfoClick} />                   
+      123                                  ))}
+      124                              </div>
+      125                          )}
+
+● Now update App.tsx to add routing, drawer state, and the detail page:
+
+● Write(src\App.tsx)
+  ⎿  Added 26 lines, removed 6 lines
+       1  /* Main App component – assembles the full dashboard layout */
+       2  
+       3 +import { useState } from "react";                              
+       4 +import { BrowserRouter, Routes, Route } from "react-router-dom"
+         +;                                                              
+       5  import { HardeningProvider, useHardening } from "./context/Hard
+          eningContext";
+       6  import OsSelector from "./components/OsSelector";
+       7  import FilterSidebar from "./components/FilterSidebar";
+       8  import RuleList from "./components/RuleList";
+       9  import ValidationPanel from "./components/ValidationPanel";
+      10 +import RuleDrawer from "./components/RuleDrawer";              
+      11 +import RuleDetailPage from "./pages/RuleDetailPage";           
+      12 +import type { RuleItem } from "./types";                       
+      13  import "./index.css";
+      14  
+      15  function Dashboard() {
+      16    const { state, runResolve } = useHardening();
+      17    const selectedCount = state.selectedRuleIds.size;
+      18  
+      19 +  const [activeRule, setActiveRule] = useState<RuleItem | null>
+         +(null);                                                        
+      20 +                                                               
+      21    return (
+      22      <>
+      23        {/* Header */}
+     ...
+       85          <ValidationPanel />
+       86  
+       87          {/* Rule list */}
+       81 -        <RuleList />                                          
+       88 +        <RuleList onInfoClick={setActiveRule} />              
+       89        </main>
+       90 +                                                              
+       91 +      {/* Rule info drawer */}                                
+       92 +      <RuleDrawer rule={activeRule} onClose={() => setActiveRu
+          +le(null)} />                                                  
+       93      </>
+       94    );
+       95  }
+       96  
+       97  export default function App() {
+       98    return (
+       89 -    <HardeningProvider>                                       
+       90 -      <div className="app-layout">                            
+       91 -        <Dashboard />                                         
+       92 -      </div>                                                  
+       93 -    </HardeningProvider>                                      
+       99 +    <BrowserRouter>                                           
+      100 +      <HardeningProvider>                                     
+      101 +        <Routes>                                              
+      102 +          <Route                                              
+      103 +            path="/"                                          
+      104 +            element={                                         
+      105 +              <div className="app-layout">                    
+      106 +                <Dashboard />                                 
+      107 +              </div>                                          
+      108 +            }                                                 
+      109 +          />                                                  
+      110 +          <Route path="/rule/:ruleId" element={<RuleDetailPage
+          + />} />                                                       
+      111 +        </Routes>                                             
+      112 +      </HardeningProvider>                                    
+      113 +    </BrowserRouter>                                          
+      114    );
+      115  }
+
+● Now add all the CSS for the drawer and detail page:
+
+● Update(src\index.css)
+  ⎿  Added 345 lines
+      1143  }
+      1144  
+      1145  
+      1146 +/* ── Rule Card info button ─────────────────────────────────
+           +────────────────── */                                        
+      1147 +                                                             
+      1148 +.rule-card__info-btn {                                       
+      1149 +  flex-shrink: 0;                                            
+      1150 +  display: flex;                                             
+      1151 +  align-items: center;                                       
+      1152 +  justify-content: center;                                   
+      1153 +  width: 28px;                                               
+      1154 +  height: 28px;                                              
+      1155 +  border: 1px solid var(--border);                           
+      1156 +  border-radius: var(--radius-sm);                           
+      1157 +  background: transparent;                                   
+      1158 +  color: var(--text-muted);                                  
+      1159 +  cursor: pointer;                                           
+      1160 +  transition: all 0.2s;                                      
+      1161 +  align-self: center;                                        
+      1162 +  opacity: 0;                                                
+      1163 +}                                                            
+      1164 +                                                             
+      1165 +.rule-card:hover .rule-card__info-btn {                      
+      1166 +  opacity: 1;                                                
+      1167 +}                                                            
+      1168 +                                                             
+      1169 +.rule-card__info-btn:hover {                                 
+      1170 +  background: var(--accent-glow);                            
+      1171 +  border-color: var(--accent-border);                        
+      1172 +  color: var(--accent);                                      
+      1173 +}                                                            
+      1174 +                                                             
+      1175 +                                                             
+      1176 +/* ── Rule Drawer ───────────────────────────────────────────
+           +────────────────── */                                        
+      1177 +                                                             
+      1178 +.drawer-backdrop {                                           
+      1179 +  position: fixed;                                           
+      1180 +  inset: 0;                                                  
+      1181 +  background: rgba(0, 0, 0, 0.5);                            
+      1182 +  z-index: 200;                                              
+      1183 +  opacity: 0;                                                
+      1184 +  pointer-events: none;                                      
+      1185 +  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);     
+      1186 +  backdrop-filter: blur(2px);                                
+      1187 +}                                                            
+      1188 +                                                             
+      1189 +.drawer-backdrop--visible {                                  
+      1190 +  opacity: 1;                                                
+      1191 +  pointer-events: auto;                                      
+      1192 +}                                                            
+      1193 +                                                             
+      1194 +.rule-drawer {                                               
+      1195 +  position: fixed;                                           
+      1196 +  top: 0;                                                    
+      1197 +  right: 0;                                                  
+      1198 +  bottom: 0;                                                 
+      1199 +  width: 420px;                                              
+      1200 +  max-width: 100vw;                                          
+      1201 +  background: var(--bg-secondary);                           
+      1202 +  border-left: 1px solid var(--border);                      
+      1203 +  z-index: 201;                                              
+      1204 +  display: flex;                                             
+      1205 +  flex-direction: column;                                    
+      1206 +  padding: var(--sp-lg);                                     
+      1207 +  gap: var(--sp-lg);                                         
+      1208 +  transform: translateX(100%);                               
+      1209 +  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);  
+      1210 +  overflow-y: auto;                                          
+      1211 +}                                                            
+      1212 +                                                             
+      1213 +.rule-drawer--open {                                         
+      1214 +  transform: translateX(0);                                  
+      1215 +  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.4);                
+      1216 +}                                                            
+      1217 +                                                             
+      1218 +.rule-drawer__header {                                       
+      1219 +  display: flex;                                             
+      1220 +  align-items: center;                                       
+      1221 +  gap: var(--sp-sm);                                         
+      1222 +}                                                            
+      1223 +                                                             
+      1224 +.rule-drawer__header-left {                                  
+      1225 +  display: flex;                                             
+      1226 +  align-items: center;                                       
+      1227 +  gap: var(--sp-sm);                                         
+      1228 +  flex: 1;                                                   
+      1229 +  flex-wrap: wrap;                                           
+      1230 +}                                                            
+      1231 +                                                             
+      1232 +.rule-drawer__rule-id {                                      
+      1233 +  font-family: var(--font-mono);                             
+      1234 +  font-size: 0.85rem;                                        
+      1235 +  font-weight: 600;                                          
+      1236 +  color: var(--accent);                                      
+      1237 +  background: var(--accent-glow);                            
+      1238 +  padding: 3px 10px;                                         
+      1239 +  border-radius: var(--radius-sm);                           
+      1240 +  white-space: nowrap;                                       
+      1241 +}                                                            
+      1242 +                                                             
+      1243 +.rule-drawer__close {                                        
+      1244 +  flex-shrink: 0;                                            
+      1245 +  display: flex;                                             
+      1246 +  align-items: center;                                       
+      1247 +  justify-content: center;                                   
+      1248 +  width: 32px;                                               
+      1249 +  height: 32px;                                              
+      1250 +  border: 1px solid var(--border);                           
+      1251 +  border-radius: var(--radius-sm);                           
+      1252 +  background: transparent;                                   
+      1253 +  color: var(--text-muted);                                  
+      1254 +  cursor: pointer;                                           
+      1255 +  transition: all 0.2s;                                      
+      1256 +}                                                            
+      1257 +                                                             
+      1258 +.rule-drawer__close:hover {                                  
+      1259 +  background: var(--error-bg);                               
+      1260 +  border-color: rgba(255, 77, 106, 0.3);                     
+      1261 +  color: var(--error);                                       
+      1262 +}                                                            
+      1263 +                                                             
+      1264 +.rule-drawer__title {                                        
+      1265 +  font-size: 1.05rem;                                        
+      1266 +  font-weight: 600;                                          
+      1267 +  color: var(--text-primary);                                
+      1268 +  line-height: 1.4;                                          
+      1269 +}                                                            
+      1270 +                                                             
+      1271 +.rule-drawer__meta {                                         
+      1272 +  display: flex;                                             
+      1273 +  flex-direction: column;                                    
+      1274 +  gap: var(--sp-sm);                                         
+      1275 +  background: var(--bg-card);                                
+      1276 +  border: 1px solid var(--border);                           
+      1277 +  border-radius: var(--radius-md);                           
+      1278 +  padding: var(--sp-md);                                     
+      1279 +}                                                            
+      1280 +                                                             
+      1281 +.rule-drawer__meta-item {                                    
+      1282 +  display: flex;                                             
+      1283 +  align-items: center;                                       
+      1284 +  gap: var(--sp-sm);                                         
+      1285 +}                                                            
+      1286 +                                                             
+      1287 +.rule-drawer__meta-label {                                   
+      1288 +  font-size: 0.7rem;                                         
+      1289 +  font-weight: 600;                                          
+      1290 +  color: var(--text-muted);                                  
+      1291 +  text-transform: uppercase;                                 
+      1292 +  letter-spacing: 0.5px;                                     
+      1293 +  min-width: 80px;                                           
+      1294 +  flex-shrink: 0;                                            
+      1295 +}                                                            
+      1296 +                                                             
+      1297 +.rule-drawer__meta-value {                                   
+      1298 +  font-size: 0.8rem;                                         
+      1299 +  color: var(--text-secondary);                              
+      1300 +}                                                            
+      1301 +                                                             
+      1302 +.rule-drawer__section {                                      
+      1303 +  display: flex;                                             
+      1304 +  flex-direction: column;                                    
+      1305 +  gap: var(--sp-sm);                                         
+      1306 +}                                                            
+      1307 +                                                             
+      1308 +.rule-drawer__section-title {                                
+      1309 +  font-size: 0.75rem;                                        
+      1310 +  font-weight: 600;                                          
+      1311 +  text-transform: uppercase;                                 
+      1312 +  letter-spacing: 1px;                                       
+      1313 +  color: var(--text-muted);                                  
+      1314 +}                                                            
+      1315 +                                                             
+      1316 +.rule-drawer__placeholder {                                  
+      1317 +  font-size: 0.85rem;                                        
+      1318 +  color: var(--text-muted);                                  
+      1319 +  font-style: italic;                                        
+      1320 +  line-height: 1.6;                                          
+      1321 +  padding: var(--sp-md);                                     
+      1322 +  background: var(--bg-card);                                
+      1323 +  border: 1px dashed var(--border);                          
+      1324 +  border-radius: var(--radius-sm);                           
+      1325 +}                                                            
+      1326 +                                                             
+      1327 +.rule-drawer__footer {                                       
+      1328 +  padding-top: var(--sp-md);                                 
+      1329 +  border-top: 1px solid var(--border);                       
+      1330 +}                                                            
+      1331 +                                                             
+      1332 +.rule-drawer__detail-btn {                                   
+      1333 +  width: 100%;                                               
+      1334 +  display: flex;                                             
+      1335 +  align-items: center;                                       
+      1336 +  justify-content: center;                                   
+      1337 +  gap: var(--sp-sm);                                         
+      1338 +  padding: 11px var(--sp-lg);                                
+      1339 +  border: 1px solid var(--accent-border);                    
+      1340 +  border-radius: var(--radius-md);                           
+      1341 +  background: var(--accent-glow);                            
+      1342 +  color: var(--accent);                                      
+      1343 +  font-family: var(--font-ui);                               
+      1344 +  font-size: 0.85rem;                                        
+      1345 +  font-weight: 600;                                          
+      1346 +  cursor: pointer;                                           
+      1347 +  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);        
+      1348 +}                                                            
+      1349 +                                                             
+      1350 +.rule-drawer__detail-btn:hover {                             
+      1351 +  background: rgba(0, 212, 255, 0.2);                        
+      1352 +  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);             
+      1353 +  transform: translateY(-1px);                               
+      1354 +}                                                            
+      1355 +                                                             
+      1356 +                                                             
+      1357 +/* ── Rule Detail Page ──────────────────────────────────────
+           +────────────────── */                                        
+      1358 +                                                             
+      1359 +.detail-page {                                               
+      1360 +  min-height: 100vh;                                         
+      1361 +  background: var(--bg-primary);                             
+      1362 +  display: flex;                                             
+      1363 +  flex-direction: column;                                    
+      1364 +}                                                            
+      1365 +                                                             
+      1366 +.detail-page__topbar {                                       
+      1367 +  position: sticky;                                          
+      1368 +  top: 0;                                                    
+      1369 +  z-index: 10;                                               
+      1370 +  padding: var(--sp-md) var(--sp-xl);                        
+      1371 +  background: rgba(15, 17, 23, 0.85);                        
+      1372 +  backdrop-filter: blur(16px);                               
+      1373 +  border-bottom: 1px solid var(--border);                    
+      1374 +}                                                            
+      1375 +                                                             
+      1376 +.detail-page__back {                                         
+      1377 +  display: inline-flex;                                      
+      1378 +  align-items: center;                                       
+      1379 +  gap: var(--sp-sm);                                         
+      1380 +  padding: 8px var(--sp-md);                                 
+      1381 +  border: 1px solid var(--border);                           
+      1382 +  border-radius: var(--radius-md);                           
+      1383 +  background: transparent;                                   
+      1384 +  color: var(--text-secondary);                              
+      1385 +  font-family: var(--font-ui);                               
+      1386 +  font-size: 0.85rem;                                        
+      1387 +  font-weight: 500;                                          
+      1388 +  cursor: pointer;                                           
+      1389 +  transition: all 0.2s;                                      
+      1390 +}                                                            
+      1391 +                                                             
+      1392 +.detail-page__back:hover {                                   
+      1393 +  border-color: var(--border-hover);                         
+      1394 +  color: var(--text-primary);                                
+      1395 +  background: var(--bg-card);                                
+      1396 +}                                                            
+      1397 +                                                             
+      1398 +.detail-page__content {                                      
+      1399 +  max-width: 800px;                                          
+      1400 +  margin: 0 auto;                                            
+      1401 +  padding: var(--sp-2xl) var(--sp-xl);                       
+      1402 +  width: 100%;                                               
+      1403 +  display: flex;                                             
+      1404 +  flex-direction: column;                                    
+      1405 +  gap: var(--sp-xl);                                         
+      1406 +}                                                            
+      1407 +                                                             
+      1408 +.detail-page__hero {                                         
+      1409 +  display: flex;                                             
+      1410 +  flex-direction: column;                                    
+      1411 +  gap: var(--sp-sm);                                         
+      1412 +}                                                            
+      1413 +                                                             
+      1414 +.detail-page__title {                                        
+      1415 +  font-size: 1.6rem;                                         
+      1416 +  font-weight: 700;                                          
+      1417 +  color: var(--text-primary);                                
+      1418 +  line-height: 1.3;                                          
+      1419 +  letter-spacing: -0.4px;                                    
+      1420 +}                                                            
+      1421 +                                                             
+      1422 +.detail-page__tag {                                          
+      1423 +  font-size: 0.65rem;                                        
+      1424 +  font-weight: 500;                                          
+      1425 +  padding: 2px 8px;                                          
+      1426 +  border-radius: var(--radius-full);                         
+      1427 +  background: var(--bg-card);                                
+      1428 +  border: 1px solid var(--border);                           
+      1429 +  color: var(--text-secondary);                              
+      1430 +  text-transform: uppercase;                                 
+      1431 +  letter-spacing: 0.5px;                                     
+      1432 +}                                                            
+      1433 +                                                             
+      1434 +.detail-page__meta-grid {                                    
+      1435 +  display: grid;                                             
+      1436 +  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)
+           +);                                                           
+      1437 +  gap: var(--sp-sm);                                         
+      1438 +}                                                            
+      1439 +                                                             
+      1440 +.detail-page__meta-card {                                    
+      1441 +  display: flex;                                             
+      1442 +  flex-direction: column;                                    
+      1443 +  gap: 4px;                                                  
+      1444 +  padding: var(--sp-md);                                     
+      1445 +  background: var(--bg-card);                                
+      1446 +  border: 1px solid var(--border);                           
+      1447 +  border-radius: var(--radius-md);                           
+      1448 +}                                                            
+      1449 +                                                             
+      1450 +.detail-page__meta-label {                                   
+      1451 +  font-size: 0.65rem;                                        
+      1452 +  font-weight: 600;                                          
+      1453 +  text-transform: uppercase;                                 
+      1454 +  letter-spacing: 1px;                                       
+      1455 +  color: var(--text-muted);                                  
+      1456 +}                                                            
+      1457 +                                                             
+      1458 +.detail-page__meta-val {                                     
+      1459 +  font-size: 0.85rem;                                        
+      1460 +  color: var(--text-primary);                                
+      1461 +  font-weight: 500;                                          
+      1462 +}                                                            
+      1463 +                                                             
+      1464 +.detail-page__section {                                      
+      1465 +  display: flex;                                             
+      1466 +  flex-direction: column;                                    
+      1467 +  gap: var(--sp-md);                                         
+      1468 +}                                                            
+      1469 +                                                             
+      1470 +.detail-page__section-title {                                
+      1471 +  font-size: 1rem;                                           
+      1472 +  font-weight: 600;                                          
+      1473 +  color: var(--text-primary);                                
+      1474 +  padding-bottom: var(--sp-sm);                              
+      1475 +  border-bottom: 1px solid var(--border);                    
+      1476 +}                                                            
+      1477 +                                                             
+      1478 +.detail-page__placeholder-block {                            
+      1479 +  padding: var(--sp-xl);                                     
+      1480 +  background: var(--bg-card);                                
+      1481 +  border: 1px dashed var(--border);                          
+      1482 +  border-radius: var(--radius-md);                           
+      1483 +  color: var(--text-muted);                                  
+      1484 +  font-size: 0.9rem;                                         
+      1485 +  font-style: italic;                                        
+      1486 +  line-height: 1.6;                                          
+      1487 +  text-align: center;                                        
+      1488 +}                                                            
+      1489 +                                                             
+      1490 +                                                             
+      1491  /* ── Responsive ────────────────────────────────────────────
+            ────────────────── */
+      1492  
+      1493  @media (max-width: 768px) {
+
+● Now let's verify the build compiles cleanly:
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && npm run build 2>&1)
+  ⎿  > frontend@0.0.0 build
+     > tsc -b && vite build
+     … +9 lines (ctrl+o to expand)
+  ⎿  (timeout 1m)
+
+● Clean build. Here's a summary of everything that was added:
+
+  ---
+  What was implemented:
+
+  1. Info button on each RuleCard
+
+  A small ⓘ icon button appears on the right side of every rule card — it's
+  hidden by default and fades in on hover so it doesn't clutter the UI. Clicking
+   it opens the drawer without affecting the checkbox selection.
+
+  2. Sliding drawer (RuleDrawer)
+
+  - Slides in from the right side with a smooth translateX CSS transition (350ms
+   cubic-bezier)
+  - A semi-transparent blurred backdrop fades in behind it
+  - Close via the × button, clicking the backdrop, or pressing Escape
+  - Displays: rule ID, CIS level badge, automation badge, title, meta info
+  (severity, category, section), and a brief description placeholder
+  - Footer has a "Detaylı Açıklama" button that navigates to the detail page
+
+  3. Detail page (/rule/:ruleId)
+
+  - A dedicated full-page route at /rule/<rule_id>
+  - Shows rule hero section (ID, title, all badges/tags), a metadata grid
+  (section, category, OS, etc.), and three placeholder sections: Açıklama,
+  Gerekçe, Düzeltme Adımları
+  - Back button returns to the previous page
+  - All content placeholders are clearly marked with dashed borders — just fill
+  them in later
+
+  4. Routing
+
+  - Installed react-router-dom and wrapped the app in BrowserRouter
+  - / → main dashboard (unchanged)
+  - /rule/:ruleId → detail page
+
+✻ Worked for 3m 18s
+
+> /usage 
+  ⎿  Status dialog dismissed
+
+> I can'see the rules now. check what you did somethins is not working.  
+
+● Read 4 files (ctrl+o to expand)
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && npm list react-router-dom 2>&1)
+  ⎿  frontend@0.0.0 C:\Users\cagri\OneDrive\Belgeler\GitHub\sh-bitirme-proj
+     e\web\frontend
+     `-- react-router-dom@7.13.1
+
+● Read 2 files (ctrl+o to expand)
+
+● Let me check for a runtime error by looking at what actually runs in dev mode:
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && npx tsc --noEmit 2>&1)
+  ⎿  (No output)
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/backend
+      && python -c "import main; print('backend ok')" 2>&1 | head -5)
+  ⎿  backend ok
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && node -e "
+      const fs = require('fs');…)
+  ⎿  src/App.tsx - lines: 116
+     src/components/RuleCard.tsx - lines: 90
+     src/components/RuleList.tsx - lines: 132
+     … +2 lines (ctrl+o to expand)
+
+● Let me start the dev server briefly to capture any runtime errors:
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && timeout 8 npm run dev 2>&1 || true)
+  ⎿  > frontend@0.0.0 dev
+     > vite
+     … +6 lines (ctrl+o to expand)
+  ⎿  (timeout 15s)
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && npm list --depth=1 2>&1 | grep -i router)
+  ⎿  +-- react-router-dom@7.13.1
+     | +-- react-router@7.13.1
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && node -e "
+      const { BrowserRouter, Routes, Route, useNavigate, useParams } =
+      require('…)
+  ⎿  Error: Exit code 1
+     node:internal/modules/cjs/loader:1424
+       throw err;
+       ^
+
+     Error: Cannot find module './node_modules/react-router-dom/dist/index.cjs'
+     Require stack:
+     - C:\Users\cagri\OneDrive\Belgeler\GitHub\sh-bitirme-proje\web\frontend\[ev
+     al]
+         at Module._resolveFilename (node:internal/modules/cjs/loader:1421:15)
+         at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+
+     … +40 lines (ctrl+o to see all)
+
+● Searched for 3 patterns, read 1 file (ctrl+o to expand)
+
+● Let me check one more thing — the exact structure and if there's a potential
+  import/render error:
+
+● Searched for 2 patterns, read 1 file (ctrl+o to expand)
+
+● The code looks logically correct, but there might be a runtime issue with
+  react-router-dom v7 that I can't catch statically. Let me pivot to a simpler
+  approach — remove the router dependency entirely and use a state-based
+  full-page overlay instead. This is more reliable and doesn't introduce a new
+  dependency:
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && npm uninstall react-router-dom 2>&1)
+  ⎿  removed 4 packages, and audited 179 packages in 986ms
+
+     46 packages are looking for funding
+     … +3 lines (ctrl+o to expand)
+
+● Now rewrite everything without a router — the detail page becomes a
+  full-screen overlay managed by state:
+
+● Write(src\components\RuleDrawer.tsx)
+  ⎿  Added 124 lines, removed 122 lines
+        1 -/* RuleDrawer – sliding panel that opens when a rule's info bu
+          -tton is clicked */                                           
+        2 -                                                             
+        3 -import { useEffect } from "react";                           
+        4 -import { useNavigate } from "react-router-dom";              
+        5 -import type { RuleItem } from "../types";                    
+        6 -                                                             
+        7 -interface Props {                                            
+        8 -    rule: RuleItem | null;                                   
+        9 -    onClose: () => void;                                     
+       10 -}                                                            
+       11 -                                                             
+       12 -export default function RuleDrawer({ rule, onClose }: Props) {
+          -                                                              
+       13 -    const navigate = useNavigate();                          
+       14 -    const isOpen = rule !== null;                            
+       15 -                                                             
+       16 -    // Close on Escape key                                   
+       17 -    useEffect(() => {                                        
+       18 -        const handleKey = (e: KeyboardEvent) => {            
+       19 -            if (e.key === "Escape") onClose();               
+       20 -        };                                                   
+       21 -        if (isOpen) document.addEventListener("keydown", handl
+          -eKey);                                                       
+       22 -        return () => document.removeEventListener("keydown", h
+          -andleKey);                                                   
+       23 -    }, [isOpen, onClose]);                                   
+       24 -                                                             
+       25 -    // Prevent body scroll when open                         
+       26 -    useEffect(() => {                                        
+       27 -        document.body.style.overflow = isOpen ? "hidden" : "";
+          -                                                              
+       28 -        return () => { document.body.style.overflow = ""; }; 
+       29 -    }, [isOpen]);                                            
+       30 -                                                             
+       31 -    return (                                                 
+       32 -        <>                                                   
+       33 -            {/* Backdrop */}                                 
+       34 -            <div                                             
+       35 -                className={`drawer-backdrop${isOpen ? " drawer
+          --backdrop--visible" : ""}`}                                  
+       36 -                onClick={onClose}                            
+       37 -            />                                               
+       38 -                                                             
+       39 -            {/* Panel */}                                    
+       40 -            <aside className={`rule-drawer${isOpen ? " rule-dr
+          -awer--open" : ""}`}>                                         
+       41 -                {rule && (                                   
+       42 -                    <>                                       
+       43 -                        {/* Header */}                       
+       44 -                        <div className="rule-drawer__header">
+       45 -                            <div className="rule-drawer__heade
+          -r-left">                                                     
+       46 -                                <span className="rule-drawer__
+          -rule-id">{rule.rule_id}</span>                               
+       47 -                                {rule.cis_level && (         
+       48 -                                    <span className={`rule-car
+          -d__badge rule-card__badge--level-${rule.cis_level}`}>        
+       49 -                                        L{rule.cis_level}    
+       50 -                                    </span>                  
+       51 -                                )}                           
+       52 -                                <span className={`rule-card__b
+          -adge ${rule.automated ? "rule-card__badge--automated" : "rule-
+          -card__badge--manual"}`}>                                     
+       53 -                                    {rule.automated ? "Otomati
+          -k" : "Manuel"}                                               
+       54 -                                </span>                      
+       55 -                            </div>                           
+       56 -                            <button className="rule-drawer__cl
+          -ose" onClick={onClose} aria-label="Kapat">                   
+       57 -                                <svg viewBox="0 0 24 24" fill=
+          -"currentColor" width="20" height="20">                       
+       58 -                                    <path d="M19 6.41L17.59 5 
+          -12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59
+          - 19 19 17.59 13.41 12z" />                                   
+       59 -                                </svg>                       
+       60 -                            </button>                        
+       61 -                        </div>                               
+       62 -                                                             
+       63 -                        {/* Title */}                        
+       64 -                        <h2 className="rule-drawer__title">{ru
+          -le.title}</h2>                                               
+       65 -                                                             
+       66 -                        {/* Meta row */}                     
+       67 -                        <div className="rule-drawer__meta">  
+       68 -                            {rule.severity && (              
+       69 -                                <div className="rule-drawer__m
+          -eta-item">                                                   
+       70 -                                    <span className="rule-draw
+          -er__meta-label">Önem</span>                                  
+       71 -                                    <span className={`rule-car
+          -d__severity rule-card__severity--${rule.severity}`}>         
+       72 -                                        {rule.severity}      
+       73 -                                    </span>                  
+       74 -                                </div>                       
+       75 -                            )}                               
+       76 -                            {rule.category && (              
+       77 -                                <div className="rule-drawer__m
+          -eta-item">                                                   
+       78 -                                    <span className="rule-draw
+          -er__meta-label">Kategori</span>                              
+       79 -                                    <span className="rule-draw
+          -er__meta-value">{rule.category}</span>                       
+       80 -                                </div>                       
+       81 -                            )}                               
+       82 -                            {rule.subcategory && (           
+       83 -                                <div className="rule-drawer__m
+          -eta-item">                                                   
+       84 -                                    <span className="rule-draw
+          -er__meta-label">Alt Kategori</span>                          
+       85 -                                    <span className="rule-draw
+          -er__meta-value">{rule.subcategory}</span>                    
+       86 -                                </div>                       
+       87 -                            )}                               
+       88 -                            <div className="rule-drawer__meta-
+          -item">                                                       
+       89 -                                <span className="rule-drawer__
+          -meta-label">Bölüm</span>                                     
+       90 -                                <span className="rule-drawer__
+          -meta-value">{rule.section}</span>                            
+       91 -                            </div>                           
+       92 -                        </div>                               
+       93 -                                                             
+       94 -                        {/* Brief description placeholder */}
+       95 -                        <div className="rule-drawer__section">
+          -                                                              
+       96 -                            <h3 className="rule-drawer__sectio
+          -n-title">Kısa Açıklama</h3>                                  
+       97 -                            <p className="rule-drawer__placeho
+          -lder">                                                       
+       98 -                                Bu kural için açıklama henüz e
+          -klenmedi.                                                    
+       99 -                            </p>                             
+      100 -                        </div>                               
+      101 -                                                             
+      102 -                        {/* Spacer */}                       
+      103 -                        <div style={{ flex: 1 }} />          
+      104 -                                                             
+      105 -                        {/* Footer */}                       
+      106 -                        <div className="rule-drawer__footer">
+      107 -                            <button                          
+      108 -                                className="rule-drawer__detail
+          --btn"                                                        
+      109 -                                onClick={() => navigate(`/rule
+          -/${encodeURIComponent(rule.rule_id)}`)}                      
+      110 -                            >                                
+      111 -                                <svg viewBox="0 0 24 24" fill=
+          -"currentColor" width="16" height="16">                       
+      112 -                                    <path d="M12 2C6.48 2 2 6.
+          -48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2
+          -v6zm0-8h-2V7h2v2z" />                                        
+      113 -                                </svg>                       
+      114 -                                Detaylı Açıklama             
+      115 -                            </button>                        
+      116 -                        </div>                               
+      117 -                    </>                                      
+      118 -                )}                                           
+      119 -            </aside>                                         
+      120 -        </>                                                  
+      121 -    );                                                       
+      122 -}                                                            
+        1 +/* RuleDrawer – sliding panel that opens when a rule's info bu
+          +tton is clicked */                                            
+        2 +                                                              
+        3 +import { useEffect } from "react";                            
+        4 +import type { RuleItem } from "../types";                     
+        5 +                                                              
+        6 +interface Props {                                             
+        7 +    rule: RuleItem | null;                                    
+        8 +    onClose: () => void;                                      
+        9 +    onOpenDetail: (rule: RuleItem) => void;                   
+       10 +}                                                             
+       11 +                                                              
+       12 +export default function RuleDrawer({ rule, onClose, onOpenDeta
+          +il }: Props) {                                                
+       13 +    const isOpen = rule !== null;                             
+       14 +                                                              
+       15 +    // Close on Escape key                                    
+       16 +    useEffect(() => {                                         
+       17 +        const handleKey = (e: KeyboardEvent) => {             
+       18 +            if (e.key === "Escape") onClose();                
+       19 +        };                                                    
+       20 +        if (isOpen) document.addEventListener("keydown", handl
+          +eKey);                                                        
+       21 +        return () => document.removeEventListener("keydown", h
+          +andleKey);                                                    
+       22 +    }, [isOpen, onClose]);                                    
+       23 +                                                              
+       24 +    // Prevent body scroll when open                          
+       25 +    useEffect(() => {                                         
+       26 +        document.body.style.overflow = isOpen ? "hidden" : "";
+       27 +        return () => { document.body.style.overflow = ""; };  
+       28 +    }, [isOpen]);                                             
+       29 +                                                              
+       30 +    return (                                                  
+       31 +        <>                                                    
+       32 +            {/* Backdrop */}                                  
+       33 +            <div                                              
+       34 +                className={`drawer-backdrop${isOpen ? " drawer
+          +-backdrop--visible" : ""}`}                                   
+       35 +                onClick={onClose}                             
+       36 +            />                                                
+       37 +                                                              
+       38 +            {/* Panel */}                                     
+       39 +            <aside className={`rule-drawer${isOpen ? " rule-dr
+          +awer--open" : ""}`}>                                          
+       40 +                {rule && (                                    
+       41 +                    <>                                        
+       42 +                        {/* Header */}                        
+       43 +                        <div className="rule-drawer__header"> 
+       44 +                            <div className="rule-drawer__heade
+          +r-left">                                                      
+       45 +                                <span className="rule-drawer__
+          +rule-id">{rule.rule_id}</span>                                
+       46 +                                {rule.cis_level && (          
+       47 +                                    <span className={`rule-car
+          +d__badge rule-card__badge--level-${rule.cis_level}`}>         
+       48 +                                        L{rule.cis_level}     
+       49 +                                    </span>                   
+       50 +                                )}                            
+       51 +                                <span className={`rule-card__b
+          +adge ${rule.automated ? "rule-card__badge--automated" : "rule-
+          +card__badge--manual"}`}>                                      
+       52 +                                    {rule.automated ? "Otomati
+          +k" : "Manuel"}                                                
+       53 +                                </span>                       
+       54 +                            </div>                            
+       55 +                            <button className="rule-drawer__cl
+          +ose" onClick={onClose} aria-label="Kapat">                    
+       56 +                                <svg viewBox="0 0 24 24" fill=
+          +"currentColor" width="20" height="20">                        
+       57 +                                    <path d="M19 6.41L17.59 5 
+          +12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59
+          + 19 19 17.59 13.41 12z" />                                    
+       58 +                                </svg>                        
+       59 +                            </button>                         
+       60 +                        </div>                                
+       61 +                                                              
+       62 +                        {/* Title */}                         
+       63 +                        <h2 className="rule-drawer__title">{ru
+          +le.title}</h2>                                                
+       64 +                                                              
+       65 +                        {/* Meta row */}                      
+       66 +                        <div className="rule-drawer__meta">   
+       67 +                            {rule.severity && (               
+       68 +                                <div className="rule-drawer__m
+          +eta-item">                                                    
+       69 +                                    <span className="rule-draw
+          +er__meta-label">Önem</span>                                   
+       70 +                                    <span className={`rule-car
+          +d__severity rule-card__severity--${rule.severity}`}>          
+       71 +                                        {rule.severity}       
+       72 +                                    </span>                   
+       73 +                                </div>                        
+       74 +                            )}                                
+       75 +                            {rule.category && (               
+       76 +                                <div className="rule-drawer__m
+          +eta-item">                                                    
+       77 +                                    <span className="rule-draw
+          +er__meta-label">Kategori</span>                               
+       78 +                                    <span className="rule-draw
+          +er__meta-value">{rule.category}</span>                        
+       79 +                                </div>                        
+       80 +                            )}                                
+       81 +                            {rule.subcategory && (            
+       82 +                                <div className="rule-drawer__m
+          +eta-item">                                                    
+       83 +                                    <span className="rule-draw
+          +er__meta-label">Alt Kategori</span>                           
+       84 +                                    <span className="rule-draw
+          +er__meta-value">{rule.subcategory}</span>                     
+       85 +                                </div>                        
+       86 +                            )}                                
+       87 +                            <div className="rule-drawer__meta-
+          +item">                                                        
+       88 +                                <span className="rule-drawer__
+          +meta-label">Bölüm</span>                                      
+       89 +                                <span className="rule-drawer__
+          +meta-value">{rule.section}</span>                             
+       90 +                            </div>                            
+       91 +                        </div>                                
+       92 +                                                              
+       93 +                        {/* Brief description placeholder */} 
+       94 +                        <div className="rule-drawer__section">
+       95 +                            <h3 className="rule-drawer__sectio
+          +n-title">Kısa Açıklama</h3>                                   
+       96 +                            <p className="rule-drawer__placeho
+          +lder">                                                        
+       97 +                                Bu kural için açıklama henüz e
+          +klenmedi.                                                     
+       98 +                            </p>                              
+       99 +                        </div>                                
+      100 +                                                              
+      101 +                        {/* Spacer */}                        
+      102 +                        <div style={{ flex: 1 }} />           
+      103 +                                                              
+      104 +                        {/* Footer */}                        
+      105 +                        <div className="rule-drawer__footer"> 
+      106 +                            <button                           
+      107 +                                className="rule-drawer__detail
+          +-btn"                                                         
+      108 +                                onClick={() => {              
+      109 +                                    onClose();                
+      110 +                                    onOpenDetail(rule);       
+      111 +                                }}                            
+      112 +                            >                                 
+      113 +                                <svg viewBox="0 0 24 24" fill=
+          +"currentColor" width="16" height="16">                        
+      114 +                                    <path d="M12 2C6.48 2 2 6.
+          +48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2
+          +v6zm0-8h-2V7h2v2z" />                                         
+      115 +                                </svg>                        
+      116 +                                Detaylı Açıklama              
+      117 +                            </button>                         
+      118 +                        </div>                                
+      119 +                    </>                                       
+      120 +                )}                                            
+      121 +            </aside>                                          
+      122 +        </>                                                   
+      123 +    );                                                        
+      124 +}                                                             
+
+● Write(src\pages\RuleDetailPage.tsx)
+  ⎿  Added 110 lines, removed 117 lines
+        1 -/* RuleDetailPage – full-page detailed description for a singl
+          -e rule */                                                    
+        2 -                                                             
+        3 -import { useParams, useNavigate } from "react-router-dom";   
+        4 -import { useHardening } from "../context/HardeningContext";  
+        5 -                                                             
+        6 -export default function RuleDetailPage() {                   
+        7 -    const { ruleId } = useParams<{ ruleId: string }>();      
+        8 -    const navigate = useNavigate();                          
+        9 -    const { state } = useHardening();                        
+       10 -                                                             
+       11 -    const decoded = ruleId ? decodeURIComponent(ruleId) : "";
+       12 -    const rule = state.rules.find((r) => r.rule_id === decoded
+          -);                                                           
+       13 -                                                             
+       14 -    return (                                                 
+       15 -        <div className="detail-page">                        
+       16 -            {/* Top bar */}                                  
+       17 -            <div className="detail-page__topbar">            
+       18 -                <button className="detail-page__back" onClick=
+          -{() => navigate(-1)}>                                        
+       19 -                    <svg viewBox="0 0 24 24" fill="currentColo
+          -r" width="18" height="18">                                   
+       20 -                        <path d="M20 11H7.83l5.59-5.59L12 4l-8
+          - 8 8 8 1.41-1.41L7.83 13H20v-2z" />                          
+       21 -                    </svg>                                   
+       22 -                    Geri Dön                                 
+       23 -                </button>                                    
+       24 -            </div>                                           
+       25 -                                                             
+       26 -            {!rule ? (                                       
+       27 -                <div className="detail-page__content">       
+       28 -                    <div className="empty-state">            
+       29 -                        <svg className="empty-state__icon" vie
+          -wBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth
+          -="1.5">                                                      
+       30 -                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 
+          -0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 
+          -0 01.293.707V19a2 2 0 01-2 2z" />                            
+       31 -                        </svg>                               
+       32 -                        <div className="empty-state__title">Ku
+          -ral bulunamadı</div>                                         
+       33 -                        <div className="empty-state__text">  
+       34 -                            <code style={{ fontFamily: "var(--
+          -font-mono)", fontSize: "0.8rem" }}>{decoded}</code> kimliğine 
+          -sahip bir kural mevcut değil.                                
+       35 -                        </div>                               
+       36 -                    </div>                                   
+       37 -                </div>                                       
+       38 -            ) : (                                            
+       39 -                <div className="detail-page__content">       
+       40 -                    {/* Hero */}                             
+       41 -                    <div className="detail-page__hero">      
+       42 -                        <span className="rule-drawer__rule-id"
+          - style={{ fontSize: "1rem" }}>{rule.rule_id}</span>          
+       43 -                        <h1 className="detail-page__title">{ru
+          -le.title}</h1>                                               
+       44 -                                                             
+       45 -                        {/* Badges */}                       
+       46 -                        <div className="rule-card__meta" style
+          -={{ marginTop: "var(--sp-md)" }}>                            
+       47 -                            {rule.cis_level && (             
+       48 -                                <span className={`rule-card__b
+          -adge rule-card__badge--level-${rule.cis_level}`}>            
+       49 -                                    CIS Level {rule.cis_level}
+          -                                                              
+       50 -                                </span>                      
+       51 -                            )}                               
+       52 -                            <span className={`rule-card__badge
+          - ${rule.automated ? "rule-card__badge--automated" : "rule-card
+          -__badge--manual"}`}>                                         
+       53 -                                {rule.automated ? "Otomatik" :
+          - "Manuel"}                                                   
+       54 -                            </span>                          
+       55 -                            {rule.severity && (              
+       56 -                                <span className={`rule-card__s
+          -everity rule-card__severity--${rule.severity}`}>             
+       57 -                                    {rule.severity}          
+       58 -                                </span>                      
+       59 -                            )}                               
+       60 -                            {rule.tags?.map((tag) => (       
+       61 -                                <span key={tag} className="det
+          -ail-page__tag">{tag}</span>                                  
+       62 -                            ))}                              
+       63 -                        </div>                               
+       64 -                    </div>                                   
+       65 -                                                             
+       66 -                    {/* Meta grid */}                        
+       67 -                    <div className="detail-page__meta-grid"> 
+       68 -                        <div className="detail-page__meta-card
+          -">                                                           
+       69 -                            <span className="detail-page__meta
+          --label">Bölüm</span>                                         
+       70 -                            <span className="detail-page__meta
+          --val">{rule.section}</span>                                  
+       71 -                        </div>                               
+       72 -                        {rule.category && (                  
+       73 -                            <div className="detail-page__meta-
+          -card">                                                       
+       74 -                                <span className="detail-page__
+          -meta-label">Kategori</span>                                  
+       75 -                                <span className="detail-page__
+          -meta-val">{rule.category}</span>                             
+       76 -                            </div>                           
+       77 -                        )}                                   
+       78 -                        {rule.subcategory && (               
+       79 -                            <div className="detail-page__meta-
+          -card">                                                       
+       80 -                                <span className="detail-page__
+          -meta-label">Alt Kategori</span>                              
+       81 -                                <span className="detail-page__
+          -meta-val">{rule.subcategory}</span>                          
+       82 -                            </div>                           
+       83 -                        )}                                   
+       84 -                        <div className="detail-page__meta-card
+          -">                                                           
+       85 -                            <span className="detail-page__meta
+          --label">İşletim Sistemi</span>                               
+       86 -                            <span className="detail-page__meta
+          --val">{rule.os}</span>                                       
+       87 -                        </div>                               
+       88 -                    </div>                                   
+       89 -                                                             
+       90 -                    {/* Description placeholder */}          
+       91 -                    <div className="detail-page__section">   
+       92 -                        <h2 className="detail-page__section-ti
+          -tle">Açıklama</h2>                                           
+       93 -                        <div className="detail-page__placehold
+          -er-block">                                                   
+       94 -                            <p>Bu kural için detaylı açıklama 
+          -henüz eklenmedi.</p>                                         
+       95 -                        </div>                               
+       96 -                    </div>                                   
+       97 -                                                             
+       98 -                    {/* Rationale placeholder */}            
+       99 -                    <div className="detail-page__section">   
+      100 -                        <h2 className="detail-page__section-ti
+          -tle">Gerekçe</h2>                                            
+      101 -                        <div className="detail-page__placehold
+          -er-block">                                                   
+      102 -                            <p>Bu kural için gerekçe henüz ekl
+          -enmedi.</p>                                                  
+      103 -                        </div>                               
+      104 -                    </div>                                   
+      105 -                                                             
+      106 -                    {/* Remediation placeholder */}          
+      107 -                    <div className="detail-page__section">   
+      108 -                        <h2 className="detail-page__section-ti
+          -tle">Düzeltme Adımları</h2>                                  
+      109 -                        <div className="detail-page__placehold
+          -er-block">                                                   
+      110 -                            <p>Bu kural için düzeltme adımları
+          - henüz eklenmedi.</p>                                        
+      111 -                        </div>                               
+      112 -                    </div>                                   
+      113 -                </div>                                       
+      114 -            )}                                               
+      115 -        </div>                                               
+      116 -    );                                                       
+      117 -}                                                            
+        1 +/* RuleDetailPage – full-screen overlay with detailed descript
+          +ion for a rule */                                             
+        2 +                                                              
+        3 +import { useEffect } from "react";                            
+        4 +import type { RuleItem } from "../types";                     
+        5 +                                                              
+        6 +interface Props {                                             
+        7 +    rule: RuleItem;                                           
+        8 +    onClose: () => void;                                      
+        9 +}                                                             
+       10 +                                                              
+       11 +export default function RuleDetailPage({ rule, onClose }: Prop
+          +s) {                                                          
+       12 +    // Close on Escape                                        
+       13 +    useEffect(() => {                                         
+       14 +        const handleKey = (e: KeyboardEvent) => {             
+       15 +            if (e.key === "Escape") onClose();                
+       16 +        };                                                    
+       17 +        document.addEventListener("keydown", handleKey);      
+       18 +        return () => document.removeEventListener("keydown", h
+          +andleKey);                                                    
+       19 +    }, [onClose]);                                            
+       20 +                                                              
+       21 +    return (                                                  
+       22 +        <div className="detail-page detail-page--visible">    
+       23 +            {/* Top bar */}                                   
+       24 +            <div className="detail-page__topbar">             
+       25 +                <button className="detail-page__back" onClick=
+          +{onClose}>                                                    
+       26 +                    <svg viewBox="0 0 24 24" fill="currentColo
+          +r" width="18" height="18">                                    
+       27 +                        <path d="M20 11H7.83l5.59-5.59L12 4l-8
+          + 8 8 8 1.41-1.41L7.83 13H20v-2z" />                           
+       28 +                    </svg>                                    
+       29 +                    Geri Dön                                  
+       30 +                </button>                                     
+       31 +            </div>                                            
+       32 +                                                              
+       33 +            <div className="detail-page__content">            
+       34 +                {/* Hero */}                                  
+       35 +                <div className="detail-page__hero">           
+       36 +                    <span className="rule-drawer__rule-id" sty
+          +le={{ fontSize: "1rem" }}>{rule.rule_id}</span>               
+       37 +                    <h1 className="detail-page__title">{rule.t
+          +itle}</h1>                                                    
+       38 +                                                              
+       39 +                    {/* Badges */}                            
+       40 +                    <div className="rule-card__meta" style={{ 
+          +marginTop: "var(--sp-md)" }}>                                 
+       41 +                        {rule.cis_level && (                  
+       42 +                            <span className={`rule-card__badge
+          + rule-card__badge--level-${rule.cis_level}`}>                 
+       43 +                                CIS Level {rule.cis_level}    
+       44 +                            </span>                           
+       45 +                        )}                                    
+       46 +                        <span className={`rule-card__badge ${r
+          +ule.automated ? "rule-card__badge--automated" : "rule-card__ba
+          +dge--manual"}`}>                                              
+       47 +                            {rule.automated ? "Otomatik" : "Ma
+          +nuel"}                                                        
+       48 +                        </span>                               
+       49 +                        {rule.severity && (                   
+       50 +                            <span className={`rule-card__sever
+          +ity rule-card__severity--${rule.severity}`}>                  
+       51 +                                {rule.severity}               
+       52 +                            </span>                           
+       53 +                        )}                                    
+       54 +                        {rule.tags?.map((tag) => (            
+       55 +                            <span key={tag} className="detail-
+          +page__tag">{tag}</span>                                       
+       56 +                        ))}                                   
+       57 +                    </div>                                    
+       58 +                </div>                                        
+       59 +                                                              
+       60 +                {/* Meta grid */}                             
+       61 +                <div className="detail-page__meta-grid">      
+       62 +                    <div className="detail-page__meta-card">  
+       63 +                        <span className="detail-page__meta-lab
+          +el">Bölüm</span>                                              
+       64 +                        <span className="detail-page__meta-val
+          +">{rule.section}</span>                                       
+       65 +                    </div>                                    
+       66 +                    {rule.category && (                       
+       67 +                        <div className="detail-page__meta-card
+          +">                                                            
+       68 +                            <span className="detail-page__meta
+          +-label">Kategori</span>                                       
+       69 +                            <span className="detail-page__meta
+          +-val">{rule.category}</span>                                  
+       70 +                        </div>                                
+       71 +                    )}                                        
+       72 +                    {rule.subcategory && (                    
+       73 +                        <div className="detail-page__meta-card
+          +">                                                            
+       74 +                            <span className="detail-page__meta
+          +-label">Alt Kategori</span>                                   
+       75 +                            <span className="detail-page__meta
+          +-val">{rule.subcategory}</span>                               
+       76 +                        </div>                                
+       77 +                    )}                                        
+       78 +                    <div className="detail-page__meta-card">  
+       79 +                        <span className="detail-page__meta-lab
+          +el">İşletim Sistemi</span>                                    
+       80 +                        <span className="detail-page__meta-val
+          +">{rule.os}</span>                                            
+       81 +                    </div>                                    
+       82 +                </div>                                        
+       83 +                                                              
+       84 +                {/* Description placeholder */}               
+       85 +                <div className="detail-page__section">        
+       86 +                    <h2 className="detail-page__section-title"
+          +>Açıklama</h2>                                                
+       87 +                    <div className="detail-page__placeholder-b
+          +lock">                                                        
+       88 +                        <p>Bu kural için detaylı açıklama henü
+          +z eklenmedi.</p>                                              
+       89 +                    </div>                                    
+       90 +                </div>                                        
+       91 +                                                              
+       92 +                {/* Rationale placeholder */}                 
+       93 +                <div className="detail-page__section">        
+       94 +                    <h2 className="detail-page__section-title"
+          +>Gerekçe</h2>                                                 
+       95 +                    <div className="detail-page__placeholder-b
+          +lock">                                                        
+       96 +                        <p>Bu kural için gerekçe henüz eklenme
+          +di.</p>                                                       
+       97 +                    </div>                                    
+       98 +                </div>                                        
+       99 +                                                              
+      100 +                {/* Remediation placeholder */}               
+      101 +                <div className="detail-page__section">        
+      102 +                    <h2 className="detail-page__section-title"
+          +>Düzeltme Adımları</h2>                                       
+      103 +                    <div className="detail-page__placeholder-b
+          +lock">                                                        
+      104 +                        <p>Bu kural için düzeltme adımları hen
+          +üz eklenmedi.</p>                                             
+      105 +                    </div>                                    
+      106 +                </div>                                        
+      107 +            </div>                                            
+      108 +        </div>                                                
+      109 +    );                                                        
+      110 +}                                                             
+
+● Now update App.tsx — no router, just state:
+
+● Write(src\App.tsx)
+  ⎿  Added 18 lines, removed 19 lines
+      1  /* Main App component – assembles the full dashboard layout */
+      2  
+      3  import { useState } from "react";
+      4 -import { BrowserRouter, Routes, Route } from "react-router-dom";
+      4  import { HardeningProvider, useHardening } from "./context/Harde
+         ningContext";
+      5  import OsSelector from "./components/OsSelector";
+      6  import FilterSidebar from "./components/FilterSidebar";
+     ...
+      15    const { state, runResolve } = useHardening();
+      16    const selectedCount = state.selectedRuleIds.size;
+      17  
+      19 -  const [activeRule, setActiveRule] = useState<RuleItem | null>
+         -(null);                                                        
+      18 +  const [drawerRule, setDrawerRule] = useState<RuleItem | null>
+         +(null);                                                        
+      19 +  const [detailRule, setDetailRule] = useState<RuleItem | null>
+         +(null);                                                        
+      20  
+      21    return (
+      22      <>
+     ...
+       85          <ValidationPanel />
+       86  
+       87          {/* Rule list */}
+       88 -        <RuleList onInfoClick={setActiveRule} />              
+       88 +        <RuleList onInfoClick={setDrawerRule} />              
+       89        </main>
+       90  
+       91        {/* Rule info drawer */}
+       92 -      <RuleDrawer rule={activeRule} onClose={() => setActiveRu
+          -le(null)} />                                                  
+       92 +      <RuleDrawer                                             
+       93 +        rule={drawerRule}                                     
+       94 +        onClose={() => setDrawerRule(null)}                   
+       95 +        onOpenDetail={(rule) => setDetailRule(rule)}          
+       96 +      />                                                      
+       97 +                                                              
+       98 +      {/* Rule detail full-page overlay */}                   
+       99 +      {detailRule && (                                        
+      100 +        <RuleDetailPage rule={detailRule} onClose={() => setDe
+          +tailRule(null)} />                                            
+      101 +      )}                                                      
+      102      </>
+      103    );
+      104  }
+      105  
+      106  export default function App() {
+      107    return (
+       99 -    <BrowserRouter>                                           
+      100 -      <HardeningProvider>                                     
+      101 -        <Routes>                                              
+      102 -          <Route                                              
+      103 -            path="/"                                          
+      104 -            element={                                         
+      105 -              <div className="app-layout">                    
+      106 -                <Dashboard />                                 
+      107 -              </div>                                          
+      108 -            }                                                 
+      109 -          />                                                  
+      110 -          <Route path="/rule/:ruleId" element={<RuleDetailPage
+          - />} />                                                       
+      111 -        </Routes>                                             
+      112 -      </HardeningProvider>                                    
+      113 -    </BrowserRouter>                                          
+      108 +    <HardeningProvider>                                       
+      109 +      <div className="app-layout">                            
+      110 +        <Dashboard />                                         
+      111 +      </div>                                                  
+      112 +    </HardeningProvider>                                      
+      113    );
+      114  }
+
+● Now update the CSS for the detail page — it should be a fixed full-screen
+  overlay that slides in from the right:
+
+● Update(src\index.css)
+  ⎿  Added 13 lines, removed 3 lines
+      1354  }
+      1355  
+      1356  
+      1357 -/* ── Rule Detail Page ──────────────────────────────────────
+           -────────────────── */                                        
+      1357 +/* ── Rule Detail Page (full-screen overlay) ────────────────
+           +────────────────── */                                        
+      1358  
+      1359  .detail-page {
+      1360 -  min-height: 100vh;                                         
+      1360 +  position: fixed;                                           
+      1361 +  inset: 0;                                                  
+      1362 +  z-index: 300;                                              
+      1363    background: var(--bg-primary);
+      1364    display: flex;
+      1365    flex-direction: column;
+      1366 +  transform: translateX(100%);                               
+      1367 +  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);   
+      1368 +  overflow-y: auto;                                          
+      1369  }
+      1370  
+      1371 +.detail-page--visible {                                      
+      1372 +  transform: translateX(0);                                  
+      1373 +}                                                            
+      1374 +                                                             
+      1375  .detail-page__topbar {
+      1376    position: sticky;
+      1377    top: 0;
+      1378    z-index: 10;
+      1379    padding: var(--sp-md) var(--sp-xl);
+      1371 -  background: rgba(15, 17, 23, 0.85);                        
+      1380 +  background: rgba(15, 17, 23, 0.92);                        
+      1381    backdrop-filter: blur(16px);
+      1382    border-bottom: 1px solid var(--border);
+      1383 +  flex-shrink: 0;                                            
+      1384  }
+      1385  
+      1386  .detail-page__back {
+
+● Now verify the build is clean:
+
+● Bash(cd /c/Users/cagri/OneDrive/Belgeler/GitHub/sh-bitirme-proje/web/frontend
+      && npm run build 2>&1)
+  ⎿  > frontend@0.0.0 build
+     > tsc -b && vite build
+     … +9 lines (ctrl+o to expand)
+  ⎿  (timeout 1m)
+
+● Clean build. Here's what changed and why:
+
+  ---
+  Root cause fix: Removed react-router-dom entirely. The v7 library has a
+  complex new architecture (designed for Remix/framework mode) that can cause
+  silent runtime issues with HMR and React 19 strict mode — even when TypeScript
+   types check out cleanly.
+
+  New architecture (no router needed):
+
+  ┌───────────────┬─────────────────────────────────────────────────────────┐
+  │     What      │                           How                           │
+  ├───────────────┼─────────────────────────────────────────────────────────┤
+  │ Info button   │ Shows on hover, opens the drawer                        │
+  │ on rule card  │                                                         │
+  ├───────────────┼─────────────────────────────────────────────────────────┤
+  │ Sliding       │ RuleDrawer — slides in from right, close via ×,         │
+  │ drawer        │ backdrop click, or Escape                               │
+  ├───────────────┼─────────────────────────────────────────────────────────┤
+  │ "Detaylı      │                                                         │
+  │ Açıklama"     │ Closes drawer, opens the detail page                    │
+  │ button        │                                                         │
+  ├───────────────┼─────────────────────────────────────────────────────────┤
+  │               │ RuleDetailPage — a position: fixed full-screen overlay  │
+  │ Detail "page" │ that slides in from the right with a 400ms animation.   │
+  │               │ Close via "Geri Dön" button or Escape                   │
+  └───────────────┴─────────────────────────────────────────────────────────┘
+
+  The bundle is also 37 KB smaller (220 KB vs 257 KB) since react-router-dom is
+  gone. Please do a hard refresh (Ctrl+F5) in your browser to clear any cached
+  module state from the previous version.
+
+✻ Brewed for 8m 54s
+
+> /usage 
+  ⎿  Status dialog dismissed
+
+> /usage 
+  ⎿  Status dialog dismissed
+
+> /skills 
+  ⎿  Skills dialog dismissed
+
+> /status 
+  ⎿  Status dialog dismissed
+
+> /doctor 
+  ⎿  Claude Code diagnostics dismissed
+
+> /context 
+  ⎿  Context Usage
+     ⛁ ⛀ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁   claude-sonnet-4-6 · 104k/200k tokens (52%)
+     ⛁ ⛀ ⛀ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ 
+     ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁   Estimated usage by category
+     ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁   ⛁ System prompt: 3.4k tokens (1.7%)
+     ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁   ⛁ System tools: 17.5k tokens (8.7%)
+     ⛁ ⛁ ⛁ ⛁ ⛁ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ Custom agents: 61 tokens (0.0%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ Skills: 84 tokens (0.0%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ Messages: 84.6k tokens (42.3%)
+     ⛶ ⛶ ⛶ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝   ⛶ Free space: 61k (30.7%)
+     ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝   ⛝ Autocompact buffer: 33k tokens (16.5%)
+
+     Custom agents · /agents
+
+     Project
+     └ shell-scripting-pro: 61 tokens
+
+     Skills · /skills

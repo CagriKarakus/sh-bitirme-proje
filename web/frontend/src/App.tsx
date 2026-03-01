@@ -1,15 +1,22 @@
 /* Main App component – assembles the full dashboard layout */
 
+import { useState } from "react";
 import { HardeningProvider, useHardening } from "./context/HardeningContext";
 import OsSelector from "./components/OsSelector";
 import FilterSidebar from "./components/FilterSidebar";
 import RuleList from "./components/RuleList";
 import ValidationPanel from "./components/ValidationPanel";
+import RuleDrawer from "./components/RuleDrawer";
+import RuleDetailPage from "./pages/RuleDetailPage";
+import type { RuleItem } from "./types";
 import "./index.css";
 
 function Dashboard() {
   const { state, runResolve } = useHardening();
   const selectedCount = state.selectedRuleIds.size;
+
+  const [drawerRule, setDrawerRule] = useState<RuleItem | null>(null);
+  const [detailRule, setDetailRule] = useState<RuleItem | null>(null);
 
   return (
     <>
@@ -78,8 +85,20 @@ function Dashboard() {
         <ValidationPanel />
 
         {/* Rule list */}
-        <RuleList />
+        <RuleList onInfoClick={setDrawerRule} />
       </main>
+
+      {/* Rule info drawer */}
+      <RuleDrawer
+        rule={drawerRule}
+        onClose={() => setDrawerRule(null)}
+        onOpenDetail={(rule) => setDetailRule(rule)}
+      />
+
+      {/* Rule detail full-page overlay */}
+      {detailRule && (
+        <RuleDetailPage rule={detailRule} onClose={() => setDetailRule(null)} />
+      )}
     </>
   );
 }

@@ -5,7 +5,11 @@ import { useHardening } from "../context/HardeningContext";
 import RuleCard from "./RuleCard";
 import type { RuleItem } from "../types";
 
-export default function RuleList() {
+interface Props {
+    onInfoClick: (rule: RuleItem) => void;
+}
+
+export default function RuleList({ onInfoClick }: Props) {
     const { state, selectSection } = useHardening();
     const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
@@ -115,7 +119,7 @@ export default function RuleList() {
                         {isOpen && (
                             <div className="section-rules">
                                 {rules.map((rule) => (
-                                    <RuleCard key={rule.rule_id} rule={rule} />
+                                    <RuleCard key={rule.rule_id} rule={rule} onInfoClick={onInfoClick} />
                                 ))}
                             </div>
                         )}
