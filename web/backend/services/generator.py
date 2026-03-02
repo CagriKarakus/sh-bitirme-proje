@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
+import os
 import shutil
-import subprocess
+import time
 import uuid
 import zipfile
 from datetime import datetime
@@ -18,6 +20,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 # Temporary artifact storage
 ARTIFACTS_DIR = Path(__file__).resolve().parent.parent / "artifacts"
 ARTIFACTS_DIR.mkdir(exist_ok=True)
+
+# Artifact eviction TTL
+ARTIFACT_TTL_DAYS = int(os.environ.get("ARTIFACT_TTL_DAYS", "30"))
+
+# ── Windows rule index (lazy, module-level) ───────────────────────────────────
+# Built once on first use: rule_id → {"data": dict, "path": Path}
+_windows_rule_index: dict[str, dict] | None = None
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -47,11 +56,32 @@ def delete_artifact(artifact_id: str) -> None:
         shutil.rmtree(art_dir, ignore_errors=True)
 
 
+def _write_sha256_sidecar(artifact_dir: Path, file_path: Path) -> None:
+    """Write SHA-256 of file_path to {artifact_dir}/.sha256."""
+    digest = _sha256(file_path)
+    (artifact_dir / ".sha256").write_text(digest, encoding="ascii")
+
+
+def _read_sha256_sidecar(artifact_dir: Path) -> str | None:
+    """Read SHA-256 from sidecar file, return None if missing."""
+    sidecar = artifact_dir / ".sha256"
+    if sidecar.exists():
+        return sidecar.read_text(encoding="ascii").strip()
+    return None
+
+
 def _find_permanent_by_sha256(sha256: str) -> str | None:
-    """Return the artifact_id of an existing permanent artifact whose file matches sha256."""
+    """Return the artifact_id of an existing permanent artifact whose sha256 matches."""
     for art_dir in ARTIFACTS_DIR.iterdir():
         if not art_dir.is_dir() or not (art_dir / ".permanent").exists():
             continue
+        # Try sidecar first (fast)
+        cached = _read_sha256_sidecar(art_dir)
+        if cached is not None:
+            if cached == sha256:
+                return art_dir.name
+            continue
+        # Fallback: hash the actual file (backward compat for pre-sidecar artifacts)
         for f in art_dir.iterdir():
             if f.is_file() and not f.name.startswith(".") and not f.name.startswith("_"):
                 try:
@@ -162,6 +192,7 @@ def _generate_ubuntu_ansible(rule_ids: List[str]) -> dict:
     out_path.write_text(playbook_content, encoding="utf-8")
 
     sha256 = _sha256(out_path)
+    _write_sha256_sidecar(out_dir, out_path)
 
     msg = f"{len(tasks)} kural için Ansible playbook oluşturuldu."
     if skipped:
@@ -270,6 +301,7 @@ def _generate_ubuntu_bash(rule_ids: List[str]) -> dict:
     out_path.write_text(script_content, encoding="utf-8")
 
     sha256 = _sha256(out_path)
+    _write_sha256_sidecar(out_dir, out_path)
 
     msg = f"{len(tasks)} kural için Bash scripti oluşturuldu."
     if skipped:
@@ -284,43 +316,52 @@ def _generate_ubuntu_bash(rule_ids: List[str]) -> dict:
     }
 
 
+# ── Windows – Rule index ──────────────────────────────────────────────────────
+
+def _get_windows_rule_index() -> dict[str, dict]:
+    """Build (once) and return the module-level Windows rule index.
+
+    Index entry: rule_id → {"data": <full JSON dict>, "path": <Path>}
+    """
+    global _windows_rule_index
+    if _windows_rule_index is not None:
+        return _windows_rule_index
+
+    index: dict[str, dict] = {}
+    win_base = PROJECT_ROOT / "platforms" / "windows"
+    for rules_dir in [win_base / "rules", win_base / "manual_rules"]:
+        if not rules_dir.exists():
+            continue
+        for json_file in rules_dir.rglob("*.json"):
+            try:
+                with open(json_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                continue
+            rule_id = data.get("rule_id")
+            if rule_id:
+                index[rule_id] = {"data": data, "path": json_file}
+
+    _windows_rule_index = index
+    return _windows_rule_index
+
+
 # ── Windows – Helpers ────────────────────────────────────────────────────────
 
 def _load_windows_rule_json(rule_id: str) -> dict | None:
-    """Find and load a Windows rule JSON by rule_id."""
-    win_base = PROJECT_ROOT / "platforms" / "windows"
-
-    for rules_dir in [win_base / "rules", win_base / "manual_rules"]:
-        if not rules_dir.exists():
-            continue
-        for json_file in rules_dir.rglob("*.json"):
-            try:
-                with open(json_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                if data.get("rule_id") == rule_id:
-                    return data
-            except (json.JSONDecodeError, UnicodeDecodeError):
-                continue
-    return None
+    """Return a Windows rule data dict by rule_id (O(1) via index)."""
+    entry = _get_windows_rule_index().get(rule_id)
+    return entry["data"] if entry else None
 
 
 def _find_windows_rule_files(rule_ids: List[str]) -> list[Path]:
-    """Find the JSON file paths for given Windows rule IDs."""
-    win_base = PROJECT_ROOT / "platforms" / "windows"
+    """Return the JSON file paths for the given Windows rule IDs (O(N) via index)."""
+    index = _get_windows_rule_index()
     files = []
-    id_set = set(rule_ids)
-
-    for rules_dir in [win_base / "rules", win_base / "manual_rules"]:
-        if not rules_dir.exists():
-            continue
-        for json_file in rules_dir.rglob("*.json"):
-            try:
-                with open(json_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                if data.get("rule_id") in id_set:
-                    files.append(json_file)
-            except (json.JSONDecodeError, UnicodeDecodeError):
-                continue
+    for rid in rule_ids:
+        entry = index.get(rid)
+        if entry:
+            files.append(entry["path"])
     return files
 
 
@@ -471,6 +512,7 @@ def _generate_windows_ps1(rule_ids: List[str]) -> dict:
     out_path.write_text(script_content, encoding="utf-8-sig")
 
     sha256 = _sha256(out_path)
+    _write_sha256_sidecar(out_dir, out_path)
 
     msg = f"{len(rules_data)} kural için PowerShell scripti oluşturuldu."
     if skipped:
@@ -487,7 +529,7 @@ def _generate_windows_ps1(rule_ids: List[str]) -> dict:
 
 # ── Windows – GPO Backup ────────────────────────────────────────────────────
 
-def _generate_windows_gpo(rule_ids: List[str]) -> dict:
+async def _generate_windows_gpo(rule_ids: List[str]) -> dict:
     """Generate GPO backup by calling the existing PowerShell toolkit, then zip."""
 
     tools_dir = PROJECT_ROOT / "platforms" / "windows" / "tools"
@@ -554,23 +596,25 @@ Write-Host "GPO_OUTPUT_DIR=$gpoOutput"
     custom_script_path.write_text(custom_script, encoding="utf-8-sig")
 
     try:
-        result = subprocess.run(
-            ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(custom_script_path)],
-            capture_output=True,
-            text=True,
-            timeout=60,
+        proc = await asyncio.create_subprocess_exec(
+            "powershell", "-ExecutionPolicy", "Bypass", "-File", str(custom_script_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
             cwd=str(tools_dir),
         )
+        try:
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=60)
+        except asyncio.TimeoutError:
+            proc.kill()
+            return {"success": False, "message": "GPO oluşturma zaman aşımına uğradı (60s)."}
 
-        if result.returncode != 0:
-            error_msg = result.stderr.strip() if result.stderr else "Unknown error"
+        if proc.returncode != 0:
+            error_msg = stderr.decode(errors="replace").strip()
             return {
                 "success": False,
                 "message": f"GPO oluşturma hatası: {error_msg[:200]}",
             }
 
-    except subprocess.TimeoutExpired:
-        return {"success": False, "message": "GPO oluşturma zaman aşımına uğradı (60s)."}
     except FileNotFoundError:
         return {"success": False, "message": "PowerShell bulunamadı. GPO oluşturma için PowerShell gereklidir."}
 
@@ -595,6 +639,7 @@ Write-Host "GPO_OUTPUT_DIR=$gpoOutput"
     custom_script_path.unlink(missing_ok=True)
 
     sha256 = _sha256(zip_path)
+    _write_sha256_sidecar(out_dir, zip_path)
 
     return {
         "success": True,
@@ -605,9 +650,21 @@ Write-Host "GPO_OUTPUT_DIR=$gpoOutput"
     }
 
 
+# ── Artifact eviction ─────────────────────────────────────────────────────────
+
+def _cleanup_old_permanent_artifacts() -> None:
+    """Remove permanent artifacts older than ARTIFACT_TTL_DAYS."""
+    cutoff = time.time() - (ARTIFACT_TTL_DAYS * 86400)
+    for art_dir in ARTIFACTS_DIR.iterdir():
+        if not art_dir.is_dir() or not (art_dir / ".permanent").exists():
+            continue
+        if art_dir.stat().st_mtime < cutoff:
+            shutil.rmtree(art_dir, ignore_errors=True)
+
+
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def generate(os_name: str, rule_ids: List[str], fmt: str, permanent: bool = False) -> dict:
+async def generate(os_name: str, rule_ids: List[str], fmt: str, permanent: bool = False) -> dict:
     """Generate configuration artifact for the given OS and format."""
     if os_name == "ubuntu":
         if fmt == "bash":
@@ -616,7 +673,7 @@ def generate(os_name: str, rule_ids: List[str], fmt: str, permanent: bool = Fals
             result = _generate_ubuntu_ansible(rule_ids)
     elif os_name == "windows":
         if fmt == "gpo":
-            result = _generate_windows_gpo(rule_ids)
+            result = await _generate_windows_gpo(rule_ids)
         else:  # default: powershell
             result = _generate_windows_ps1(rule_ids)
     else:
@@ -651,10 +708,23 @@ def get_artifact_info(artifact_id: str) -> dict | None:
     """Return filename and sha256 for an existing permanent artifact, or None if not found."""
     if not is_artifact_permanent(artifact_id):
         return None
+    art_dir = ARTIFACTS_DIR / artifact_id
     file_path = get_artifact_path(artifact_id)
     if not file_path or not file_path.exists():
         return None
+    # Use sidecar if available, else compute and cache it
+    sha256 = _read_sha256_sidecar(art_dir)
+    if sha256 is None:
+        sha256 = _sha256(file_path)
+        _write_sha256_sidecar(art_dir, file_path)
     return {
         "filename": file_path.name,
-        "sha256": _sha256(file_path),
+        "sha256": sha256,
     }
+
+
+# ── Module startup: evict old artifacts ───────────────────────────────────────
+try:
+    _cleanup_old_permanent_artifacts()
+except Exception:
+    pass  # Never fail startup due to cleanup errors

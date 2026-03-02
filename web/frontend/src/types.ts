@@ -46,7 +46,7 @@ export interface ResolveRequest {
 export interface GenerateRequest {
   os: string;
   rule_ids: string[];
-  format: string;
+  format: "ansible" | "bash" | "gpo" | "powershell";
   permanent: boolean;
 }
 

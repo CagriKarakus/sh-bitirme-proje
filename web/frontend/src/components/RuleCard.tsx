@@ -1,30 +1,30 @@
 /* RuleCard – individual rule display with checkbox and info button */
 
+import { memo } from "react";
 import type { RuleItem } from "../types";
-import { useHardening } from "../context/HardeningContext";
 import { useLocale } from "../context/LocaleContext";
 
 interface Props {
     rule: RuleItem;
+    isSelected: boolean;
+    onToggle: (id: string) => void;
     onInfoClick: (rule: RuleItem) => void;
 }
 
-export default function RuleCard({ rule, onInfoClick }: Props) {
-    const { state, toggleRule } = useHardening();
+export default memo(function RuleCard({ rule, isSelected, onToggle, onInfoClick }: Props) {
     const { t } = useLocale();
-    const isSelected = state.selectedRuleIds.has(rule.rule_id);
 
     return (
         <div
             className={`rule-card${isSelected ? " rule-card--selected" : ""}`}
-            onClick={() => toggleRule(rule.rule_id)}
+            onClick={() => onToggle(rule.rule_id)}
         >
             {/* Checkbox */}
             <label className="rule-card__checkbox" onClick={(e) => e.stopPropagation()}>
                 <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={() => toggleRule(rule.rule_id)}
+                    onChange={() => onToggle(rule.rule_id)}
                 />
                 <span className="rule-card__checkbox-visual" />
             </label>
@@ -88,4 +88,4 @@ export default function RuleCard({ rule, onInfoClick }: Props) {
             </button>
         </div>
     );
-}
+});

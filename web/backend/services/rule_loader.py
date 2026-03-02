@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 from typing import Dict, List
 
@@ -10,6 +11,10 @@ from models import RuleItem
 
 # Resolve project root (three levels up from web/backend/services/)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+
+# ── In-memory cache ───────────────────────────────────────────────────────────
+_CACHE_TTL = 60.0  # seconds
+_cache: dict[str, tuple[dict, float]] = {}  # os_name → (grouped_result, timestamp)
 
 
 # ── Ubuntu loader ────────────────────────────────────────────────────────────
@@ -106,10 +111,17 @@ def load_rules(os_name: str) -> List[RuleItem]:
 
 
 def load_rules_grouped(os_name: str) -> Dict[str, List[RuleItem]]:
-    """Return rules grouped by section."""
+    """Return rules grouped by section. Results are cached for _CACHE_TTL seconds."""
+    now = time.monotonic()
+    cached = _cache.get(os_name)
+    if cached is not None and (now - cached[1]) < _CACHE_TTL:
+        return cached[0]
+
     rules = load_rules(os_name)
     grouped: Dict[str, List[RuleItem]] = {}
     for rule in rules:
         key = rule.section or "Other"
         grouped.setdefault(key, []).append(rule)
+
+    _cache[os_name] = (grouped, now)
     return grouped

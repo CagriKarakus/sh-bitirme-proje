@@ -1,10 +1,9 @@
 """Rules router – rule listing, conflict resolution, and config generation."""
 
-from __future__ import annotations
-
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from fastapi.responses import FileResponse
 
+from limiter import limiter
 from models import (
     ArtifactInfoResponse,
     GenerateRequest,
@@ -32,7 +31,8 @@ async def get_rules(os_name: str):
 
 
 @router.post("/resolve", response_model=ResolveResult)
-async def resolve_rules(req: ResolveRequest):
+@limiter.limit("30/minute")
+async def resolve_rules(request: Request, req: ResolveRequest):
     """Validate selected rules for dependency / conflict issues."""
     if req.os not in ("ubuntu", "windows"):
         raise HTTPException(status_code=400, detail=f"Desteklenmeyen OS: {req.os}")
@@ -44,7 +44,8 @@ async def resolve_rules(req: ResolveRequest):
 
 
 @router.post("/generate", response_model=GenerateResponse)
-async def generate_config(req: GenerateRequest):
+@limiter.limit("10/minute")
+async def generate_config(request: Request, req: GenerateRequest):
     """Generate configuration artifact for the selected rules."""
     if req.os not in ("ubuntu", "windows"):
         raise HTTPException(status_code=400, detail=f"Desteklenmeyen OS: {req.os}")
@@ -52,7 +53,7 @@ async def generate_config(req: GenerateRequest):
     if not req.rule_ids:
         raise HTTPException(status_code=400, detail="En az bir kural seçilmelidir.")
 
-    result = generate(req.os, req.rule_ids, req.format, permanent=req.permanent)
+    result = await generate(req.os, req.rule_ids, req.format, permanent=req.permanent)
 
     if not result.get("success"):
         return GenerateResponse(

@@ -6,6 +6,7 @@ import {
     useReducer,
     useCallback,
     useEffect,
+    useRef,
     type ReactNode,
 } from "react";
 import type { RuleItem, ResolveResult, GenerateResponse } from "../types";
@@ -187,6 +188,8 @@ const HardeningContext = createContext<HardeningContextValue | null>(null);
 
 export function HardeningProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(reducer, initialState);
+    const resolveControllerRef = useRef<AbortController | null>(null);
+    const generateControllerRef = useRef<AbortController | null>(null);
 
     // Load rules whenever the OS changes
     useEffect(() => {
@@ -225,14 +228,20 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
 
     const runResolve = useCallback(async () => {
         if (state.selectedRuleIds.size === 0) return;
+        resolveControllerRef.current?.abort();
+        const controller = new AbortController();
+        resolveControllerRef.current = controller;
         dispatch({ type: "SET_RESOLVING", resolving: true });
         try {
             const result = await resolveRules(
                 state.selectedOS,
-                Array.from(state.selectedRuleIds)
+                Array.from(state.selectedRuleIds),
+                controller.signal
             );
+            if (controller.signal.aborted) return;
             dispatch({ type: "SET_VALIDATION", result });
         } catch (err: unknown) {
+            if (controller.signal.aborted) return;
             // TODO(i18n): error messages in async callbacks, not reactive to locale
             const msg = err instanceof Error ? err.message : "Doğrulama hatası";
             dispatch({ type: "SET_ERROR", error: msg });
@@ -241,16 +250,22 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
 
     const runGenerate = useCallback(async (permanent: boolean = false) => {
         if (state.selectedRuleIds.size === 0) return;
+        generateControllerRef.current?.abort();
+        const controller = new AbortController();
+        generateControllerRef.current = controller;
         dispatch({ type: "SET_GENERATING", generating: true });
         try {
             const result = await generateConfig(
                 state.selectedOS,
                 Array.from(state.selectedRuleIds),
-                state.selectedFormat,
-                permanent
+                state.selectedFormat as "ansible" | "bash" | "gpo" | "powershell",
+                permanent,
+                controller.signal
             );
+            if (controller.signal.aborted) return;
             dispatch({ type: "SET_GENERATE_RESULT", result });
         } catch (err: unknown) {
+            if (controller.signal.aborted) return;
             // TODO(i18n): error messages in async callbacks, not reactive to locale
             const msg = err instanceof Error ? err.message : "Oluşturma hatası";
             dispatch({ type: "SET_ERROR", error: msg });

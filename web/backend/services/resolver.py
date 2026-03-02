@@ -5,76 +5,44 @@ Checks:
 2. Conflicts             – rule A conflicts_with B and both selected → error
 
 Dependency data sources:
-- Ubuntu:  statically defined dependency map (extracted from docs/kural_bagimliliklari.py)
+- Ubuntu:  depends_on / conflicts_with fields in platforms/linux/ubuntu/desktop/rules/index.json
 - Windows: (future) depends_on / conflicts_with fields in rule JSONs
 """
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Dict, List, Set
 
 from models import Error, ResolveResult, Warning
 
+# Project root (same resolution as other services)
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
-# ── Static dependency data ───────────────────────────────────────────────────
-# Extracted from docs/kural_bagimliliklari.py
-# Format: { rule_id: { "depends_on": [rule_ids], "conflicts_with": [rule_ids] } }
-
-UBUNTU_DEPENDENCIES: Dict[str, Dict[str, List[str]]] = {
-    # Firewall – UFW chain
-    "4.2.1": {"depends_on": ["4.1.1"], "conflicts_with": []},
-    "4.2.2": {"depends_on": ["4.2.1"], "conflicts_with": []},
-    "4.2.3": {"depends_on": ["4.2.1"], "conflicts_with": []},
-    "4.2.4": {"depends_on": ["4.2.3"], "conflicts_with": []},
-    "4.2.5": {"depends_on": ["4.2.4"], "conflicts_with": []},
-    "4.2.6": {"depends_on": ["4.2.5"], "conflicts_with": []},
-    "4.2.7": {"depends_on": ["4.2.6"], "conflicts_with": []},
-
-    # Firewall – nftables chain
-    "4.3.2": {"depends_on": ["4.1.1"], "conflicts_with": []},
-    "4.3.3": {"depends_on": ["4.3.2"], "conflicts_with": []},
-    "4.3.4": {"depends_on": ["4.3.3"], "conflicts_with": []},
-    "4.3.5": {"depends_on": ["4.3.4"], "conflicts_with": []},
-    "4.3.6": {"depends_on": ["4.3.5"], "conflicts_with": []},
-    "4.3.7": {"depends_on": ["4.3.2"], "conflicts_with": []},
-    "4.3.8": {"depends_on": ["4.3.7"], "conflicts_with": []},
-    "4.3.9": {"depends_on": ["4.3.8"], "conflicts_with": []},
-
-    # Firewall – iptables chain
-    "4.4.2.1": {"depends_on": ["4.1.1"], "conflicts_with": []},
-    "4.4.2.2": {"depends_on": ["4.4.2.1"], "conflicts_with": []},
-    "4.4.2.3": {"depends_on": ["4.4.2.2"], "conflicts_with": []},
-    "4.4.2.4": {"depends_on": ["4.4.2.3"], "conflicts_with": []},
-
-    # Mutual exclusion – firewall groups
-    # If UFW rules selected, they conflict with nftables and iptables
-    "4.2.1_group": {"depends_on": [], "conflicts_with": ["4.3.2", "4.4.2.1"]},
-    "4.3.2_group": {"depends_on": [], "conflicts_with": ["4.2.1", "4.4.2.1"]},
-    "4.4.2.1_group": {"depends_on": [], "conflicts_with": ["4.2.1", "4.3.2"]},
-
-    # GDM dependencies
-    "1.7.2": {"depends_on": [], "conflicts_with": []},
-    "1.7.3": {"depends_on": ["1.7.1"], "conflicts_with": []},
-    "1.7.4": {"depends_on": ["1.7.1"], "conflicts_with": []},
-    "1.7.5": {"depends_on": ["1.7.4"], "conflicts_with": []},
-    "1.7.6": {"depends_on": ["1.7.1"], "conflicts_with": []},
-
-    # PAM chain
-    "5.3.2.1": {"depends_on": ["5.3.1.1"], "conflicts_with": []},
-    "5.3.2.2": {"depends_on": ["5.3.1.1"], "conflicts_with": []},
-    "5.3.2.3": {"depends_on": ["5.3.1.1"], "conflicts_with": []},
-    "5.3.2.4": {"depends_on": ["5.3.1.1"], "conflicts_with": []},
-    "5.3.3.1.1": {"depends_on": ["5.3.2.2"], "conflicts_with": []},
-    "5.3.3.1.2": {"depends_on": ["5.3.2.2"], "conflicts_with": []},
-    "5.3.3.1.3": {"depends_on": ["5.3.2.2"], "conflicts_with": []},
-}
-
-# Firewall mutual-exclusion groups (if any rule from group A and group B are
-# both selected, that is a conflict).
+# Firewall mutual-exclusion groups (structural constants, not per-rule metadata).
 _UFW_RULES = {"4.2.1", "4.2.2", "4.2.3", "4.2.4", "4.2.5", "4.2.6", "4.2.7"}
 _NFT_RULES = {"4.3.2", "4.3.3", "4.3.4", "4.3.5", "4.3.6", "4.3.7", "4.3.8", "4.3.9"}
 _IPT_RULES = {"4.4.2.1", "4.4.2.2", "4.4.2.3", "4.4.2.4"}
 _FIREWALL_GROUPS = [_UFW_RULES, _NFT_RULES, _IPT_RULES]
+
+
+def _load_ubuntu_deps() -> Dict[str, Dict[str, List[str]]]:
+    """Load per-rule dependency metadata from index.json."""
+    index_path = _PROJECT_ROOT / "platforms" / "linux" / "ubuntu" / "desktop" / "rules" / "index.json"
+    try:
+        with open(index_path, "r", encoding="utf-8") as f:
+            entries = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return {
+        e["id"]: {
+            "depends_on": e.get("depends_on", []),
+            "conflicts_with": e.get("conflicts_with", []),
+        }
+        for e in entries
+        if e.get("depends_on") or e.get("conflicts_with")
+    }
 
 
 # ── Resolver logic ───────────────────────────────────────────────────────────
@@ -115,7 +83,7 @@ def resolve(os_name: str, selected_ids: List[str]) -> ResolveResult:
     errors: List[Error] = []
 
     if os_name == "ubuntu":
-        deps = UBUNTU_DEPENDENCIES
+        deps = _load_ubuntu_deps()
 
         # Check missing dependencies
         for rule_id in selected_ids:

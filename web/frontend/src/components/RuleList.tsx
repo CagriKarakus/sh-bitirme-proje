@@ -1,17 +1,87 @@
 /* RuleList – groups rules by section with accordion expand/collapse */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useHardening } from "../context/HardeningContext";
 import { useLocale } from "../context/LocaleContext";
 import RuleCard from "./RuleCard";
 import type { RuleItem } from "../types";
+
+const VIRTUALIZE_THRESHOLD = 30;
+
+interface SectionContentProps {
+    rules: RuleItem[];
+    selectedRuleIds: Set<string>;
+    toggleRule: (id: string) => void;
+    onInfoClick: (rule: RuleItem) => void;
+}
+
+function SectionContent({ rules, selectedRuleIds, toggleRule, onInfoClick }: SectionContentProps) {
+    const parentRef = useRef<HTMLDivElement>(null);
+    const shouldVirtualize = rules.length > VIRTUALIZE_THRESHOLD;
+
+    const virtualizer = useVirtualizer({
+        count: rules.length,
+        getScrollElement: () => (shouldVirtualize ? parentRef.current : null),
+        estimateSize: () => 72,
+        overscan: 5,
+        enabled: shouldVirtualize,
+    });
+
+    if (!shouldVirtualize) {
+        return (
+            <div className="section-rules">
+                {rules.map((rule) => (
+                    <RuleCard
+                        key={rule.rule_id}
+                        rule={rule}
+                        isSelected={selectedRuleIds.has(rule.rule_id)}
+                        onToggle={toggleRule}
+                        onInfoClick={onInfoClick}
+                    />
+                ))}
+            </div>
+        );
+    }
+
+    const items = virtualizer.getVirtualItems();
+    return (
+        <div
+            ref={parentRef}
+            className="section-rules"
+            style={{ maxHeight: "480px", overflowY: "auto" }}
+        >
+            <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+                {items.map((item) => (
+                    <div
+                        key={item.key}
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            transform: `translateY(${item.start}px)`,
+                        }}
+                    >
+                        <RuleCard
+                            rule={rules[item.index]}
+                            isSelected={selectedRuleIds.has(rules[item.index].rule_id)}
+                            onToggle={toggleRule}
+                            onInfoClick={onInfoClick}
+                        />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
 
 interface Props {
     onInfoClick: (rule: RuleItem) => void;
 }
 
 export default function RuleList({ onInfoClick }: Props) {
-    const { state, selectSection } = useHardening();
+    const { state, selectSection, toggleRule } = useHardening();
     const { t } = useLocale();
     const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
@@ -119,11 +189,12 @@ export default function RuleList({ onInfoClick }: Props) {
                         </div>
 
                         {isOpen && (
-                            <div className="section-rules">
-                                {rules.map((rule) => (
-                                    <RuleCard key={rule.rule_id} rule={rule} onInfoClick={onInfoClick} />
-                                ))}
-                            </div>
+                            <SectionContent
+                                rules={rules}
+                                selectedRuleIds={state.selectedRuleIds}
+                                toggleRule={toggleRule}
+                                onInfoClick={onInfoClick}
+                            />
                         )}
                     </div>
                 );

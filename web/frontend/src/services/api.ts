@@ -9,7 +9,8 @@ import type {
     GenerateResponse,
 } from "../types";
 
-const API_BASE = "http://localhost:8001/api";
+const API_HOST = import.meta.env.VITE_API_HOST ?? "http://localhost:8000";
+const API_BASE = `${API_HOST}/api`;
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
     const res = await fetch(url, {
@@ -29,25 +30,29 @@ export async function fetchRules(os: string): Promise<RulesResponse> {
 
 export async function resolveRules(
     os: string,
-    ruleIds: string[]
+    ruleIds: string[],
+    signal?: AbortSignal
 ): Promise<ResolveResult> {
     const body: ResolveRequest = { os, rule_ids: ruleIds };
     return request<ResolveResult>(`${API_BASE}/resolve`, {
         method: "POST",
         body: JSON.stringify(body),
+        signal,
     });
 }
 
 export async function generateConfig(
     os: string,
     ruleIds: string[],
-    format: string = "ansible",
-    permanent: boolean = false
+    format: "ansible" | "bash" | "gpo" | "powershell" = "ansible",
+    permanent: boolean = false,
+    signal?: AbortSignal
 ): Promise<GenerateResponse> {
     const body: GenerateRequest = { os, rule_ids: ruleIds, format, permanent };
     return request<GenerateResponse>(`${API_BASE}/generate`, {
         method: "POST",
         body: JSON.stringify(body),
+        signal,
     });
 }
 
@@ -60,7 +65,7 @@ export async function lookupArtifact(artifactId: string): Promise<ArtifactInfoRe
  * Opens the URL in a new tab / triggers browser download.
  */
 export function downloadArtifact(downloadUrl: string): void {
-    const fullUrl = `${API_BASE.replace("/api", "")}${downloadUrl}`;
+    const fullUrl = `${API_HOST}${downloadUrl}`;
     const a = document.createElement("a");
     a.href = fullUrl;
     a.download = "";

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -57,7 +59,7 @@ class ResolveResult(BaseModel):
 class GenerateRequest(BaseModel):
     os: str
     rule_ids: list[str]
-    format: str = "ansible"  # "ansible" | "bash" | "gpo" | "powershell"
+    format: Literal["ansible", "bash", "gpo", "powershell"] = "ansible"
     permanent: bool = False
 
 

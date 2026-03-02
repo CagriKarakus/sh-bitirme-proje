@@ -2,7 +2,10 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
+from limiter import limiter
 from routers.rules import router as rules_router
 
 app = FastAPI(
@@ -10,6 +13,9 @@ app = FastAPI(
     description="Backend for the Security Hardening Configuration Platform",
     version="1.0.0",
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS – allow the Vite dev server
 app.add_middleware(
