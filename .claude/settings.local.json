@@ -1,12 +1,4 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(npm run:*)",
-      "Bash(python3:*)",
-      "Bash(python:*)",
-      "Bash(grep:*)"
-    ]
-  },
   "enabledMcpjsonServers": [
     "github"
   ],
