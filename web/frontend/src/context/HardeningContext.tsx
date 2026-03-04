@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { RuleItem, ResolveResult, GenerateResponse } from "../types";
 import { fetchRules, resolveRules, generateConfig } from "../services/api";
+import { useToast } from "./ToastContext";
 
 // ── State & Actions ─────────────────────────────────────────────────────────
 
@@ -31,6 +32,7 @@ interface HardeningState {
     searchQuery: string;
     levelFilter: number | null;     // 1 or 2 or null = all
     automatedFilter: boolean | null; // true/false/null = all
+    collapseAllKey: number;
 }
 
 type Action =
@@ -51,7 +53,9 @@ type Action =
     | { type: "SET_ERROR"; error: string | null }
     | { type: "SET_SEARCH"; query: string }
     | { type: "SET_LEVEL_FILTER"; level: number | null }
-    | { type: "SET_AUTOMATED_FILTER"; automated: boolean | null };
+    | { type: "SET_AUTOMATED_FILTER"; automated: boolean | null }
+    | { type: "COLLAPSE_VIEW" }
+    | { type: "RESET_ALL" };
 
 const initialState: HardeningState = {
     selectedOS: "ubuntu",
@@ -68,6 +72,7 @@ const initialState: HardeningState = {
     searchQuery: "",
     levelFilter: null,
     automatedFilter: null,
+    collapseAllKey: 0,
 };
 
 function reducer(state: HardeningState, action: Action): HardeningState {
@@ -160,6 +165,28 @@ function reducer(state: HardeningState, action: Action): HardeningState {
         case "SET_AUTOMATED_FILTER":
             return { ...state, automatedFilter: action.automated };
 
+        case "COLLAPSE_VIEW":
+            return {
+                ...state,
+                searchQuery: "",
+                levelFilter: null,
+                automatedFilter: null,
+                collapseAllKey: state.collapseAllKey + 1,
+            };
+
+        case "RESET_ALL":
+            return {
+                ...state,
+                selectedRuleIds: new Set(),
+                searchQuery: "",
+                levelFilter: null,
+                automatedFilter: null,
+                validationResult: null,
+                generateResult: null,
+                error: null,
+                collapseAllKey: state.collapseAllKey + 1,
+            };
+
         default:
             return state;
     }
@@ -180,6 +207,8 @@ interface HardeningContextValue {
     setSearch: (query: string) => void;
     setLevelFilter: (level: number | null) => void;
     setAutomatedFilter: (automated: boolean | null) => void;
+    collapseView: () => void;
+    resetAll: () => void;
 }
 
 const HardeningContext = createContext<HardeningContextValue | null>(null);
@@ -190,6 +219,7 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(reducer, initialState);
     const resolveControllerRef = useRef<AbortController | null>(null);
     const generateControllerRef = useRef<AbortController | null>(null);
+    const { addToast } = useToast();
 
     // Load rules whenever the OS changes
     useEffect(() => {
@@ -207,13 +237,14 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
                 dispatch({ type: "SET_RULES", rules: allRules, sections: data.sections });
             } catch (err: unknown) {
                 if (cancelled) return;
-                // TODO(i18n): error messages in async callbacks, not reactive to locale
                 const msg = err instanceof Error ? err.message : "Kurallar yüklenemedi";
                 dispatch({ type: "SET_ERROR", error: msg });
+                addToast(msg, "error");
             }
         }
         load();
         return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.selectedOS]);
 
     const setOS = useCallback((os: SelectedOS) => dispatch({ type: "SET_OS", os }), []);
@@ -225,6 +256,8 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
     const setLevelFilter = useCallback((l: number | null) => dispatch({ type: "SET_LEVEL_FILTER", level: l }), []);
     const setFormat = useCallback((f: string) => dispatch({ type: "SET_FORMAT", format: f }), []);
     const setAutomatedFilter = useCallback((a: boolean | null) => dispatch({ type: "SET_AUTOMATED_FILTER", automated: a }), []);
+    const collapseView = useCallback(() => dispatch({ type: "COLLAPSE_VIEW" }), []);
+    const resetAll = useCallback(() => dispatch({ type: "RESET_ALL" }), []);
 
     const runResolve = useCallback(async () => {
         if (state.selectedRuleIds.size === 0) return;
@@ -242,11 +275,11 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
             dispatch({ type: "SET_VALIDATION", result });
         } catch (err: unknown) {
             if (controller.signal.aborted) return;
-            // TODO(i18n): error messages in async callbacks, not reactive to locale
             const msg = err instanceof Error ? err.message : "Doğrulama hatası";
             dispatch({ type: "SET_ERROR", error: msg });
+            addToast(msg, "error");
         }
-    }, [state.selectedOS, state.selectedRuleIds]);
+    }, [state.selectedOS, state.selectedRuleIds, addToast]);
 
     const runGenerate = useCallback(async (permanent: boolean = false) => {
         if (state.selectedRuleIds.size === 0) return;
@@ -266,11 +299,11 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
             dispatch({ type: "SET_GENERATE_RESULT", result });
         } catch (err: unknown) {
             if (controller.signal.aborted) return;
-            // TODO(i18n): error messages in async callbacks, not reactive to locale
             const msg = err instanceof Error ? err.message : "Oluşturma hatası";
             dispatch({ type: "SET_ERROR", error: msg });
+            addToast(msg, "error");
         }
-    }, [state.selectedOS, state.selectedRuleIds, state.selectedFormat]);
+    }, [state.selectedOS, state.selectedRuleIds, state.selectedFormat, addToast]);
 
     return (
         <HardeningContext.Provider
@@ -287,6 +320,8 @@ export function HardeningProvider({ children }: { children: ReactNode }) {
                 setSearch,
                 setLevelFilter,
                 setAutomatedFilter,
+                collapseView,
+                resetAll,
             }}
         >
             {children}

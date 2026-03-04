@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useHardening } from "../context/HardeningContext";
 import { useLocale } from "../context/LocaleContext";
+import { useToast } from "../context/ToastContext";
 import { downloadArtifact } from "../services/api";
 
 export default function ValidationPanel() {
     const { state, runResolve, runGenerate, setFormat } = useHardening();
     const { t } = useLocale();
+    const { addToast } = useToast();
     const [permanent, setPermanent] = useState(false);
     const {
         selectedRuleIds,
@@ -211,7 +213,10 @@ export default function ValidationPanel() {
                                     <code className="vp-share-box__code">{generateResult.artifact_id}</code>
                                     <button
                                         className="vp-share-box__copy"
-                                        onClick={() => navigator.clipboard.writeText(generateResult.artifact_id!)}
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(generateResult.artifact_id!);
+                                            addToast(t("toast.copy_success"), "success");
+                                        }}
                                     >
                                         {t("validation.shareable_copy")}
                                     </button>

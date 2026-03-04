@@ -83,7 +83,9 @@ interface Props {
 export default function RuleList({ onInfoClick }: Props) {
     const { state, selectSection, toggleRule } = useHardening();
     const { t } = useLocale();
-    const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+    // Track open sections keyed to collapseAllKey so collapse resets without an effect
+    const [accordionState, setAccordionState] = useState<{ key: number; open: Set<string> }>({ key: 0, open: new Set() });
+    const openSections: Set<string> = accordionState.key === state.collapseAllKey ? accordionState.open : new Set();
 
     // Apply filters
     const filteredSections = useMemo(() => {
@@ -113,11 +115,13 @@ export default function RuleList({ onInfoClick }: Props) {
     }, [state.sections, state.searchQuery, state.levelFilter, state.automatedFilter]);
 
     const toggleSection = (section: string) => {
-        setOpenSections((prev) => {
-            const next = new Set(prev);
+        const currentKey = state.collapseAllKey;
+        setAccordionState((prev) => {
+            const base = prev.key === currentKey ? prev.open : new Set<string>();
+            const next = new Set(base);
             if (next.has(section)) next.delete(section);
             else next.add(section);
-            return next;
+            return { key: currentKey, open: next };
         });
     };
 

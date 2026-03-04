@@ -11,7 +11,9 @@
     "calculate": "Calculate ({count})",
     "calculating": "Calculating...",
     "select_all": "Select All",
-    "clear_selection": "Clear Selection"
+    "clear_selection": "Clear Selection",
+    "collapse_view": "Collapse Sections",
+    "reset_all": "Reset Everything"
   },
   "filter": {
     "search_title": "Search",
@@ -97,6 +99,34 @@
   },
   "lang_toggle": {
     "label": "Language"
+  },
+  "tabs": {
+    "rules": "Rules",
+    "dashboard": "Dashboard"
+  },
+  "dashboard": {
+    "title": "Compliance Overview",
+    "overall_score": "Coverage Score",
+    "no_selection": "Select rules from the left panel to view the dashboard.",
+    "section_coverage": "Section Coverage",
+    "level_breakdown": "CIS Level Breakdown",
+    "severity_dist": "Severity Distribution",
+    "selected_of_total": "{selected}/{total}",
+    "level_1": "Level 1",
+    "level_2": "Level 2",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "automated_vs_manual": "Automated Rules"
+  },
+  "toast": {
+    "copy_success": "Copied!",
+    "generate_success": "Artifact generated successfully.",
+    "error_generic": "An error occurred."
+  },
+  "theme": {
+    "toggle_dark": "Switch to dark theme",
+    "toggle_light": "Switch to light theme"
   },
   "artifact_search": {
     "title": "Find Artifact",

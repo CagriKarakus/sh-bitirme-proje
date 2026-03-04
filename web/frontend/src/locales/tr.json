@@ -11,7 +11,9 @@
     "calculate": "Hesapla ({count})",
     "calculating": "Hesaplanıyor...",
     "select_all": "Tümünü Seç",
-    "clear_selection": "Seçimi Temizle"
+    "clear_selection": "Seçimi Temizle",
+    "collapse_view": "Bölümleri Daralt",
+    "reset_all": "Her Şeyi Sıfırla"
   },
   "filter": {
     "search_title": "Ara",
@@ -97,6 +99,34 @@
   },
   "lang_toggle": {
     "label": "Dil"
+  },
+  "tabs": {
+    "rules": "Kurallar",
+    "dashboard": "Dashboard"
+  },
+  "dashboard": {
+    "title": "Uyumluluk Genel Bakış",
+    "overall_score": "Kapsam Skoru",
+    "no_selection": "Dashboard'u görmek için sol panelden kural seçin.",
+    "section_coverage": "Bölüm Kapsamı",
+    "level_breakdown": "CIS Seviye Dağılımı",
+    "severity_dist": "Önem Seviyesi Dağılımı",
+    "selected_of_total": "{selected}/{total}",
+    "level_1": "Level 1",
+    "level_2": "Level 2",
+    "high": "Yüksek",
+    "medium": "Orta",
+    "low": "Düşük",
+    "automated_vs_manual": "Otomatik Kural"
+  },
+  "toast": {
+    "copy_success": "Kopyalandı!",
+    "generate_success": "Artifact başarıyla oluşturuldu.",
+    "error_generic": "Bir hata oluştu."
+  },
+  "theme": {
+    "toggle_dark": "Koyu temaya geç",
+    "toggle_light": "Açık temaya geç"
   },
   "artifact_search": {
     "title": "Artifact Ara",

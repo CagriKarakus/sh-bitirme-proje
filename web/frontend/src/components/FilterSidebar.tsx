@@ -4,7 +4,11 @@ import { useHardening } from "../context/HardeningContext";
 import { useLocale } from "../context/LocaleContext";
 import LanguageToggle from "./LanguageToggle";
 
-export default function FilterSidebar() {
+interface Props {
+    mobileOpen?: boolean;
+}
+
+export default function FilterSidebar({ mobileOpen }: Props) {
     const {
         state,
         setSearch,
@@ -12,6 +16,7 @@ export default function FilterSidebar() {
         setAutomatedFilter,
         selectAll,
         clearAll,
+        resetAll,
     } = useHardening();
     const { t } = useLocale();
 
@@ -19,7 +24,7 @@ export default function FilterSidebar() {
     const totalCount = state.rules.length;
 
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar${mobileOpen ? " sidebar--mobile-open" : ""}`}>
             {/* Search */}
             <div>
                 <div className="sidebar__section-title">{t("filter.search_title")}</div>
@@ -98,6 +103,9 @@ export default function FilterSidebar() {
                 </button>
                 <button className="btn btn--secondary" onClick={clearAll} style={{ fontSize: "0.8rem", padding: "8px" }}>
                     {t("actions.clear_selection")}
+                </button>
+                <button className="btn btn--danger" onClick={resetAll} style={{ fontSize: "0.8rem", padding: "8px" }}>
+                    {t("actions.reset_all")}
                 </button>
             </div>
 

@@ -1,0 +1,95 @@
+---
+# CIS Ubuntu Desktop Hardening Playbook
+# Generated for 4 rules
+# WARNING: Review each task before applying to production systems.
+
+- name: CIS Ubuntu Desktop Hardening
+  hosts: all
+  become: true
+  tasks:
+
+    # ── 2.1.1: Section 2 Services ──
+    - name: "CIS 2.1.1 - 2.1.1"
+      ansible.builtin.shell: |
+        #!/bin/bash
+        # CIS Benchmark 2.1.1 - Ensure autofs services are not in use
+        # Remediation Script
+        
+        echo "Applying remediation for CIS 2.1.1 - Ensure autofs services are not in use..."
+        
+        # Stop autofs service if running
+        if systemctl is-active autofs.service 2>/dev/null | grep -q "^active"; then
+            echo "Stopping autofs.service..."
+            systemctl stop autofs.service
+        fi
+        
+        # Mask autofs service
+        echo "Masking autofs.service..."
+        systemctl mask autofs.service 2>/dev/null
+        
+        # Remove autofs package if installed
+        if dpkg-query -W -f='${db:Status-Status}' autofs 2>/dev/null | grep -q "installed"; then
+            echo "Removing autofs package..."
+            apt purge -y autofs
+        fi
+        
+        echo ""
+        echo "Remediation complete for CIS 2.1.1 - Ensure autofs services are not in use"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      tags: ["cis", "2.1.1"]
+
+    # ── 2.1.2: Section 2 Services ──
+    - name: "CIS 2.1.2 - 2.1.2"
+      ansible.builtin.shell: |
+        #!/bin/bash
+        # CIS Benchmark 2.1.2 - Ensure avahi daemon services are not in use
+        # Remediation Script
+        
+        echo "Applying remediation for CIS 2.1.2..."
+        
+        systemctl stop avahi-daemon.service 2>/dev/null
+        systemctl stop avahi-daemon.socket 2>/dev/null
+        systemctl mask avahi-daemon.service 2>/dev/null
+        systemctl mask avahi-daemon.socket 2>/dev/null
+        
+        if dpkg-query -W -f='${db:Status-Status}' avahi-daemon 2>/dev/null | grep -q "installed"; then
+            apt purge -y avahi-daemon
+        fi
+        
+        echo "Remediation complete for CIS 2.1.2"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      tags: ["cis", "2.1.2"]
+
+    # ── 2.1.9: Section 2 Services ──
+    - name: "CIS 2.1.9 - 2.1.9"
+      ansible.builtin.shell: |
+        #!/bin/bash
+        # CIS Benchmark 2.1.9 - Ensure network file system services are not in use
+        echo "Applying remediation for CIS 2.1.9..."
+        systemctl stop nfs-server.service 2>/dev/null
+        systemctl mask nfs-server.service 2>/dev/null
+        dpkg-query -W -f='${db:Status-Status}' nfs-kernel-server 2>/dev/null | grep -q "installed" && apt purge -y nfs-kernel-server
+        echo "Remediation complete for CIS 2.1.9"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      tags: ["cis", "2.1.9"]
+
+    # ── 2.1.8: Section 2 Services ──
+    - name: "CIS 2.1.8 - 2.1.8"
+      ansible.builtin.shell: |
+        #!/bin/bash
+        # CIS Benchmark 2.1.8 - Ensure message access agent services are not in use
+        echo "Applying remediation for CIS 2.1.8..."
+        systemctl stop dovecot.service 2>/dev/null
+        systemctl mask dovecot.service 2>/dev/null
+        apt purge -y dovecot-imapd dovecot-pop3d 2>/dev/null
+        echo "Remediation complete for CIS 2.1.8"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      tags: ["cis", "2.1.8"]

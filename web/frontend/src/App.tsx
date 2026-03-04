@@ -1,6 +1,8 @@
 /* Main App component – assembles the full dashboard layout */
 
 import { useState } from "react";
+import { ThemeProvider } from "./context/ThemeContext";
+import { ToastProvider } from "./context/ToastContext";
 import { HardeningProvider, useHardening } from "./context/HardeningContext";
 import { LocaleProvider, useLocale } from "./context/LocaleContext";
 import OsSelector from "./components/OsSelector";
@@ -10,22 +12,37 @@ import ValidationPanel from "./components/ValidationPanel";
 import ArtifactSearchPanel from "./components/ArtifactSearchPanel";
 import RuleDrawer from "./components/RuleDrawer";
 import RuleDetailPage from "./pages/RuleDetailPage";
+import ThemeToggle from "./components/ThemeToggle";
+import MobileMenuButton from "./components/MobileMenuButton";
+import ToastContainer from "./components/ToastContainer";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ComplianceDashboard from "./components/ComplianceDashboard";
 import type { RuleItem } from "./types";
 import "./index.css";
 
+type ViewMode = "rules" | "dashboard";
+
 function Dashboard() {
-  const { state, runResolve } = useHardening();
+  const { state, runResolve, collapseView } = useHardening();
   const { t } = useLocale();
   const selectedCount = state.selectedRuleIds.size;
 
   const [drawerRule, setDrawerRule] = useState<RuleItem | null>(null);
   const [detailRule, setDetailRule] = useState<RuleItem | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("rules");
 
   return (
     <>
       {/* Header */}
       <header className="app-header">
-        <div className="app-header__logo">
+        <MobileMenuButton isOpen={sidebarOpen} onToggle={() => setSidebarOpen((o) => !o)} />
+        <button
+          className="app-header__logo-btn"
+          onClick={collapseView}
+          title={t("actions.collapse_view")}
+          aria-label={t("actions.collapse_view")}
+        >
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
           </svg>
@@ -33,13 +50,19 @@ function Dashboard() {
             <div className="app-header__title">CIS Hardening Platform</div>
             <div className="app-header__subtitle">{t("app.subtitle")}</div>
           </div>
-        </div>
+        </button>
         <div className="app-header__spacer" />
+        <ThemeToggle />
         <OsSelector />
       </header>
 
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <FilterSidebar />
+      <FilterSidebar mobileOpen={sidebarOpen} />
 
       {/* Main content */}
       <main className="main-content">
@@ -84,14 +107,40 @@ function Dashboard() {
           </button>
         </div>
 
-        {/* Artifact search */}
-        <ArtifactSearchPanel />
+        {/* View tabs */}
+        <div className="view-tabs">
+          <button
+            className={`view-tab${viewMode === "rules" ? " view-tab--active" : ""}`}
+            onClick={() => setViewMode("rules")}
+          >
+            {t("tabs.rules")}
+          </button>
+          <button
+            className={`view-tab${viewMode === "dashboard" ? " view-tab--active" : ""}`}
+            onClick={() => setViewMode("dashboard")}
+          >
+            {t("tabs.dashboard")}
+          </button>
+        </div>
 
-        {/* Validation results */}
-        <ValidationPanel />
+        {viewMode === "dashboard" ? (
+          <ErrorBoundary fallbackLabel={t("tabs.dashboard")}>
+            <ComplianceDashboard />
+          </ErrorBoundary>
+        ) : (
+          <>
+            {/* Artifact search */}
+            <ArtifactSearchPanel />
 
-        {/* Rule list */}
-        <RuleList onInfoClick={setDrawerRule} />
+            {/* Validation results */}
+            <ValidationPanel />
+
+            {/* Rule list */}
+            <ErrorBoundary>
+              <RuleList onInfoClick={setDrawerRule} />
+            </ErrorBoundary>
+          </>
+        )}
       </main>
 
       {/* Rule info drawer */}
@@ -105,18 +154,25 @@ function Dashboard() {
       {detailRule && (
         <RuleDetailPage rule={detailRule} onClose={() => setDetailRule(null)} />
       )}
+
+      {/* Toast notifications */}
+      <ToastContainer />
     </>
   );
 }
 
 export default function App() {
   return (
-    <LocaleProvider>
-      <HardeningProvider>
-        <div className="app-layout">
-          <Dashboard />
-        </div>
-      </HardeningProvider>
-    </LocaleProvider>
+    <ThemeProvider>
+      <LocaleProvider>
+        <ToastProvider>
+          <HardeningProvider>
+            <div className="app-layout">
+              <Dashboard />
+            </div>
+          </HardeningProvider>
+        </ToastProvider>
+      </LocaleProvider>
+    </ThemeProvider>
   );
 }
